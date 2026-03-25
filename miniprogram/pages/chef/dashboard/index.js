@@ -47,5 +47,9 @@ Page({
 
   goOrderManage() {
     wx.navigateTo({ url: '/pages/chef/order-manage/index' })
+  },
+
+  goCategoryManage() {
+    wx.navigateTo({ url: '/pages/chef/category-manage/index' })
   }
 })

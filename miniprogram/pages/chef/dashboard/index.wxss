@@ -117,14 +117,16 @@
 
 .action-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 20rpx;
 }
 
 .action-item {
-  flex: 1;
+  flex: 0 0 calc(50% - 10rpx);
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 32rpx 16rpx;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -153,6 +155,10 @@
 
 .action-icon-wrap.order {
   background: #E8F0FF;
+}
+
+.action-icon-wrap.category {
+  background: #FFF3E0;
 }
 
 .action-icon {

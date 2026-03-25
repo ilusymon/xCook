@@ -1,12 +1,12 @@
-# xCook 情侣点餐微信小程序 — 技术设计文档
+# 星厨房 情侣点餐微信小程序 — 技术设计文档
 
 ## 1. 项目概述
 
-xCook 是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单制作。使用虚拟「星星币」作为支付方式，不接入真实支付。
+星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单制作。使用虚拟「星星币」作为支付方式，不接入真实支付。
 
 ### 1.1 核心目标
 - 让情侣间的做饭点餐变得有仪式感和趣味性
-- 厨师可以完整管理菜品的食材、步骤、视频
+- 厨师可以完整管理菜品分类、菜品的食材、步骤、视频
 - 点菜人可以方便地浏览、选择口味偏好、追踪订单
 
 ---
@@ -59,10 +59,11 @@ xCook/
 │   │   ├── star-coin-badge/     # 星星币余额徽章
 │   │   ├── order-status-tag/    # 订单状态标签
 │   │   ├── step-card/           # 制作步骤卡片
-│   │   └── material-list/       # 食材清单
+│   │   ├── material-list/       # 食材清单
+│   │   └── home-btn/            # 首页导航按钮
 │   │
 │   └── pages/
-│       ├── index/               # 首页（角色选择 + 情侣配对）
+│       ├── index/               # 首页（角色选择）
 │       │
 │       ├── order/               # ── 点菜端 ──
 │       │   ├── menu/            # 菜单浏览（左分类 + 右列表）
@@ -74,13 +75,14 @@ xCook/
 │       │
 │       └── chef/                # ── 厨师端 ──
 │           ├── dashboard/       # 厨房首页（统计 + 快捷入口）
+│           ├── category-manage/ # 分类管理（增删改排序）
 │           ├── dish-manage/     # 菜品管理列表
 │           ├── dish-edit/       # 菜品编辑（选项组/食材/步骤/视频）
 │           ├── cook-view/       # 沉浸式烹饪指引
 │           └── order-manage/    # 订单管理（接单/制作/完成）
 │
 └── cloudfunctions/
-    ├── getUserInfo/             # 获取/创建用户 + 配对
+    ├── getUserInfo/             # 获取/创建用户
     ├── getMenu/                 # 获取菜单（分类+菜品）
     ├── getDishDetail/           # 获取菜品详情
     ├── saveDish/                # 新建/更新菜品
@@ -89,7 +91,8 @@ xCook/
     ├── getOrders/               # 查询订单列表/详情
     ├── updateOrderStatus/       # 更新订单状态
     ├── adjustStarCoins/         # 调整星星币余额
-    └── initCategories/          # 初始化默认分类
+    ├── initCategories/          # 初始化默认分类
+    └── saveCategory/            # 新建/更新/删除分类
 ```
 
 ---
@@ -107,30 +110,21 @@ xCook/
 | role | string | `orderer` / `chef` / `both` |
 | starCoins | number | 星星币余额（初始赠送 100） |
 | coinLog | array | 星星币变动记录 |
-| coupleId | string | 关联 couple 集合的 _id |
-| coupleCode | string | 配对码（openid 后6位大写） |
 | createdAt | date | 注册时间 |
 
-### 4.2 couple 集合
+### 4.2 categories 集合
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | _id | string | 自动生成 |
-| user1 | string | openid |
-| user2 | string | openid |
-| createdAt | date | 配对时间 |
-
-### 4.3 categories 集合
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| _id | string | 自动生成 |
-| name | string | 分类名（荤菜/素菜/汤品/主食/甜品/饮品） |
+| name | string | 分类名（可自定义，默认：荤菜/素菜/汤品/主食/甜品/饮品） |
 | icon | string | 图标标识 |
 | sortOrder | number | 排序序号 |
 | isActive | boolean | 是否启用 |
+| createdAt | date | 创建时间 |
+| updatedAt | date | 更新时间 |
 
-### 4.4 dishes 集合
+### 4.3 dishes 集合
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -199,7 +193,7 @@ xCook/
 ]
 ```
 
-### 4.5 orders 集合
+### 4.4 orders 集合
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -229,7 +223,6 @@ cancelled  cancelled
 
 #### 首页 (index)
 - 角色选择入口：「我要点菜」/「我要做菜」
-- 情侣配对：输入配对码或展示自己的配对码
 - 星星币余额显示
 
 #### 菜单页 (order/menu)
@@ -270,7 +263,14 @@ cancelled  cancelled
 - 问候区域
 - 新订单提醒横幅
 - 统计卡片（待处理/今日订单/菜品总数）
-- 快捷操作：管理菜品、新增菜品、订单管理
+- 快捷操作：管理菜品、新增菜品、订单管理、分类管理
+
+#### 分类管理 (chef/category-manage)
+- 分类列表，展示图标、名称、启用状态
+- 内联编辑分类名称和图标（10种图标可选）
+- 上移/下移调整分类排序
+- 启用/停用开关
+- 添加新分类、删除分类（有菜品时阻止删除）
 
 #### 菜品管理 (chef/dish-manage)
 - 按分类分组展示菜品
@@ -345,7 +345,6 @@ cancelled  cancelled
 ### 7.1 getUserInfo
 - 获取/自动创建用户记录
 - 新用户赠送 100 星星币
-- 支持配对操作（验证配对码、创建 couple 记录）
 
 ### 7.2 getMenu
 - 返回所有启用分类 + 按分类分组的可用菜品
@@ -381,6 +380,11 @@ cancelled  cancelled
 
 ### 7.10 initCategories
 - 初始化默认 6 个菜品分类（幂等操作）
+
+### 7.11 saveCategory
+- 有 `_id` 时更新分类，无 `_id` 时新建（自动排到最后）
+- `action: 'delete'` 时删除分类（需先检查是否有关联菜品）
+- 自动维护 `createdAt` / `updatedAt` 时间戳
 
 ---
 

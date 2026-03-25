@@ -1,0 +1,80 @@
+<view class="category-page">
+  <!-- 顶部栏 -->
+  <view class="top-bar">
+    <home-btn />
+    <text class="page-title">分类管理</text>
+  </view>
+
+  <!-- 分类列表 -->
+  <view class="category-list">
+    <view
+      class="category-item {{item._id === editingId ? 'editing' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="_id"
+    >
+      <!-- 查看态 -->
+      <view class="item-row" wx:if="{{item._id !== editingId}}">
+        <text class="item-emoji">{{item.emoji}}</text>
+        <text class="item-name {{!item.isActive ? 'disabled' : ''}}">{{item.name}}</text>
+        <view class="item-actions">
+          <view class="sort-btns">
+            <text class="sort-btn {{index === 0 ? 'sort-disabled' : ''}}" bindtap="moveUp" data-index="{{index}}">↑</text>
+            <text class="sort-btn {{index === categories.length - 1 ? 'sort-disabled' : ''}}" bindtap="moveDown" data-index="{{index}}">↓</text>
+          </view>
+          <switch
+            class="active-switch"
+            checked="{{item.isActive}}"
+            color="#FF6B81"
+            bindchange="toggleActive"
+            data-id="{{item._id}}"
+            data-active="{{item.isActive}}"
+          />
+          <text class="action-btn edit" bindtap="startEdit" data-id="{{item._id}}" data-name="{{item.name}}" data-icon="{{item.icon}}">编辑</text>
+          <text class="action-btn delete" bindtap="deleteCategory" data-id="{{item._id}}" data-name="{{item.name}}">删除</text>
+        </view>
+      </view>
+
+      <!-- 编辑态 -->
+      <view class="edit-panel" wx:else>
+        <view class="edit-row">
+          <block wx:for="{{iconList}}" wx:for-item="ic" wx:key="key">
+            <text class="edit-emoji-display" wx:if="{{ic.key === editIcon}}" bindtap="toggleIconPicker">{{ic.emoji}}</text>
+          </block>
+          <input class="edit-input" value="{{editName}}" bindinput="onNameInput" placeholder="分类名称" focus="{{true}}" />
+        </view>
+
+        <!-- 图标选择器 -->
+        <view class="icon-picker" wx:if="{{showIconPicker}}">
+          <view
+            class="icon-option {{ic.key === editIcon ? 'active' : ''}}"
+            wx:for="{{iconList}}"
+            wx:for-item="ic"
+            wx:key="key"
+            bindtap="pickIcon"
+            data-key="{{ic.key}}"
+          >
+            <text class="icon-option-emoji">{{ic.emoji}}</text>
+            <text class="icon-option-label">{{ic.label}}</text>
+          </view>
+        </view>
+
+        <view class="edit-actions">
+          <text class="edit-btn cancel" bindtap="cancelEdit">取消</text>
+          <text class="edit-btn save" bindtap="saveEdit">保存</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{categories.length === 0 && !loading}}">
+    <text class="empty-emoji">📂</text>
+    <text class="empty-text">暂无分类，点击下方按钮添加</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-btn" bindtap="addCategory">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加分类</text>
+  </view>
+</view>

@@ -12,7 +12,8 @@
     "pages/chef/dish-manage/index",
     "pages/chef/dish-edit/index",
     "pages/chef/cook-view/index",
-    "pages/chef/order-manage/index"
+    "pages/chef/order-manage/index",
+    "pages/chef/category-manage/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

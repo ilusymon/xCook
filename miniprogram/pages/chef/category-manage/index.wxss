@@ -1,0 +1,239 @@
+.category-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 16rpx 24rpx;
+  padding-bottom: 160rpx;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.page-title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #4A3333;
+}
+
+/* 分类列表 */
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.category-item {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+  transition: all 0.2s ease;
+}
+
+.category-item.editing {
+  border: 2rpx solid #FF6B81;
+}
+
+/* 查看态 */
+.item-row {
+  display: flex;
+  align-items: center;
+}
+
+.item-emoji {
+  font-size: 44rpx;
+  margin-right: 16rpx;
+}
+
+.item-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #4A3333;
+}
+
+.item-name.disabled {
+  color: #C0B0B0;
+  text-decoration: line-through;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.sort-btns {
+  display: flex;
+  gap: 4rpx;
+}
+
+.sort-btn {
+  font-size: 28rpx;
+  color: #9B8888;
+  padding: 6rpx 12rpx;
+  background: #FFF5F5;
+  border-radius: 8rpx;
+}
+
+.sort-btn.sort-disabled {
+  opacity: 0.3;
+}
+
+.active-switch {
+  transform: scale(0.7);
+  margin: 0 -8rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+}
+
+.action-btn.edit {
+  color: #FF6B81;
+  background: #FFE4E4;
+}
+
+.action-btn.delete {
+  color: #999;
+  background: #F5F5F5;
+}
+
+/* 编辑态 */
+.edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.edit-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.edit-emoji {
+  display: none;
+}
+
+.edit-emoji-display {
+  font-size: 44rpx;
+  padding: 8rpx;
+  background: #FFF5F5;
+  border-radius: 12rpx;
+}
+
+.edit-input {
+  flex: 1;
+  font-size: 30rpx;
+  padding: 16rpx 20rpx;
+  background: #FFF5F5;
+  border-radius: 16rpx;
+  color: #4A3333;
+}
+
+/* 图标选择器 */
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 16rpx;
+  background: #FFF5F5;
+  border-radius: 16rpx;
+}
+
+.icon-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 16rpx;
+  border-radius: 16rpx;
+  min-width: 100rpx;
+  transition: all 0.2s ease;
+}
+
+.icon-option.active {
+  background: #FFE4E4;
+}
+
+.icon-option-emoji {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.icon-option-label {
+  font-size: 20rpx;
+  color: #9B8888;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+}
+
+.edit-btn {
+  font-size: 26rpx;
+  padding: 12rpx 32rpx;
+  border-radius: 24rpx;
+  font-weight: 500;
+}
+
+.edit-btn.cancel {
+  color: #9B8888;
+  background: #F5F5F5;
+}
+
+.edit-btn.save {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 48rpx;
+}
+
+.empty-emoji {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #9B8888;
+}
+
+/* 添加按钮 */
+.add-btn {
+  position: fixed;
+  bottom: 60rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 24rpx 48rpx;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 129, 0.3);
+  font-weight: 500;
+}
+
+.add-icon {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.add-text {
+  font-size: 28rpx;
+}

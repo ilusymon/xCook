@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "home-btn": "/components/home-btn/index"
+  },
+  "navigationBarTitleText": "分类管理"
+}

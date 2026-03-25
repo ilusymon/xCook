@@ -78,6 +78,20 @@ function updateOrderStatus(orderId, newStatus) {
 }
 
 /**
+ * 保存分类（新建或更新）
+ */
+function saveCategory(category) {
+  return callFunction('saveCategory', { category })
+}
+
+/**
+ * 删除分类
+ */
+function deleteCategory(categoryId) {
+  return callFunction('saveCategory', { action: 'delete', categoryId })
+}
+
+/**
  * 调整星星币
  */
 function adjustStarCoins(targetUserId, amount, reason) {
@@ -137,6 +151,8 @@ module.exports = {
   placeOrder,
   getOrders,
   updateOrderStatus,
+  saveCategory,
+  deleteCategory,
   adjustStarCoins,
   watchOrder,
   watchNewOrders,

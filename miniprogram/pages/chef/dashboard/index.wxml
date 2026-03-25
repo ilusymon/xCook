@@ -58,5 +58,11 @@
       </view>
       <text class="action-text">订单管理</text>
     </view>
+    <view class="action-item" bindtap="goCategoryManage">
+      <view class="action-icon-wrap category">
+        <text class="action-icon">🏷️</text>
+      </view>
+      <text class="action-text">分类管理</text>
+    </view>
   </view>
 </view>
