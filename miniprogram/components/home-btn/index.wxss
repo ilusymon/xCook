@@ -1,0 +1,22 @@
+.home-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #FFF5F5;
+  border: 2rpx solid #FFE4E4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+
+.home-btn:active {
+  background: #FFE4E4;
+}
+
+.home-icon {
+  font-size: 32rpx;
+  color: #FF6B81;
+  line-height: 1;
+}

@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "star-coin-badge": "/components/star-coin-badge/index",
+    "home-btn": "/components/home-btn/index"
+  },
+  "navigationBarTitleText": "购物车"
+}

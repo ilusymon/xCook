@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "option-picker": "/components/option-picker/index"
+  },
+  "navigationBarTitleText": "菜品详情"
+}

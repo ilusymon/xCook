@@ -1,0 +1,87 @@
+.menu-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 129, 0.06);
+}
+
+.page-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #4A3333;
+}
+
+.menu-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  height: calc(100vh - 200rpx);
+}
+
+/* 左侧分类栏 */
+.category-sidebar {
+  width: 180rpx;
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.category-item {
+  padding: 28rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #9B8888;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.category-item.active {
+  color: #FF6B81;
+  font-weight: 600;
+  background: #FFF5F5;
+}
+
+.category-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 36rpx;
+  background: #FF6B81;
+  border-radius: 0 6rpx 6rpx 0;
+}
+
+/* 右侧菜品列表 */
+.dish-list {
+  flex: 1;
+  padding: 16rpx 20rpx;
+  padding-bottom: 130rpx;
+}
+
+.category-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3333;
+  padding: 16rpx 8rpx 12rpx;
+}
+
+.dish-group {
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 24rpx;
+  color: #9B8888;
+}

@@ -1,0 +1,39 @@
+<view class="manage-page">
+  <!-- 菜品列表按分类分组 -->
+  <view class="category-group" wx:for="{{categories}}" wx:key="_id">
+    <text class="category-name">{{item.name}}</text>
+    <view class="dish-list">
+      <view class="dish-item" wx:for="{{dishMap[item._id]}}" wx:for-item="dish" wx:key="_id">
+        <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" />
+        <view class="dish-info">
+          <text class="dish-name">{{dish.name}}</text>
+          <view class="dish-meta">
+            <text class="dish-price">⭐ {{dish.price}}</text>
+            <text class="dish-cal">{{dish.calories}}kcal</text>
+          </view>
+        </view>
+        <view class="dish-actions">
+          <switch
+            class="avail-switch"
+            checked="{{dish.isAvailable}}"
+            bindchange="toggleAvailable"
+            data-id="{{dish._id}}"
+            data-available="{{dish.isAvailable}}"
+            color="#FF6B81"
+          />
+          <view class="action-btns">
+            <view class="action-btn edit" bindtap="editDish" data-id="{{dish._id}}">编辑</view>
+            <view class="action-btn cook" bindtap="viewCook" data-id="{{dish._id}}">做法</view>
+            <view class="action-btn delete" bindtap="deleteDish" data-id="{{dish._id}}" data-name="{{dish.name}}">删除</view>
+          </view>
+        </view>
+      </view>
+      <view class="empty-group" wx:if="{{!dishMap[item._id] || dishMap[item._id].length === 0}}">
+        <text>暂无菜品</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 悬浮添加按钮 -->
+  <view class="fab" bindtap="addDish">+</view>
+</view>

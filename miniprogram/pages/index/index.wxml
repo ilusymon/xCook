@@ -1,0 +1,32 @@
+<view class="page-container">
+  <!-- Logo & 标题 -->
+  <view class="header">
+    <view class="logo-wrap">
+      <text class="logo-heart">⭐</text>
+    </view>
+    <text class="app-title">星厨房</text>
+    <text class="app-subtitle">属于我们的小厨房</text>
+  </view>
+
+  <!-- 角色选择卡片 -->
+  <view class="role-cards">
+    <view class="role-card orderer" bindtap="goOrder">
+      <text class="role-emoji">🍽️</text>
+      <text class="role-title">我要点菜</text>
+      <text class="role-desc">浏览菜单，选择喜欢的菜品</text>
+    </view>
+
+    <view class="role-card chef" bindtap="goChef">
+      <text class="role-emoji">👨‍🍳</text>
+      <text class="role-title">我要做菜</text>
+      <text class="role-desc">管理菜品，接单烹饪</text>
+    </view>
+  </view>
+
+  <!-- 星星币余额 -->
+  <view class="coin-section" wx:if="{{starCoins >= 0}}">
+    <image class="coin-icon" src="/images/star-coin.png" />
+    <text class="coin-amount">{{starCoins}}</text>
+    <text class="coin-label">星星币</text>
+  </view>
+</view>

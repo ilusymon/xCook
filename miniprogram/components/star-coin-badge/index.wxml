@@ -1,0 +1,4 @@
+<view class="star-coin-badge" bindtap="onTap">
+  <image class="badge-icon" src="/images/star-coin.png" />
+  <text class="badge-amount">{{balance}}</text>
+</view>

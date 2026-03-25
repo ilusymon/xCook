@@ -1,0 +1,80 @@
+<view class="detail-page">
+  <!-- 状态步骤条 -->
+  <view class="status-steps">
+    <view class="step {{stepIndex >= 0 ? 'done' : ''}}" >
+      <view class="step-dot {{stepIndex >= 0 ? 'active' : ''}}"></view>
+      <text class="step-label">已下单</text>
+    </view>
+    <view class="step-line {{stepIndex >= 1 ? 'active' : ''}}"></view>
+    <view class="step {{stepIndex >= 1 ? 'done' : ''}}">
+      <view class="step-dot {{stepIndex >= 1 ? 'active' : ''}}"></view>
+      <text class="step-label">已接单</text>
+    </view>
+    <view class="step-line {{stepIndex >= 2 ? 'active' : ''}}"></view>
+    <view class="step {{stepIndex >= 2 ? 'done' : ''}}">
+      <view class="step-dot {{stepIndex >= 2 ? 'active' : ''}}"></view>
+      <text class="step-label">制作中</text>
+    </view>
+    <view class="step-line {{stepIndex >= 3 ? 'active' : ''}}"></view>
+    <view class="step {{stepIndex >= 3 ? 'done' : ''}}">
+      <view class="step-dot {{stepIndex >= 3 ? 'active' : ''}}"></view>
+      <text class="step-label">已完成</text>
+    </view>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="section-card">
+    <view class="order-header">
+      <text class="order-number">{{order.orderNumber}}</text>
+      <order-status-tag status="{{order.status}}" />
+    </view>
+    <text class="order-time">下单时间：{{createdAtText}}</text>
+  </view>
+
+  <!-- 菜品列表 -->
+  <view class="section-card">
+    <text class="section-title">菜品明细</text>
+    <view class="order-item" wx:for="{{order.items}}" wx:key="dishId">
+      <image class="item-cover" src="{{item.coverImage}}" mode="aspectFill" />
+      <view class="item-info">
+        <text class="item-name">{{item.dishName}}</text>
+        <view class="item-options">
+          <text class="option-tag" wx:for="{{item.optionTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        </view>
+      </view>
+      <view class="item-right">
+        <text class="item-qty">x{{item.quantity}}</text>
+        <view class="item-price">
+          <image class="coin-icon" src="/images/star-coin.png" />
+          <text>{{item.itemTotal}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="section-card" wx:if="{{order.note}}">
+    <text class="section-title">备注</text>
+    <text class="note-text">{{order.note}}</text>
+  </view>
+
+  <!-- 合计 -->
+  <view class="section-card total-card">
+    <view class="total-row">
+      <text>总计</text>
+      <view class="total-price">
+        <image class="coin-icon-lg" src="/images/star-coin.png" />
+        <text>{{order.totalPrice}}</text>
+      </view>
+    </view>
+    <view class="total-row sub">
+      <text>总热量</text>
+      <text class="cal-text">{{order.totalCalories}}kcal</text>
+    </view>
+  </view>
+
+  <!-- 取消订单按钮 -->
+  <view class="cancel-btn" wx:if="{{order.status === 'placed'}}" bindtap="cancelOrder">
+    取消订单
+  </view>
+</view>

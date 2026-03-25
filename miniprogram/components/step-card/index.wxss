@@ -1,0 +1,93 @@
+.step-card {
+  display: flex;
+  padding: 16rpx 0;
+  transition: all 0.3s ease;
+}
+
+.step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.step-number {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #FFE4E4;
+  color: #FF6B81;
+  font-size: 26rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-card.active .step-number {
+  background: #FF6B81;
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.4);
+}
+
+.step-check {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #5FD068;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-line {
+  width: 4rpx;
+  flex: 1;
+  min-height: 40rpx;
+  background: #FFE4E4;
+  margin: 8rpx 0;
+}
+
+.step-card.completed .step-line {
+  background: #5FD068;
+}
+
+.step-content {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.step-card.active .step-content {
+  border: 2rpx solid #FF6B81;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.12);
+}
+
+.step-desc {
+  font-size: 28rpx;
+  color: #4A3333;
+  line-height: 1.6;
+}
+
+.step-image {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 16rpx;
+  margin-top: 16rpx;
+}
+
+.step-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.step-duration {
+  font-size: 24rpx;
+  color: #9B8888;
+}

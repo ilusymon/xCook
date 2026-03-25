@@ -1,0 +1,112 @@
+.page-container {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 40rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 60rpx 0 50rpx;
+}
+
+.logo-wrap {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFB8C6, #FF6B81);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(255, 107, 129, 0.3);
+}
+
+.logo-heart {
+  font-size: 64rpx;
+}
+
+.app-title {
+  font-size: 52rpx;
+  font-weight: bold;
+  color: #4A3333;
+  margin-bottom: 8rpx;
+}
+
+.app-subtitle {
+  font-size: 26rpx;
+  color: #9B8888;
+}
+
+/* 角色选择卡片 */
+.role-cards {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.role-card {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6rpx 24rpx rgba(255, 107, 129, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.role-card:active {
+  transform: scale(0.97);
+}
+
+.role-emoji {
+  font-size: 72rpx;
+  margin-bottom: 16rpx;
+}
+
+.role-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #4A3333;
+  margin-bottom: 8rpx;
+}
+
+.role-desc {
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+/* 星星币 */
+.coin-section {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #FFF8E6, #FFEFCC);
+  border-radius: 40rpx;
+  padding: 16rpx 32rpx;
+  border: 2rpx solid #FFE0A0;
+}
+
+.coin-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+.coin-amount {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFA500;
+  margin-right: 8rpx;
+}
+
+.coin-label {
+  font-size: 24rpx;
+  color: #C89030;
+}

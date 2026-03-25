@@ -1,0 +1,18 @@
+<view class="cart-bar {{totalCount > 0 ? 'show' : 'hide'}}" bindtap="goToCart">
+  <view class="cart-left">
+    <view class="cart-icon-wrap">
+      <text class="cart-icon">🛒</text>
+      <view class="cart-badge" wx:if="{{totalCount > 0}}">{{totalCount}}</view>
+    </view>
+    <view class="cart-info">
+      <view class="cart-price">
+        <image class="coin-icon" src="/images/star-coin.png" />
+        <text>{{totalPrice}}</text>
+      </view>
+      <text class="cart-calories">{{totalCalories}}kcal</text>
+    </view>
+  </view>
+  <view class="cart-btn {{totalCount > 0 ? '' : 'disabled'}}">
+    <text>去购物车</text>
+  </view>
+</view>

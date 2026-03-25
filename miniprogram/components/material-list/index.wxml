@@ -1,0 +1,20 @@
+<view class="material-list">
+  <view class="material-header">
+    <text class="material-title">食材清单</text>
+    <text class="material-count">共{{materials.length}}种</text>
+  </view>
+  <view
+    class="material-item {{checkedMap[index] ? 'checked' : ''}}"
+    wx:for="{{materials}}"
+    wx:key="index"
+    bindtap="onToggle"
+    data-index="{{index}}"
+  >
+    <view class="check-box" wx:if="{{interactive}}">
+      <view class="check-inner" wx:if="{{checkedMap[index]}}">✓</view>
+    </view>
+    <text class="material-name">{{item.name}}</text>
+    <text class="material-amount">{{item.amount}}</text>
+    <text class="material-note" wx:if="{{item.note}}">{{item.note}}</text>
+  </view>
+</view>

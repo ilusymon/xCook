@@ -1,0 +1,55 @@
+<view class="detail-page">
+  <!-- 封面图 -->
+  <image class="dish-hero" src="{{dish.coverImage}}" mode="aspectFill" />
+
+  <!-- 基本信息 -->
+  <view class="info-card">
+    <text class="dish-name">{{dish.name}}</text>
+    <text class="dish-desc">{{dish.description}}</text>
+
+    <view class="info-tags">
+      <view class="info-tag calorie">{{dish.calories}}kcal</view>
+      <view class="info-tag time" wx:if="{{dish.preparationTime}}">{{dish.preparationTime}}分钟</view>
+      <view class="info-tag difficulty" wx:if="{{dish.difficulty}}">{{difficultyText}}</view>
+    </view>
+
+    <view class="price-row">
+      <image class="coin-icon" src="/images/star-coin.png" />
+      <text class="price-value">{{dish.price}}</text>
+      <text class="price-unit">星星币</text>
+    </view>
+  </view>
+
+  <!-- 选项选择 -->
+  <view class="section-card" wx:if="{{dish.optionGroups && dish.optionGroups.length > 0}}">
+    <text class="section-title">口味选择</text>
+    <option-picker
+      id="optionPicker"
+      optionGroups="{{dish.optionGroups}}"
+      bind:change="onOptionChange"
+    />
+  </view>
+
+  <!-- 数量选择 -->
+  <view class="section-card">
+    <text class="section-title">数量</text>
+    <view class="quantity-row">
+      <view class="qty-btn" bindtap="decreaseQty">-</view>
+      <text class="qty-value">{{quantity}}</text>
+      <view class="qty-btn" bindtap="increaseQty">+</view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="total-info">
+      <text class="total-label">合计</text>
+      <view class="total-price">
+        <image class="coin-icon-sm" src="/images/star-coin.png" />
+        <text>{{totalPrice}}</text>
+      </view>
+      <text class="total-cal">{{totalCalories}}kcal</text>
+    </view>
+    <view class="add-cart-btn" bindtap="addToCart">加入购物车</view>
+  </view>
+</view>

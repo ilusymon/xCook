@@ -1,0 +1,194 @@
+.detail-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding-bottom: 140rpx;
+}
+
+.dish-hero {
+  width: 100%;
+  height: 480rpx;
+  border-radius: 0 0 32rpx 32rpx;
+}
+
+.info-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin: -40rpx 24rpx 20rpx;
+  position: relative;
+  box-shadow: 0 4rpx 20rpx rgba(255, 107, 129, 0.08);
+}
+
+.dish-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #4A3333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.dish-desc {
+  font-size: 26rpx;
+  color: #9B8888;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.info-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.info-tag {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 14rpx;
+}
+
+.info-tag.calorie {
+  background: #FFF0E6;
+  color: #FF9F43;
+}
+
+.info-tag.time {
+  background: #E8F0FF;
+  color: #54A0FF;
+}
+
+.info-tag.difficulty {
+  background: #FFE4E4;
+  color: #FF6B81;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+}
+
+.coin-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 8rpx;
+}
+
+.price-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.price-unit {
+  font-size: 24rpx;
+  color: #C89030;
+  margin-left: 6rpx;
+}
+
+.section-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin: 0 24rpx 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+/* 数量选择 */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40rpx;
+}
+
+.qty-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #FFF5F5;
+  border: 2rpx solid #FFE4E4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: #FF6B81;
+  font-weight: bold;
+}
+
+.qty-btn:active {
+  background: #FFE4E4;
+}
+
+.qty-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #4A3333;
+  min-width: 60rpx;
+  text-align: center;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #FFFFFF;
+  border-radius: 28rpx 28rpx 0 0;
+  box-shadow: 0 -4rpx 20rpx rgba(255, 107, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28rpx;
+}
+
+.total-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.total-label {
+  font-size: 22rpx;
+  color: #9B8888;
+}
+
+.total-price {
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.coin-icon-sm {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 6rpx;
+}
+
+.total-cal {
+  font-size: 20rpx;
+  color: #9B8888;
+}
+
+.add-cart-btn {
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 20rpx 48rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.3);
+}
+
+.add-cart-btn:active {
+  transform: scale(0.97);
+}

@@ -1,0 +1,106 @@
+.dish-card {
+  display: flex;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  padding: 20rpx;
+}
+
+.dish-cover {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+
+.dish-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dish-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dish-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280rpx;
+}
+
+.calorie-tag {
+  background: #FFF0E6;
+  color: #FF9F43;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.dish-desc {
+  font-size: 24rpx;
+  color: #9B8888;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 8rpx 0;
+}
+
+.dish-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dish-price {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.coin-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 6rpx;
+}
+
+.dish-time {
+  display: flex;
+  align-items: center;
+}
+
+.time-text {
+  font-size: 22rpx;
+  color: #9B8888;
+}
+
+.add-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 36rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 129, 0.3);
+}
+
+.add-btn:active {
+  transform: scale(0.9);
+}

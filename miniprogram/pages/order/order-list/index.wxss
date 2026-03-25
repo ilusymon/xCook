@@ -1,0 +1,134 @@
+.order-list-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 129, 0.06);
+}
+
+.page-title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #4A3333;
+}
+
+/* 筛选标签 */
+.filter-tabs {
+  display: flex;
+  background: #FFFFFF;
+  padding: 16rpx 24rpx;
+  gap: 16rpx;
+}
+
+.filter-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: #9B8888;
+  border-radius: 28rpx;
+  transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  font-weight: 600;
+}
+
+/* 订单卡片 */
+.orders {
+  padding: 16rpx 24rpx;
+}
+
+.order-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.order-number {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #4A3333;
+}
+
+.order-items-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.item-summary {
+  font-size: 24rpx;
+  color: #9B8888;
+  background: #FFF5F5;
+  padding: 6rpx 14rpx;
+  border-radius: 12rpx;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-time {
+  font-size: 22rpx;
+  color: #B0B0B0;
+}
+
+.order-total {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.coin-icon {
+  width: 26rpx;
+  height: 26rpx;
+  margin-right: 6rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 48rpx;
+}
+
+.empty-emoji {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #9B8888;
+}
+
+.load-more {
+  text-align: center;
+  padding: 24rpx;
+  font-size: 24rpx;
+  color: #9B8888;
+}

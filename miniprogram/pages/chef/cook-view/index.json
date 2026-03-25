@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "step-card": "/components/step-card/index",
+    "material-list": "/components/material-list/index"
+  },
+  "navigationBarTitleText": "烹饪指引"
+}

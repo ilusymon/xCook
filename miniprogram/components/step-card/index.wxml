@@ -1,0 +1,14 @@
+<view class="step-card {{isActive ? 'active' : ''}} {{isCompleted ? 'completed' : ''}}">
+  <view class="step-indicator">
+    <view class="step-number" wx:if="{{!isCompleted}}">{{step.stepNumber}}</view>
+    <view class="step-check" wx:else>✓</view>
+    <view class="step-line" wx:if="{{!isLast}}"></view>
+  </view>
+  <view class="step-content">
+    <text class="step-desc">{{step.description}}</text>
+    <image class="step-image" wx:if="{{step.image}}" src="{{step.image}}" mode="aspectFill" lazy-load />
+    <view class="step-meta" wx:if="{{step.duration}}">
+      <text class="step-duration">⏱ {{step.duration}}分钟</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,3 @@
+<view class="status-tag" style="background: {{bgColor}}; color: {{textColor}};">
+  {{statusText}}
+</view>

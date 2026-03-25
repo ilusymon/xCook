@@ -1,0 +1,76 @@
+<view class="order-manage-page">
+  <!-- 状态筛选 -->
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{currentTab === index ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="value"
+      bindtap="onTabChange"
+      data-index="{{index}}"
+    >
+      {{item.label}}
+      <view class="tab-badge" wx:if="{{item.count > 0}}">{{item.count}}</view>
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="orders" wx:if="{{orders.length > 0}}">
+    <view class="order-card" wx:for="{{orders}}" wx:key="_id">
+      <view class="order-header">
+        <view class="order-left">
+          <text class="order-number">{{item.orderNumber}}</text>
+          <text class="order-time">{{item.createdAtText}}</text>
+        </view>
+        <order-status-tag status="{{item.status}}" />
+      </view>
+
+      <!-- 菜品列表 -->
+      <view class="order-dishes">
+        <view class="dish-row" wx:for="{{item.items}}" wx:for-item="dish" wx:key="dishId">
+          <text class="dish-name">{{dish.dishName}}</text>
+          <text class="dish-qty">x{{dish.quantity}}</text>
+        </view>
+      </view>
+
+      <!-- 备注 -->
+      <view class="order-note" wx:if="{{item.note}}">
+        <text class="note-label">备注：</text>
+        <text>{{item.note}}</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="order-actions">
+        <view class="total-info">
+          <image class="coin-icon" src="/images/star-coin.png" />
+          <text class="total-price">{{item.totalPrice}}</text>
+        </view>
+        <view class="action-buttons">
+          <view
+            class="action-btn accept"
+            wx:if="{{item.status === 'placed'}}"
+            bindtap="acceptOrder"
+            data-id="{{item._id}}"
+          >接单</view>
+          <view
+            class="action-btn cooking"
+            wx:if="{{item.status === 'accepted'}}"
+            bindtap="startCooking"
+            data-id="{{item._id}}"
+          >开始制作</view>
+          <view
+            class="action-btn done"
+            wx:if="{{item.status === 'cooking'}}"
+            bindtap="markDone"
+            data-id="{{item._id}}"
+          >完成</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-emoji">📦</text>
+    <text class="empty-text">暂无订单</text>
+  </view>
+</view>

@@ -1,0 +1,77 @@
+.option-picker {
+  padding: 0 8rpx;
+}
+
+.option-group {
+  margin-bottom: 28rpx;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.group-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-right: 12rpx;
+}
+
+.group-type {
+  font-size: 20rpx;
+  color: #FF6B81;
+  background: #FFE4E4;
+  padding: 2rpx 12rpx;
+  border-radius: 10rpx;
+  margin-right: 8rpx;
+}
+
+.group-type.optional {
+  color: #9B8888;
+  background: #F5F0F0;
+}
+
+.group-hint {
+  font-size: 20rpx;
+  color: #9B8888;
+}
+
+.option-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 28rpx;
+  background: #FFF5F5;
+  border: 2rpx solid #FFE4E4;
+  border-radius: 32rpx;
+  transition: all 0.2s ease;
+}
+
+.option-item.selected {
+  background: #FF6B81;
+  border-color: #FF6B81;
+  color: #FFFFFF;
+}
+
+.option-item.selected .option-label,
+.option-item.selected .option-extra {
+  color: #FFFFFF;
+}
+
+.option-label {
+  font-size: 26rpx;
+  color: #4A3333;
+}
+
+.option-extra {
+  font-size: 22rpx;
+  color: #FFC048;
+  margin-left: 8rpx;
+}

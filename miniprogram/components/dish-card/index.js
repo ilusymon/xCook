@@ -1,0 +1,22 @@
+Component({
+  properties: {
+    dish: {
+      type: Object,
+      value: {}
+    },
+    showAddButton: {
+      type: Boolean,
+      value: true
+    }
+  },
+
+  methods: {
+    onTap() {
+      this.triggerEvent('tap', { dish: this.data.dish })
+    },
+
+    onAdd() {
+      this.triggerEvent('add', { dish: this.data.dish })
+    }
+  }
+})

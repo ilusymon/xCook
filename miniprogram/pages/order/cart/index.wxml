@@ -1,0 +1,57 @@
+<view class="cart-page">
+  <!-- 顶部余额 -->
+  <view class="top-bar">
+    <home-btn />
+    <text class="page-title">购物车</text>
+    <star-coin-badge balance="{{starCoins}}" />
+  </view>
+
+  <!-- 购物车列表 -->
+  <view class="cart-list" wx:if="{{cart.length > 0}}">
+    <view class="cart-item" wx:for="{{cart}}" wx:key="cartItemId">
+      <image class="item-cover" src="{{item.coverImage}}" mode="aspectFill" />
+      <view class="item-info">
+        <text class="item-name">{{item.dishName}}</text>
+        <!-- 已选选项 -->
+        <view class="item-options" wx:if="{{item.optionTags.length > 0}}">
+          <text class="option-tag" wx:for="{{item.optionTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        </view>
+        <view class="item-bottom">
+          <view class="item-price">
+            <image class="coin-icon" src="/images/star-coin.png" />
+            <text>{{item.itemTotal}}</text>
+          </view>
+          <view class="qty-control">
+            <view class="qty-btn" bindtap="decreaseQty" data-id="{{item.cartItemId}}">-</view>
+            <text class="qty-value">{{item.quantity}}</text>
+            <view class="qty-btn" bindtap="increaseQty" data-id="{{item.cartItemId}}">+</view>
+          </view>
+        </view>
+      </view>
+      <view class="delete-btn" bindtap="removeItem" data-id="{{item.cartItemId}}">✕</view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-emoji">🛒</text>
+    <text class="empty-text">购物车空空的</text>
+    <text class="empty-hint">去菜单看看吧～</text>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="checkout-bar" wx:if="{{cart.length > 0}}">
+    <view class="checkout-info">
+      <view class="checkout-row">
+        <text class="checkout-label">共{{totalCount}}道菜</text>
+        <text class="checkout-cal">{{totalCalories}}kcal</text>
+      </view>
+      <view class="checkout-price">
+        <image class="coin-icon-sm" src="/images/star-coin.png" />
+        <text>{{totalPrice}}</text>
+      </view>
+    </view>
+    <view class="clear-btn" bindtap="clearCart">清空</view>
+    <view class="checkout-btn" bindtap="goCheckout">去下单</view>
+  </view>
+</view>

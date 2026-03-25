@@ -1,0 +1,94 @@
+.cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110rpx;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  box-shadow: 0 -4rpx 20rpx rgba(255, 107, 129, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
+  z-index: 999;
+  transition: transform 0.3s ease;
+}
+
+.cart-bar.show {
+  transform: translateY(0);
+}
+
+.cart-bar.hide {
+  transform: translateY(100%);
+}
+
+.cart-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.cart-icon-wrap {
+  position: relative;
+  margin-right: 16rpx;
+}
+
+.cart-icon {
+  font-size: 48rpx;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  text-align: center;
+  background: #FF6B81;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  border-radius: 16rpx;
+  padding: 0 8rpx;
+}
+
+.cart-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-price {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.coin-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 6rpx;
+}
+
+.cart-calories {
+  font-size: 22rpx;
+  color: #9B8888;
+  margin-top: 4rpx;
+}
+
+.cart-btn {
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 16rpx 40rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 129, 0.3);
+}
+
+.cart-btn.disabled {
+  background: #E0D5D5;
+  box-shadow: none;
+}

@@ -1,0 +1,122 @@
+.manage-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 16rpx 24rpx;
+  padding-bottom: 180rpx;
+}
+
+.category-group {
+  margin-bottom: 24rpx;
+}
+
+.category-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  padding: 12rpx 0;
+  display: block;
+}
+
+.dish-item {
+  display: flex;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 16rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 129, 0.06);
+}
+
+.dish-cover {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+
+.dish-info {
+  flex: 1;
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dish-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-bottom: 8rpx;
+}
+
+.dish-meta {
+  display: flex;
+  gap: 16rpx;
+}
+
+.dish-price {
+  font-size: 24rpx;
+  color: #FFC048;
+  font-weight: 600;
+}
+
+.dish-cal {
+  font-size: 22rpx;
+  color: #9B8888;
+}
+
+.dish-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.action-btns {
+  display: flex;
+  gap: 8rpx;
+}
+
+.action-btn {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+}
+
+.action-btn.edit {
+  color: #54A0FF;
+  background: #E8F0FF;
+}
+
+.action-btn.cook {
+  color: #5FD068;
+  background: #E8F8E8;
+}
+
+.action-btn.delete {
+  color: #B0B0B0;
+  background: #F5F0F0;
+}
+
+.empty-group {
+  text-align: center;
+  padding: 32rpx;
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 160rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 48rpx;
+  z-index: 100;
+}

@@ -1,0 +1,89 @@
+.material-list {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.material-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.material-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+}
+
+.material-count {
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+.material-item {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #FFE4E4;
+  transition: opacity 0.2s ease;
+}
+
+.material-item:last-child {
+  border-bottom: none;
+}
+
+.material-item.checked {
+  opacity: 0.5;
+}
+
+.material-item.checked .material-name {
+  text-decoration: line-through;
+}
+
+.check-box {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #FFB8C6;
+  margin-right: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.check-inner {
+  color: #FF6B81;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.material-item.checked .check-box {
+  background: #FF6B81;
+  border-color: #FF6B81;
+}
+
+.material-item.checked .check-inner {
+  color: #FFFFFF;
+}
+
+.material-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #4A3333;
+}
+
+.material-amount {
+  font-size: 26rpx;
+  color: #FFC048;
+  font-weight: 500;
+  margin: 0 16rpx;
+}
+
+.material-note {
+  font-size: 22rpx;
+  color: #9B8888;
+}

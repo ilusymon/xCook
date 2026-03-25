@@ -1,0 +1,62 @@
+<view class="menu-page">
+  <!-- 顶部栏 -->
+  <view class="top-bar">
+    <home-btn />
+    <text class="page-title">今天想吃什么？</text>
+    <star-coin-badge balance="{{starCoins}}" />
+  </view>
+
+  <view class="menu-body">
+    <!-- 左侧分类栏 -->
+    <scroll-view class="category-sidebar" scroll-y>
+      <view
+        class="category-item {{currentCategory === index ? 'active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="_id"
+        bindtap="onCategoryTap"
+        data-index="{{index}}"
+        data-id="{{item._id}}"
+      >
+        <text>{{item.name}}</text>
+      </view>
+    </scroll-view>
+
+    <!-- 右侧菜品列表 -->
+    <scroll-view
+      class="dish-list"
+      scroll-y
+      scroll-into-view="{{scrollToView}}"
+      scroll-with-animation
+      bindscroll="onDishScroll"
+    >
+      <view
+        wx:for="{{categories}}"
+        wx:key="_id"
+        id="cat_{{item._id}}"
+      >
+        <view class="category-title">{{item.name}}</view>
+        <view class="dish-group">
+          <dish-card
+            wx:for="{{dishMap[item._id]}}"
+            wx:for-item="dish"
+            wx:key="_id"
+            dish="{{dish}}"
+            showAddButton
+            bind:tap="onDishTap"
+            bind:add="onDishAdd"
+          />
+          <view class="empty-hint" wx:if="{{!dishMap[item._id] || dishMap[item._id].length === 0}}">
+            <text>暂无菜品</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 悬浮购物车栏 -->
+  <cart-bar
+    totalCount="{{cartSummary.totalCount}}"
+    totalPrice="{{cartSummary.totalPrice}}"
+    totalCalories="{{cartSummary.totalCalories}}"
+  />
+</view>

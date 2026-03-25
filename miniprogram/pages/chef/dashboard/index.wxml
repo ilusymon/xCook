@@ -1,0 +1,62 @@
+<view class="dashboard-page">
+  <!-- 顶部返回首页 -->
+  <view class="top-bar">
+    <home-btn />
+    <text class="page-title">星厨房</text>
+  </view>
+
+  <!-- 问候区域 -->
+  <view class="greeting-card">
+    <text class="greeting-emoji">👨‍🍳</text>
+    <view class="greeting-text">
+      <text class="greeting-title">大厨你好！</text>
+      <text class="greeting-sub">今天想做什么好吃的？</text>
+    </view>
+  </view>
+
+  <!-- 新订单提醒 -->
+  <view class="notice-bar" wx:if="{{pendingCount > 0}}" bindtap="goOrderManage">
+    <text class="notice-icon">🔔</text>
+    <text class="notice-text">你有 {{pendingCount}} 个新订单待处理</text>
+    <text class="notice-arrow">›</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-row">
+    <view class="stat-card">
+      <text class="stat-value">{{pendingCount}}</text>
+      <text class="stat-label">待处理</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{todayCount}}</text>
+      <text class="stat-label">今日订单</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{dishCount}}</text>
+      <text class="stat-label">菜品总数</text>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="section-title">快捷操作</view>
+  <view class="action-grid">
+    <view class="action-item" bindtap="goDishManage">
+      <view class="action-icon-wrap">
+        <text class="action-icon">📋</text>
+      </view>
+      <text class="action-text">管理菜品</text>
+    </view>
+    <view class="action-item" bindtap="goAddDish">
+      <view class="action-icon-wrap add">
+        <text class="action-icon">➕</text>
+      </view>
+      <text class="action-text">新增菜品</text>
+    </view>
+    <view class="action-item" bindtap="goOrderManage">
+      <view class="action-icon-wrap order">
+        <text class="action-icon">📦</text>
+      </view>
+      <text class="action-text">订单管理</text>
+    </view>
+  </view>
+</view>

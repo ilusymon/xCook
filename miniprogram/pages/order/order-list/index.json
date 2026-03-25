@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "order-status-tag": "/components/order-status-tag/index",
+    "home-btn": "/components/home-btn/index"
+  },
+  "navigationBarTitleText": "我的订单"
+}

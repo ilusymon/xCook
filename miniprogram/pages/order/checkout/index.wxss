@@ -1,0 +1,153 @@
+.checkout-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 16rpx 24rpx;
+  padding-bottom: 160rpx;
+}
+
+.section-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #4A3333;
+}
+
+.item-price {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FFC048;
+}
+
+.coin-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 6rpx;
+}
+
+.divider {
+  height: 1rpx;
+  background: #FFE4E4;
+  margin: 16rpx 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+.cal-text {
+  color: #FF9F43;
+}
+
+/* 备注 */
+.note-input {
+  width: 100%;
+  height: 160rpx;
+  border: 2rpx solid #FFE4E4;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+/* 支付信息 */
+.pay-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.pay-label {
+  font-size: 28rpx;
+  color: #4A3333;
+}
+
+.pay-price {
+  display: flex;
+  align-items: center;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.pay-balance {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #5FD068;
+}
+
+.pay-balance.insufficient {
+  color: #FF6B6B;
+}
+
+.insufficient-tip {
+  font-size: 24rpx;
+  color: #FF6B6B;
+  text-align: center;
+  margin-top: 12rpx;
+  padding: 12rpx;
+  background: #FFF0F0;
+  border-radius: 12rpx;
+}
+
+/* 下单按钮 */
+.pay-btn-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 32rpx 40rpx;
+  background: #FFF5F5;
+}
+
+.pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 24rpx;
+  border-radius: 44rpx;
+  box-shadow: 0 6rpx 24rpx rgba(255, 107, 129, 0.3);
+}
+
+.pay-btn.disabled {
+  background: #E0D5D5;
+  box-shadow: none;
+}
+
+.coin-icon-btn {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 10rpx;
+}

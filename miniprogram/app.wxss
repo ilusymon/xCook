@@ -1,0 +1,210 @@
+/* 星厨房 全局样式 — 温馨情侣主题 */
+
+page {
+  --color-primary: #FF6B81;
+  --color-primary-light: #FFB8C6;
+  --color-primary-dark: #E84660;
+  --color-secondary: #FFC048;
+  --color-bg: #FFF5F5;
+  --color-bg-card: #FFFFFF;
+  --color-text: #4A3333;
+  --color-text-secondary: #9B8888;
+  --color-success: #5FD068;
+  --color-warning: #FF9F43;
+  --color-border: #FFE4E4;
+
+  /* iView Weapp 主题覆盖 */
+  --button-primary-bg-color: #FF6B81;
+  --button-primary-active-color: #E84660;
+  --tab-bar-active-color: #FF6B81;
+  --tag-primary-color: #FF6B81;
+  --switch-checked-color: #FF6B81;
+
+  background-color: #FFF5F5;
+  color: #4A3333;
+  font-size: 28rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 通用卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
+  padding: 24rpx;
+  margin: 16rpx 24rpx;
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 40rpx;
+  padding: 20rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 6rpx 20rpx rgba(255, 107, 129, 0.3);
+}
+
+.btn-primary:active {
+  background: linear-gradient(135deg, #E84660, #FF6B81);
+  transform: scale(0.98);
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  background: #FFFFFF;
+  color: #FF6B81;
+  border: 2rpx solid #FF6B81;
+  border-radius: 40rpx;
+  padding: 18rpx 48rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  border-radius: 16rpx;
+  padding: 4rpx 16rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.tag-calorie {
+  background: #FFF0E6;
+  color: #FF9F43;
+}
+
+.tag-coin {
+  background: #FFF8E6;
+  color: #FFC048;
+}
+
+.tag-difficulty {
+  background: #FFE4E4;
+  color: #FF6B81;
+}
+
+/* 星星币显示 */
+.star-coin {
+  display: inline-flex;
+  align-items: center;
+  color: #FFC048;
+  font-weight: 600;
+}
+
+.star-coin-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 6rpx;
+}
+
+/* 价格文字 */
+.price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+/* 区域标题 */
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin: 24rpx 0 16rpx 0;
+}
+
+/* 辅助文字 */
+.text-secondary {
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+/* 分割线 */
+.divider {
+  height: 1rpx;
+  background: #FFE4E4;
+  margin: 16rpx 0;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 48rpx;
+}
+
+.empty-state-image {
+  width: 240rpx;
+  height: 240rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.6;
+}
+
+.empty-state-text {
+  font-size: 28rpx;
+  color: #9B8888;
+}
+
+/* 页面容器 */
+.page-container {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding-bottom: 120rpx;
+}
+
+/* 输入框 */
+.input-box {
+  border: 2rpx solid #FFE4E4;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  background: #FFFFFF;
+}
+
+.input-box:focus {
+  border-color: #FF6B81;
+}
+
+/* 浮动操作按钮 */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 160rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 48rpx;
+  z-index: 100;
+}
+
+/* 弹跳动画 */
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.bounce {
+  animation: bounce 0.3s ease;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}

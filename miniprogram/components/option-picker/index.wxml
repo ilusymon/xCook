@@ -1,0 +1,42 @@
+<view class="option-picker">
+  <view class="option-group" wx:for="{{optionGroups}}" wx:key="groupName" wx:for-item="group">
+    <view class="group-header">
+      <text class="group-name">{{group.groupName}}</text>
+      <text class="group-type" wx:if="{{group.required}}">必选</text>
+      <text class="group-type optional" wx:else>可选</text>
+      <text class="group-hint">{{group.type === 'single' ? '单选' : '多选'}}</text>
+    </view>
+
+    <!-- 单选 -->
+    <view class="option-list" wx:if="{{group.type === 'single'}}">
+      <view
+        class="option-item {{selections[group.groupName] && selections[group.groupName][0] === option.value ? 'selected' : ''}}"
+        wx:for="{{group.options}}"
+        wx:key="value"
+        wx:for-item="option"
+        bindtap="onSingleSelect"
+        data-group="{{group.groupName}}"
+        data-value="{{option.value}}"
+      >
+        <text class="option-label">{{option.label}}</text>
+        <text class="option-extra" wx:if="{{option.extraPrice > 0}}">+{{option.extraPrice}}币</text>
+      </view>
+    </view>
+
+    <!-- 多选 -->
+    <view class="option-list" wx:if="{{group.type === 'multi'}}">
+      <view
+        class="option-item {{selections[group.groupName] && selections[group.groupName].indexOf(option.value) > -1 ? 'selected' : ''}}"
+        wx:for="{{group.options}}"
+        wx:key="value"
+        wx:for-item="option"
+        bindtap="onMultiSelect"
+        data-group="{{group.groupName}}"
+        data-value="{{option.value}}"
+      >
+        <text class="option-label">{{option.label}}</text>
+        <text class="option-extra" wx:if="{{option.extraPrice > 0}}">+{{option.extraPrice}}币</text>
+      </view>
+    </view>
+  </view>
+</view>

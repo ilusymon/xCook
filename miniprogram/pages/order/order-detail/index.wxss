@@ -1,0 +1,215 @@
+.detail-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 16rpx 24rpx;
+  padding-bottom: 40rpx;
+}
+
+/* 状态步骤条 */
+.status-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.step-dot {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: #FFE4E4;
+  transition: all 0.3s ease;
+}
+
+.step-dot.active {
+  background: #FF6B81;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 129, 0.4);
+}
+
+.step-label {
+  font-size: 20rpx;
+  color: #9B8888;
+}
+
+.step.done .step-label {
+  color: #FF6B81;
+  font-weight: 500;
+}
+
+.step-line {
+  width: 60rpx;
+  height: 4rpx;
+  background: #FFE4E4;
+  margin: 0 8rpx;
+  margin-bottom: 30rpx;
+  transition: background 0.3s ease;
+}
+
+.step-line.active {
+  background: #FF6B81;
+}
+
+/* 通用卡片 */
+.section-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.order-number {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3333;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+/* 菜品明细 */
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #FFE4E4;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-cover {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+
+.item-info {
+  flex: 1;
+  margin-left: 16rpx;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #4A3333;
+  display: block;
+}
+
+.item-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+  margin-top: 6rpx;
+}
+
+.option-tag {
+  font-size: 20rpx;
+  color: #FF6B81;
+  background: #FFE4E4;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+}
+
+.item-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.item-qty {
+  font-size: 24rpx;
+  color: #9B8888;
+  display: block;
+}
+
+.item-price {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FFC048;
+  margin-top: 6rpx;
+}
+
+.coin-icon {
+  width: 24rpx;
+  height: 24rpx;
+  margin-right: 4rpx;
+}
+
+.note-text {
+  font-size: 26rpx;
+  color: #9B8888;
+  line-height: 1.6;
+}
+
+/* 合计 */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8rpx 0;
+  font-size: 28rpx;
+  color: #4A3333;
+}
+
+.total-row.sub {
+  font-size: 24rpx;
+  color: #9B8888;
+}
+
+.total-price {
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFC048;
+}
+
+.coin-icon-lg {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 6rpx;
+}
+
+.cal-text {
+  color: #FF9F43;
+}
+
+/* 取消按钮 */
+.cancel-btn {
+  text-align: center;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #B0B0B0;
+  margin-top: 20rpx;
+}

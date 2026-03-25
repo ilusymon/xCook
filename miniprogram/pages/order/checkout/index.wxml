@@ -1,0 +1,64 @@
+<view class="checkout-page">
+  <!-- 订单摘要 -->
+  <view class="section-card">
+    <text class="section-title">订单确认</text>
+    <view class="order-items">
+      <view class="order-item" wx:for="{{cart}}" wx:key="cartItemId">
+        <text class="item-name">{{item.dishName}} x{{item.quantity}}</text>
+        <view class="item-price">
+          <image class="coin-icon" src="/images/star-coin.png" />
+          <text>{{item.itemTotal}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="summary-row">
+      <text>共 {{totalCount}} 道菜</text>
+      <text class="cal-text">{{totalCalories}}kcal</text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="section-card">
+    <text class="section-title">想对厨师说...</text>
+    <textarea
+      class="note-input"
+      placeholder="口味偏好、特殊要求等"
+      value="{{note}}"
+      bindinput="onNoteInput"
+      maxlength="200"
+    />
+  </view>
+
+  <!-- 支付信息 -->
+  <view class="section-card payment-card">
+    <view class="pay-row">
+      <text class="pay-label">订单总价</text>
+      <view class="pay-price">
+        <image class="coin-icon" src="/images/star-coin.png" />
+        <text>{{totalPrice}}</text>
+      </view>
+    </view>
+    <view class="pay-row">
+      <text class="pay-label">我的余额</text>
+      <view class="pay-balance {{starCoins < totalPrice ? 'insufficient' : ''}}">
+        <image class="coin-icon" src="/images/star-coin.png" />
+        <text>{{starCoins}}</text>
+      </view>
+    </view>
+    <view class="insufficient-tip" wx:if="{{starCoins < totalPrice}}">
+      余额不足，需要 {{totalPrice - starCoins}} 星星币
+    </view>
+  </view>
+
+  <!-- 下单按钮 -->
+  <view class="pay-btn-wrap">
+    <view
+      class="pay-btn {{starCoins < totalPrice ? 'disabled' : ''}}"
+      bindtap="placeOrder"
+    >
+      <image class="coin-icon-btn" src="/images/star-coin.png" />
+      <text>支付 {{totalPrice}} 星星币</text>
+    </view>
+  </view>
+</view>

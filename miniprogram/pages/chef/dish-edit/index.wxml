@@ -1,0 +1,199 @@
+<view class="edit-page">
+  <!-- 封面图 -->
+  <view class="section-card">
+    <text class="section-title">封面图片</text>
+    <view class="cover-upload" bindtap="chooseCover">
+      <image class="cover-preview" wx:if="{{dish.coverImage}}" src="{{dish.coverImage}}" mode="aspectFill" />
+      <view class="cover-placeholder" wx:else>
+        <text class="upload-icon">📷</text>
+        <text class="upload-text">点击上传</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="section-card">
+    <text class="section-title">基本信息</text>
+    <view class="form-item">
+      <text class="form-label">菜品名称</text>
+      <input class="form-input" placeholder="输入菜品名称" value="{{dish.name}}" bindinput="onInput" data-field="name" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">描述</text>
+      <textarea class="form-textarea" placeholder="简短描述" value="{{dish.description}}" bindinput="onInput" data-field="description" maxlength="100" />
+    </view>
+    <view class="form-row">
+      <view class="form-item half">
+        <text class="form-label">价格（星星币）</text>
+        <input class="form-input" type="number" placeholder="0" value="{{dish.price}}" bindinput="onInputNumber" data-field="price" />
+      </view>
+      <view class="form-item half">
+        <text class="form-label">卡路里(kcal)</text>
+        <input class="form-input" type="number" placeholder="0" value="{{dish.calories}}" bindinput="onInputNumber" data-field="calories" />
+      </view>
+    </view>
+    <view class="form-row">
+      <view class="form-item half">
+        <text class="form-label">制作时间(分钟)</text>
+        <input class="form-input" type="number" placeholder="0" value="{{dish.preparationTime}}" bindinput="onInputNumber" data-field="preparationTime" />
+      </view>
+      <view class="form-item half">
+        <text class="form-label">难度</text>
+        <view class="difficulty-picker">
+          <view class="diff-option {{dish.difficulty === 1 ? 'active' : ''}}" bindtap="setDifficulty" data-value="{{1}}">简单</view>
+          <view class="diff-option {{dish.difficulty === 2 ? 'active' : ''}}" bindtap="setDifficulty" data-value="{{2}}">中等</view>
+          <view class="diff-option {{dish.difficulty === 3 ? 'active' : ''}}" bindtap="setDifficulty" data-value="{{3}}">困难</view>
+        </view>
+      </view>
+    </view>
+    <view class="form-item">
+      <text class="form-label">分类</text>
+      <picker mode="selector" range="{{categoryNames}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
+        <view class="form-input picker-display">{{categoryNames[categoryIndex] || '选择分类'}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 选项组（树形结构） -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">口味选项</text>
+      <view class="add-btn" bindtap="addOptionGroup">+ 添加选项组</view>
+    </view>
+
+    <!-- 空状态引导 -->
+    <view class="tree-empty" wx:if="{{!dish.optionGroups || dish.optionGroups.length === 0}}">
+      <text class="tree-empty-text">暂无选项，点击上方添加选项组（如辣度、加料等）</text>
+    </view>
+
+    <!-- 树形选项组列表 -->
+    <view class="tree-group" wx:for="{{dish.optionGroups}}" wx:key="idx" wx:for-index="idx">
+      <!-- 父节点：选项组 -->
+      <view class="tree-parent {{item.expanded !== false ? 'expanded' : ''}}">
+        <view class="tree-parent-left" bindtap="toggleGroupExpand" data-idx="{{idx}}">
+          <view class="tree-arrow {{item.expanded !== false ? 'down' : ''}}">›</view>
+          <view class="tree-parent-icon">🏷️</view>
+          <input
+            class="tree-parent-name"
+            placeholder="选项组名（如辣度、加料）"
+            value="{{item.groupName}}"
+            bindinput="onOptionGroupInput"
+            data-idx="{{idx}}"
+            data-field="groupName"
+            catchtap
+          />
+        </view>
+        <view class="tree-parent-right">
+          <view class="tree-tag {{item.type === 'single' ? 'tag-single' : 'tag-multi'}}" bindtap="toggleOptionType" data-idx="{{idx}}">
+            {{item.type === 'single' ? '单选' : '多选'}}
+          </view>
+          <view class="tree-tag {{item.required ? 'tag-required' : 'tag-optional'}}" bindtap="toggleRequired" data-idx="{{idx}}">
+            {{item.required ? '必选' : '可选'}}
+          </view>
+          <view class="tree-del" bindtap="removeOptionGroup" data-idx="{{idx}}">✕</view>
+        </view>
+      </view>
+
+      <!-- 子节点：选项列表 -->
+      <view class="tree-children" wx:if="{{item.expanded !== false}}">
+        <view class="tree-branch-line"></view>
+
+        <view class="tree-child" wx:for="{{item.options}}" wx:for-item="opt" wx:key="oidx" wx:for-index="oidx">
+          <view class="tree-connector">
+            <view class="tree-vert-line"></view>
+            <view class="tree-horiz-line"></view>
+          </view>
+          <view class="tree-child-dot"></view>
+          <view class="tree-child-body">
+            <input
+              class="tree-child-name"
+              placeholder="选项名（如微辣）"
+              value="{{opt.label}}"
+              bindinput="onOptionInput"
+              data-gidx="{{idx}}"
+              data-oidx="{{oidx}}"
+              data-field="label"
+            />
+            <view class="tree-child-price-wrap">
+              <text class="tree-child-price-label">加价</text>
+              <input
+                class="tree-child-price"
+                type="digit"
+                placeholder="0"
+                value="{{opt.extraPrice}}"
+                bindinput="onOptionPriceInput"
+                data-gidx="{{idx}}"
+                data-oidx="{{oidx}}"
+              />
+              <text class="tree-child-price-unit">币</text>
+            </view>
+          </view>
+          <view class="tree-child-del" bindtap="removeOption" data-gidx="{{idx}}" data-oidx="{{oidx}}">✕</view>
+        </view>
+
+        <!-- 添加子选项 -->
+        <view class="tree-add-child" bindtap="addOption" data-idx="{{idx}}">
+          <view class="tree-connector">
+            <view class="tree-vert-line last"></view>
+            <view class="tree-horiz-line"></view>
+          </view>
+          <view class="tree-add-dot">+</view>
+          <text class="tree-add-text">添加选项</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 制作材料 -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">制作材料</text>
+      <view class="add-btn" bindtap="addMaterial">+ 添加材料</view>
+    </view>
+
+    <view class="material-edit-item" wx:for="{{dish.materials}}" wx:key="idx" wx:for-index="idx">
+      <input class="mat-name-input" placeholder="食材名" value="{{item.name}}" bindinput="onMaterialInput" data-idx="{{idx}}" data-field="name" />
+      <input class="mat-amount-input" placeholder="用量" value="{{item.amount}}" bindinput="onMaterialInput" data-idx="{{idx}}" data-field="amount" />
+      <input class="mat-note-input" placeholder="备注" value="{{item.note}}" bindinput="onMaterialInput" data-idx="{{idx}}" data-field="note" />
+      <view class="remove-mat" bindtap="removeMaterial" data-idx="{{idx}}">✕</view>
+    </view>
+  </view>
+
+  <!-- 制作步骤 -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">制作步骤</text>
+      <view class="add-btn" bindtap="addStep">+ 添加步骤</view>
+    </view>
+
+    <view class="step-edit-item" wx:for="{{dish.steps}}" wx:key="idx" wx:for-index="idx">
+      <view class="step-number-badge">{{idx + 1}}</view>
+      <view class="step-edit-content">
+        <textarea class="step-desc-input" placeholder="描述制作步骤" value="{{item.description}}" bindinput="onStepInput" data-idx="{{idx}}" data-field="description" maxlength="200" />
+        <view class="step-meta-row">
+          <input class="step-duration-input" type="number" placeholder="时长(分)" value="{{item.duration}}" bindinput="onStepInput" data-idx="{{idx}}" data-field="duration" />
+          <view class="step-img-btn" bindtap="chooseStepImage" data-idx="{{idx}}">
+            {{item.image ? '更换图片' : '添加图片'}}
+          </view>
+        </view>
+        <image class="step-preview" wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" />
+      </view>
+      <view class="step-actions">
+        <view class="move-btn" wx:if="{{idx > 0}}" bindtap="moveStepUp" data-idx="{{idx}}">↑</view>
+        <view class="move-btn" wx:if="{{idx < dish.steps.length - 1}}" bindtap="moveStepDown" data-idx="{{idx}}">↓</view>
+        <view class="remove-step" bindtap="removeStep" data-idx="{{idx}}">✕</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 视频链接 -->
+  <view class="section-card">
+    <text class="section-title">制作视频</text>
+    <input class="form-input" placeholder="视频链接（可选）" value="{{dish.videoUrl}}" bindinput="onInput" data-field="videoUrl" />
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-btn-wrap">
+    <view class="save-btn" bindtap="saveDish">保存菜品</view>
+  </view>
+</view>

@@ -1,0 +1,22 @@
+<view class="dish-card" bindtap="onTap">
+  <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" lazy-load />
+  <view class="dish-info">
+    <view class="dish-header">
+      <text class="dish-name">{{dish.name}}</text>
+      <view class="calorie-tag">{{dish.calories}}kcal</view>
+    </view>
+    <text class="dish-desc">{{dish.description}}</text>
+    <view class="dish-footer">
+      <view class="dish-price">
+        <image class="coin-icon" src="/images/star-coin.png" />
+        <text>{{dish.price}}</text>
+      </view>
+      <view class="dish-time" wx:if="{{dish.preparationTime}}">
+        <text class="time-text">{{dish.preparationTime}}min</text>
+      </view>
+      <view class="add-btn" wx:if="{{showAddButton}}" catchtap="onAdd">
+        <text>+</text>
+      </view>
+    </view>
+  </view>
+</view>

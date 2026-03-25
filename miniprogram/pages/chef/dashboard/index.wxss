@@ -1,0 +1,166 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: #FFF5F5;
+  padding: 16rpx 24rpx;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.page-title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #4A3333;
+}
+
+/* 问候 */
+.greeting-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  border-radius: 28rpx;
+  padding: 36rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(255, 107, 129, 0.2);
+}
+
+.greeting-emoji {
+  font-size: 80rpx;
+  margin-right: 24rpx;
+}
+
+.greeting-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.greeting-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.greeting-sub {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 6rpx;
+}
+
+/* 新订单提醒 */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  background: #FFF8E6;
+  border: 2rpx solid #FFE0A0;
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.notice-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.notice-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #C89030;
+  font-weight: 500;
+}
+
+.notice-arrow {
+  font-size: 32rpx;
+  color: #C89030;
+}
+
+/* 统计 */
+.stats-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #FF6B81;
+  display: block;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #9B8888;
+  margin-top: 6rpx;
+}
+
+/* 快捷操作 */
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3333;
+  margin-bottom: 20rpx;
+}
+
+.action-grid {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-item {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.action-item:active {
+  transform: scale(0.96);
+}
+
+.action-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: #FFE4E4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.action-icon-wrap.add {
+  background: #E8F8E8;
+}
+
+.action-icon-wrap.order {
+  background: #E8F0FF;
+}
+
+.action-icon {
+  font-size: 40rpx;
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: #4A3333;
+  font-weight: 500;
+}

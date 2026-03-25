@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "dish-card": "/components/dish-card/index",
+    "cart-bar": "/components/cart-bar/index",
+    "star-coin-badge": "/components/star-coin-badge/index",
+    "home-btn": "/components/home-btn/index"
+  },
+  "navigationBarTitleText": "菜单"
+}

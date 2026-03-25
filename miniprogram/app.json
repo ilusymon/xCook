@@ -1,0 +1,58 @@
+{
+  "cloud": true,
+  "pages": [
+    "pages/index/index",
+    "pages/order/menu/index",
+    "pages/order/dish-detail/index",
+    "pages/order/cart/index",
+    "pages/order/checkout/index",
+    "pages/order/order-list/index",
+    "pages/order/order-detail/index",
+    "pages/chef/dashboard/index",
+    "pages/chef/dish-manage/index",
+    "pages/chef/dish-edit/index",
+    "pages/chef/cook-view/index",
+    "pages/chef/order-manage/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF6B81",
+    "navigationBarTitleText": "星厨房",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FFF5F5"
+  },
+  "tabBar": {
+    "color": "#9B8888",
+    "selectedColor": "#FF6B81",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/order/menu/index",
+        "text": "菜单",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/order/cart/index",
+        "text": "购物车",
+        "iconPath": "images/tab-cart.png",
+        "selectedIconPath": "images/tab-cart-active.png"
+      },
+      {
+        "pagePath": "pages/order/order-list/index",
+        "text": "订单",
+        "iconPath": "images/tab-order.png",
+        "selectedIconPath": "images/tab-order-active.png"
+      },
+      {
+        "pagePath": "pages/chef/dashboard/index",
+        "text": "厨房",
+        "iconPath": "images/tab-chef.png",
+        "selectedIconPath": "images/tab-chef-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "xcook",
+  "version": "1.0.0",
+  "description": "情侣点餐微信小程序",
+  "dependencies": {
+    "iview-weapp": "^1.8.0"
+  }
+}

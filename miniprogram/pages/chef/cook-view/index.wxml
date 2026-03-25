@@ -1,0 +1,56 @@
+<view class="cook-page">
+  <!-- 菜品头部 -->
+  <view class="dish-header">
+    <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" />
+    <view class="dish-overlay">
+      <text class="dish-name">{{dish.name}}</text>
+      <view class="dish-tags">
+        <text class="dish-tag">{{dish.calories}}kcal</text>
+        <text class="dish-tag" wx:if="{{dish.preparationTime}}">{{dish.preparationTime}}分钟</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 食材清单 -->
+  <view class="section">
+    <material-list
+      id="materialList"
+      materials="{{dish.materials}}"
+      interactive="{{true}}"
+    />
+  </view>
+
+  <!-- 制作步骤 -->
+  <view class="section">
+    <view class="section-title-bar">
+      <text class="section-title">制作步骤</text>
+      <text class="step-progress">{{currentStep + 1}} / {{dish.steps.length}}</text>
+    </view>
+
+    <view class="steps-timeline">
+      <step-card
+        wx:for="{{dish.steps}}"
+        wx:key="stepNumber"
+        step="{{item}}"
+        isActive="{{currentStep === index}}"
+        isCompleted="{{index < currentStep}}"
+        isLast="{{index === dish.steps.length - 1}}"
+        bindtap="goToStep"
+        data-index="{{index}}"
+      />
+    </view>
+  </view>
+
+  <!-- 底部导航 -->
+  <view class="bottom-nav">
+    <view class="nav-btn prev {{currentStep <= 0 ? 'disabled' : ''}}" bindtap="prevStep">
+      ‹ 上一步
+    </view>
+    <view class="nav-btn video" wx:if="{{dish.videoUrl}}" bindtap="playVideo">
+      ▶ 看视频
+    </view>
+    <view class="nav-btn next {{currentStep >= dish.steps.length - 1 ? 'done' : ''}}" bindtap="nextStep">
+      {{currentStep >= dish.steps.length - 1 ? '完成 ✓' : '下一步 ›'}}
+    </view>
+  </view>
+</view>

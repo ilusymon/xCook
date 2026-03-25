@@ -1,0 +1,20 @@
+.star-coin-badge {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #FFF8E6, #FFEFCC);
+  border-radius: 32rpx;
+  padding: 8rpx 20rpx;
+  border: 2rpx solid #FFE0A0;
+}
+
+.badge-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
+}
+
+.badge-amount {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #FFA500;
+}
