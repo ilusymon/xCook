@@ -147,30 +147,50 @@ async function uploadImage(filePath, options = {}) {
 
   console.log('[Upload] 开始上传到 GitCode:', remotePath, ', 大小:', Math.round(base64Content.length * 3 / 4 / 1024), 'KB')
 
+  // 第 1 步：创建文件
+  await requestGitCode(apiUrl, 'POST', {
+    content: base64Content,
+    message: `upload ${remotePath}`,
+    branch: GITCODE_BRANCH
+  })
+
+  // 第 2 步：获取文件元信息，取 download_url（blobs/{sha} 格式，微信可访问）
+  const meta = await requestGitCode(`${apiUrl}?ref=${GITCODE_BRANCH}`, 'GET')
+  const downloadUrl = meta.download_url
+
+  if (!downloadUrl) {
+    // 降级：自行拼 blobs URL
+    const blobUrl = `${GITCODE_RAW_BASE}/${GITCODE_OWNER}/${GITCODE_REPO}/blobs/${meta.sha}/${remotePath}`
+    console.log('[Upload] 上传成功 (fallback):', blobUrl)
+    return blobUrl
+  }
+
+  console.log('[Upload] 上传成功:', downloadUrl)
+  return downloadUrl
+}
+
+/**
+ * 封装 GitCode API 请求
+ * @param {string} url
+ * @param {string} method
+ * @param {Object} data
+ * @returns {Promise<Object>}
+ */
+function requestGitCode(url, method, data) {
   return new Promise((resolve, reject) => {
-    wx.request({
-      url: apiUrl,
-      method: 'POST',
+    const options = {
+      url,
+      method,
       header: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${GITCODE_TOKEN}`
       },
-      data: {
-        content: base64Content,
-        message: `upload ${remotePath}`,
-        branch: GITCODE_BRANCH
-      },
       success: (res) => {
-        console.log('[Upload] 响应状态码:', res.statusCode)
-
-        if (res.statusCode === 200 || res.statusCode === 201) {
-          // 拼接 raw URL
-          const rawUrl = `${GITCODE_RAW_BASE}/${GITCODE_OWNER}/${GITCODE_REPO}/raw/${GITCODE_BRANCH}/${remotePath}`
-          console.log('[Upload] 上传成功:', rawUrl)
-          resolve(rawUrl)
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data)
         } else {
           const errMsg = (res.data && (res.data.error_message || res.data.message)) || `HTTP ${res.statusCode}`
-          console.error('[Upload] 上传失败:', errMsg, res.data)
+          console.error('[Upload] GitCode 请求失败:', method, url, errMsg)
           reject(new Error(errMsg))
         }
       },
@@ -178,7 +198,9 @@ async function uploadImage(filePath, options = {}) {
         console.error('[Upload] 网络请求失败:', JSON.stringify(err))
         reject(new Error(err.errMsg || '网络请求失败'))
       }
-    })
+    }
+    if (data) options.data = data
+    wx.request(options)
   })
 }
 
