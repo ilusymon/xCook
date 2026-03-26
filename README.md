@@ -45,15 +45,20 @@
 ### 2. 配置项目
 
 1. 用微信开发者工具打开 `xCook` 目录
-2. 修改 `project.config.json` 中的 `appid` 为你的小程序 AppID
-3. 修改 `miniprogram/app.js` 中的云开发环境 ID：
-   ```js
-   wx.cloud.init({ env: 'your-env-id' })
+2. 配置敏感信息：
+   ```bash
+   cd miniprogram/config
+   cp secret.config.example.js secret.config.js
    ```
-4. 配置图床 API Token（用于图片上传）：
-   - 注册 [helloimg.com](https://www.helloimg.com) 账号
-   - 在个人中心获取 API Token
-   - 填入 `miniprogram/utils/upload.js` 的 `API_TOKEN` 常量
+   编辑 `secret.config.js`，填入以下配置：
+   | 字段 | 说明 | 获取方式 |
+   |------|------|----------|
+   | `CLOUD_ENV` | 云开发环境 ID | 微信开发者工具 → 云开发控制台 → 设置 |
+   | `HELLOIMG_TOKEN` | 图床 API Token | 注册 [helloimg.com](https://www.helloimg.com) → 个人中心 |
+
+   > `secret.config.js` 已被 `.gitignore` 排除，不会提交到仓库
+
+3. 修改 `project.config.json` 中的 `appid` 为你的小程序 AppID
 
 ### 3. 云开发配置
 

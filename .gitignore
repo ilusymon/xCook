@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+miniprogram/miniprogram_npm/
+package-lock.json
+
+# 敏感配置（含 API Token 等密钥）
+miniprogram/config/secret.config.js
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 云函数依赖
+cloudfunctions/*/node_modules/
+cloudfunctions/*/package-lock.json
+
+# Claude 本地配置
+.claude/

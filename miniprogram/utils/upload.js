@@ -5,8 +5,15 @@
 
 // 图床 API 配置
 const UPLOAD_API = 'https://www.helloimg.com/api/v1/upload'
-// 请在此处填入你的 API Token（从 helloimg.com 个人中心获取）
-const API_TOKEN = ''
+
+// 从私有配置文件读取 Token（该文件被 .gitignore 排除，不会提交到仓库）
+let API_TOKEN = ''
+try {
+  const secret = require('../config/secret.config')
+  API_TOKEN = secret.HELLOIMG_TOKEN || ''
+} catch (e) {
+  console.warn('[Upload] 未找到 secret.config.js，图片将以游客身份上传。请参照 secret.config.example.js 创建配置文件。')
+}
 
 /**
  * 压缩图片

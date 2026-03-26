@@ -20,7 +20,7 @@
     "ignore": [],
     "include": []
   },
-  "appid": "wx167ec4dc5c054ead",
+  "appid": "your-appid-here",
   "editorSetting": {},
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
 }
