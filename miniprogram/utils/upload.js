@@ -138,13 +138,24 @@ async function batchUpload(items, options = {}, onProgress) {
 }
 
 /**
- * 判断是否为远程 URL（已上传的图片）
+ * 判断是否为已上传的远程 URL
+ * 注意：微信小程序临时文件路径格式为 http://tmp/xxx 或 wxfile://tmp_xxx，
+ * 需要排除这些本地路径，不能简单用 startsWith('http://') 判断
  * @param {string} url
  * @returns {boolean}
  */
 function isRemoteUrl(url) {
   if (!url) return false
-  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('cloud://')
+  // 微信本地临时文件：http://tmp/xxx, wxfile://xxx
+  if (url.startsWith('http://tmp/') || url.startsWith('http://tmp_')) return false
+  if (url.startsWith('wxfile://')) return false
+  // 微信云存储文件
+  if (url.startsWith('cloud://')) return true
+  // 真正的远程 URL
+  if (url.startsWith('https://')) return true
+  // http 非 tmp 开头的也算远程（兼容）
+  if (url.startsWith('http://') && !url.startsWith('http://usr/') && !url.startsWith('http://store/')) return true
+  return false
 }
 
 /**
