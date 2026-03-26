@@ -63,17 +63,38 @@ async function uploadImage(filePath, options = {}) {
 
   // 上传到图床
   return new Promise((resolve, reject) => {
-    const header = {}
+    const header = {
+      'Accept': 'application/json'
+    }
     if (API_TOKEN) {
       header['Authorization'] = `Bearer ${API_TOKEN}`
     }
+
+    console.log('[Upload] 开始上传, Token:', API_TOKEN ? '已配置' : '未配置', ', 文件:', uploadPath)
 
     wx.uploadFile({
       url: UPLOAD_API,
       filePath: uploadPath,
       name: 'file',
       header,
+      formData: {
+        permission: '1'  // 公开访问
+      },
       success: (res) => {
+        console.log('[Upload] 响应状态码:', res.statusCode)
+        console.log('[Upload] 响应内容:', res.data)
+
+        if (res.statusCode !== 200) {
+          let errMsg = `HTTP ${res.statusCode}`
+          try {
+            const errData = JSON.parse(res.data)
+            errMsg = errData.message || errMsg
+          } catch (e) {}
+          console.error('[Upload] 请求失败:', errMsg)
+          reject(new Error(errMsg))
+          return
+        }
+
         try {
           const data = JSON.parse(res.data)
           if (data.status === true && data.data && data.data.links) {
@@ -82,7 +103,7 @@ async function uploadImage(filePath, options = {}) {
             resolve(imageUrl)
           } else {
             const errMsg = (data && data.message) || '上传失败'
-            console.error('[Upload] 接口返回错误:', errMsg)
+            console.error('[Upload] 接口返回错误:', errMsg, data)
             reject(new Error(errMsg))
           }
         } catch (e) {
@@ -91,8 +112,8 @@ async function uploadImage(filePath, options = {}) {
         }
       },
       fail: (err) => {
-        console.error('[Upload] 网络请求失败:', err)
-        reject(new Error('网络请求失败'))
+        console.error('[Upload] 网络请求失败:', JSON.stringify(err))
+        reject(new Error(err.errMsg || '网络请求失败'))
       }
     })
   })

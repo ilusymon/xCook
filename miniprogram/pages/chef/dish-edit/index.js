@@ -306,7 +306,12 @@ Page({
     } catch (err) {
       wx.hideLoading()
       console.error('保存菜品失败', err)
-      wx.showToast({ title: '保存失败', icon: 'none' })
+      const errMsg = err.message || '保存失败'
+      wx.showModal({
+        title: '保存失败',
+        content: errMsg,
+        showCancel: false
+      })
     }
   }
 })
