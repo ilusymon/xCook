@@ -1,7 +1,11 @@
 {
   "usingComponents": {
     "order-status-tag": "/components/order-status-tag/index",
-    "home-btn": "/components/home-btn/index"
+    "home-btn": "/components/home-btn/index",
+    "placeholder": "/components/placeholder/index"
+  },
+  "componentPlaceholder": {
+    "order-status-tag": "placeholder"
   },
   "navigationBarTitleText": "我的订单"
 }

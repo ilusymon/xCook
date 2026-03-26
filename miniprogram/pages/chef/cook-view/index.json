@@ -1,7 +1,12 @@
 {
   "usingComponents": {
     "step-card": "/components/step-card/index",
-    "material-list": "/components/material-list/index"
+    "material-list": "/components/material-list/index",
+    "placeholder": "/components/placeholder/index"
+  },
+  "componentPlaceholder": {
+    "step-card": "placeholder",
+    "material-list": "placeholder"
   },
   "navigationBarTitleText": "烹饪指引"
 }

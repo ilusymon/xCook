@@ -3,7 +3,12 @@
     "dish-card": "/components/dish-card/index",
     "cart-bar": "/components/cart-bar/index",
     "star-coin-badge": "/components/star-coin-badge/index",
-    "home-btn": "/components/home-btn/index"
+    "home-btn": "/components/home-btn/index",
+    "placeholder": "/components/placeholder/index"
+  },
+  "componentPlaceholder": {
+    "dish-card": "placeholder",
+    "cart-bar": "placeholder"
   },
   "navigationBarTitleText": "菜单"
 }

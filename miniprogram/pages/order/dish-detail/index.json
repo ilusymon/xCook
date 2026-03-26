@@ -1,6 +1,10 @@
 {
   "usingComponents": {
-    "option-picker": "/components/option-picker/index"
+    "option-picker": "/components/option-picker/index",
+    "placeholder": "/components/placeholder/index"
+  },
+  "componentPlaceholder": {
+    "option-picker": "placeholder"
   },
   "navigationBarTitleText": "菜品详情"
 }
