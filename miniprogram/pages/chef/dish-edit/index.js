@@ -1,5 +1,6 @@
 const app = getApp()
 const cloud = require('../../../utils/cloud')
+const upload = require('../../../utils/upload')
 
 Page({
   data: {
@@ -260,26 +261,37 @@ Page({
     wx.showLoading({ title: '保存中...' })
 
     try {
-      // 上传封面图（如果是本地文件）
-      if (dish.coverImage && !dish.coverImage.startsWith('cloud://')) {
-        const fileID = await cloud.uploadImage(
-          dish.coverImage,
-          `dishes/cover_${Date.now()}.jpg`
-        )
-        dish.coverImage = fileID
+      // 收集需要上传的本地图片
+      const uploadTasks = []
+
+      // 封面图（如果是本地文件）
+      if (dish.coverImage && !upload.isRemoteUrl(dish.coverImage)) {
+        uploadTasks.push({ type: 'cover', filePath: dish.coverImage })
       }
 
-      // 上传步骤图片
+      // 步骤图片
       for (let i = 0; i < dish.steps.length; i++) {
         const step = dish.steps[i]
-        if (step.image && !step.image.startsWith('cloud://')) {
-          const fileID = await cloud.uploadImage(
-            step.image,
-            `dishes/step_${Date.now()}_${i}.jpg`
-          )
-          dish.steps[i].image = fileID
+        if (step.image && !upload.isRemoteUrl(step.image)) {
+          uploadTasks.push({ type: 'step', index: i, filePath: step.image })
         }
       }
+
+      // 逐个压缩上传并更新进度
+      if (uploadTasks.length > 0) {
+        for (let t = 0; t < uploadTasks.length; t++) {
+          wx.showLoading({ title: `上传图片 ${t + 1}/${uploadTasks.length}...` })
+          const task = uploadTasks[t]
+          const imageUrl = await upload.uploadImage(task.filePath)
+          if (task.type === 'cover') {
+            dish.coverImage = imageUrl
+          } else {
+            dish.steps[task.index].image = imageUrl
+          }
+        }
+      }
+
+      wx.showLoading({ title: '保存中...' })
 
       // 保存到云端
       const res = await cloud.saveDish(dish)

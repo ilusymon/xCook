@@ -129,13 +129,15 @@ function watchNewOrders(onChange) {
 }
 
 /**
- * 上传图片到云存储
+ * 上传图片到第三方图床（helloimg.com）
+ * 自动压缩后上传，返回图片 URL
+ * @param {string} filePath - 本地图片路径
+ * @param {string} _cloudPath - 已废弃参数，保留兼容
+ * @param {Object} options - 上传选项（quality, compress）
  */
-function uploadImage(filePath, cloudPath) {
-  return wx.cloud.uploadFile({
-    cloudPath,
-    filePath
-  }).then(res => res.fileID)
+function uploadImage(filePath, _cloudPath, options) {
+  const upload = require('./upload')
+  return upload.uploadImage(filePath, options)
 }
 
 module.exports = {

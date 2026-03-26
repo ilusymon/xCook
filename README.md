@@ -32,7 +32,7 @@
 | UI 组件 | iView Weapp |
 | 后端 | 微信云开发（CloudBase） |
 | 数据库 | 云开发数据库 |
-| 存储 | 云开发存储 |
+| 图片存储 | helloimg.com 第三方图床 |
 | 实时通信 | 数据库 watch |
 
 ## 快速开始
@@ -50,6 +50,10 @@
    ```js
    wx.cloud.init({ env: 'your-env-id' })
    ```
+4. 配置图床 API Token（用于图片上传）：
+   - 注册 [helloimg.com](https://www.helloimg.com) 账号
+   - 在个人中心获取 API Token
+   - 填入 `miniprogram/utils/upload.js` 的 `API_TOKEN` 常量
 
 ### 3. 云开发配置
 
@@ -109,7 +113,7 @@ xCook/
 ├── miniprogram/
 │   ├── app.js / app.json / app.wxss
 │   ├── images/               # 图标资源
-│   ├── utils/                # 工具函数
+│   ├── utils/                # 工具函数（含图床上传模块）
 │   ├── components/           # 自定义组件（8个）
 │   └── pages/
 │       ├── index/            # 首页（角色选择）
@@ -130,6 +134,7 @@ xCook/
 
 - 本项目不接入任何真实支付，使用虚拟「星星币」
 - 新用户自动赠送 100 星星币
+- 图片上传使用 [helloimg.com](https://www.helloimg.com) 图床，上传前自动压缩（质量 80%），需配置 API Token
 - `images/` 目录下为程序生成的占位图标，建议替换为专业设计的 PNG 图标（推荐 81x81px）
 - `star-coin.png` 用于星星币标识，建议设计一个金色星星图标
 
