@@ -129,8 +129,8 @@ function watchNewOrders(onChange) {
 }
 
 /**
- * 上传图片到第三方图床（helloimg.com）
- * 自动压缩后上传，返回图片 URL
+ * 上传图片到 GitCode 仓库图床
+ * 自动压缩后转 base64 上传，返回 raw URL
  * @param {string} filePath - 本地图片路径
  * @param {string} _cloudPath - 已废弃参数，保留兼容
  * @param {Object} options - 上传选项（quality, compress）

@@ -19,7 +19,7 @@
 | UI 组件库 | iView Weapp |
 | 后端 | 微信云开发（CloudBase） |
 | 数据库 | 云开发数据库（MongoDB-like） |
-| 图片存储 | helloimg.com 第三方图床（压缩上传） |
+| 图片存储 | GitCode 仓库图床（压缩 + base64 上传） |
 | 实时通信 | 数据库实时推送（watch） |
 
 ---
@@ -48,7 +48,7 @@ xCook/
 │   │
 │   ├── utils/
 │   │   ├── cloud.js             # 云函数调用封装
-│   │   ├── upload.js            # 图片压缩 & 图床上传（helloimg.com）
+│   │   ├── upload.js            # 图片压缩 & GitCode 仓库图床上传
 │   │   ├── auth.js              # 用户角色与权限
 │   │   ├── constants.js         # 常量定义
 │   │   └── format.js            # 格式化工具
@@ -420,4 +420,4 @@ cancelled  cancelled
 - **原子操作**：星星币扣减使用 `_.inc()` 保证原子性
 - **软删除**：菜品删除为逻辑删除，保留历史订单引用完整性
 - **openid 鉴权**：云函数通过 `cloud.getWXContext()` 获取可信 openid
-- **图片上传**：使用 helloimg.com 第三方图床，上传前自动压缩（quality=80），需在小程序管理后台添加 `https://www.helloimg.com` 到 request 合法域名和 uploadFile 合法域名
+- **图片上传**：使用 GitCode 仓库作为图床，上传前自动压缩（quality=80），通过 GitCode v5 API 将 base64 内容写入仓库，返回 raw URL。需在小程序管理后台添加 `https://api.gitcode.com` 和 `https://raw.gitcode.com` 到 request 合法域名

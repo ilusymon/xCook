@@ -32,7 +32,7 @@
 | UI 组件 | iView Weapp |
 | 后端 | 微信云开发（CloudBase） |
 | 数据库 | 云开发数据库 |
-| 图片存储 | helloimg.com 第三方图床 |
+| 图片存储 | GitCode 仓库图床 |
 | 实时通信 | 数据库 watch |
 
 ## 快速开始
@@ -54,7 +54,9 @@
    | 字段 | 说明 | 获取方式 |
    |------|------|----------|
    | `CLOUD_ENV` | 云开发环境 ID | 微信开发者工具 → 云开发控制台 → 设置 |
-   | `HELLOIMG_TOKEN` | 图床 API Token | 注册 [helloimg.com](https://www.helloimg.com) → 个人中心 |
+   | `GITCODE_OWNER` | GitCode 用户名 | 你的 [GitCode](https://gitcode.com) 用户名 |
+   | `GITCODE_REPO` | 图床仓库名 | 创建一个**公开**仓库用于存放图片 |
+   | `GITCODE_TOKEN` | GitCode 私人令牌 | 个人设置 → 安全设置 → 私人令牌 |
 
    > `secret.config.js` 已被 `.gitignore` 排除，不会提交到仓库
 
@@ -139,7 +141,7 @@ xCook/
 
 - 本项目不接入任何真实支付，使用虚拟「星星币」
 - 新用户自动赠送 100 星星币
-- 图片上传使用 [helloimg.com](https://www.helloimg.com) 图床，上传前自动压缩（质量 80%），需配置 API Token
+- 图片上传使用 GitCode 仓库图床，上传前自动压缩（质量 80%），通过 API 写入公开仓库后返回 raw URL。需在小程序后台添加 `api.gitcode.com` 和 `raw.gitcode.com` 到合法域名
 - `images/` 目录下为程序生成的占位图标，建议替换为专业设计的 PNG 图标（推荐 81x81px）
 - `star-coin.png` 用于星星币标识，建议设计一个金色星星图标
 
