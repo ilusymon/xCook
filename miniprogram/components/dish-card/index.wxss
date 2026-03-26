@@ -1,5 +1,7 @@
 .dish-card {
   display: flex;
+  width: 100%;
+  box-sizing: border-box;
   background: #FFFFFF;
   border-radius: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
@@ -17,6 +19,7 @@
 
 .dish-info {
   flex: 1;
+  min-width: 0;
   margin-left: 20rpx;
   display: flex;
   flex-direction: column;
@@ -36,7 +39,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 280rpx;
+  flex: 1;
+  min-width: 0;
 }
 
 .calorie-tag {

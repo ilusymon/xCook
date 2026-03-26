@@ -64,8 +64,10 @@
 /* 右侧菜品列表 */
 .dish-list {
   flex: 1;
+  min-width: 0;
   padding: 16rpx 20rpx;
   padding-bottom: 130rpx;
+  box-sizing: border-box;
 }
 
 .category-title {

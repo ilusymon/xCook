@@ -81,7 +81,6 @@
 /* 统计 */
 .stats-row {
   display: flex;
-  gap: 16rpx;
   margin-bottom: 32rpx;
 }
 
@@ -92,6 +91,11 @@
   padding: 28rpx 16rpx;
   text-align: center;
   box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+  margin-right: 16rpx;
+}
+
+.stat-card:last-child {
+  margin-right: 0;
 }
 
 .stat-value {
@@ -118,11 +122,11 @@
 .action-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
+  justify-content: space-between;
 }
 
 .action-item {
-  flex: 0 0 calc(50% - 10rpx);
+  width: 48%;
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 32rpx 16rpx;
@@ -132,6 +136,7 @@
   align-items: center;
   box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
   transition: transform 0.2s ease;
+  margin-bottom: 20rpx;
 }
 
 .action-item:active {
