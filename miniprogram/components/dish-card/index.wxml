@@ -1,5 +1,8 @@
 <view class="dish-card" bindtap="onTap">
-  <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" lazy-load />
+  <view class="dish-cover-wrap">
+    <image class="dish-cover-loading" src="/images/loading.gif" wx:if="{{!coverLoaded}}" mode="aspectFill" />
+    <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" lazy-load bindload="onCoverLoad" binderror="onCoverLoad" style="opacity:{{coverLoaded ? 1 : 0}}" />
+  </view>
   <view class="dish-info">
     <view class="dish-header">
       <text class="dish-name">{{dish.name}}</text>

@@ -10,6 +10,10 @@ Component({
     }
   },
 
+  data: {
+    coverLoaded: false
+  },
+
   methods: {
     onTap() {
       this.triggerEvent('tap', { dish: this.data.dish })
@@ -17,6 +21,10 @@ Component({
 
     onAdd() {
       this.triggerEvent('add', { dish: this.data.dish })
+    },
+
+    onCoverLoad() {
+      this.setData({ coverLoaded: true })
     }
   }
 })

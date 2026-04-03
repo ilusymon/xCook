@@ -74,11 +74,29 @@
   line-height: 1.6;
 }
 
-.step-image {
+.step-image-wrap {
+  position: relative;
   width: 100%;
   height: 300rpx;
   border-radius: 16rpx;
   margin-top: 16rpx;
+  overflow: hidden;
+  background: #FFF5F5;
+}
+
+.step-image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.step-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+  transition: opacity 0.3s;
 }
 
 .step-meta {

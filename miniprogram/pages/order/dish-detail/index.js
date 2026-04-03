@@ -9,7 +9,8 @@ Page({
     extraPrice: 0,
     totalPrice: 0,
     totalCalories: 0,
-    difficultyText: ''
+    difficultyText: '',
+    heroLoaded: false
   },
 
   onLoad(options) {
@@ -57,6 +58,10 @@ Page({
     const totalPrice = (dish.price + extraPrice) * quantity
     const totalCalories = dish.calories * quantity
     this.setData({ totalPrice, totalCalories })
+  },
+
+  onHeroLoad() {
+    this.setData({ heroLoaded: true })
   },
 
   addToCart() {

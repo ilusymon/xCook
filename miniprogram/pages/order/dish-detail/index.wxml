@@ -1,6 +1,9 @@
 <view class="detail-page">
   <!-- 封面图 -->
-  <image class="dish-hero" src="{{dish.coverImage}}" mode="aspectFill" />
+  <view class="dish-hero-wrap">
+    <image class="dish-hero-loading" src="/images/loading.gif" wx:if="{{!heroLoaded}}" mode="aspectFill" />
+    <image class="dish-hero" src="{{dish.coverImage}}" mode="aspectFill" bindload="onHeroLoad" binderror="onHeroLoad" style="opacity:{{heroLoaded ? 1 : 0}}" />
+  </view>
 
   <!-- 基本信息 -->
   <view class="info-card">

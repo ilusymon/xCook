@@ -6,7 +6,10 @@
   </view>
   <view class="step-content">
     <text class="step-desc">{{step.description}}</text>
-    <image class="step-image" wx:if="{{step.image}}" src="{{step.image}}" mode="aspectFill" lazy-load />
+    <view class="step-image-wrap" wx:if="{{step.image}}">
+      <image class="step-image-loading" src="/images/loading.gif" wx:if="{{!imageLoaded}}" mode="aspectFill" />
+      <image class="step-image" src="{{step.image}}" mode="aspectFill" lazy-load bindload="onImageLoad" binderror="onImageLoad" style="opacity:{{imageLoaded ? 1 : 0}}" />
+    </view>
     <view class="step-meta" wx:if="{{step.duration}}">
       <text class="step-duration">⏱ {{step.duration}}分钟</text>
     </view>

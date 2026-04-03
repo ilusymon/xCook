@@ -4,5 +4,15 @@ Component({
     isActive: { type: Boolean, value: false },
     isCompleted: { type: Boolean, value: false },
     isLast: { type: Boolean, value: false }
+  },
+
+  data: {
+    imageLoaded: false
+  },
+
+  methods: {
+    onImageLoad() {
+      this.setData({ imageLoaded: true })
+    }
   }
 })
