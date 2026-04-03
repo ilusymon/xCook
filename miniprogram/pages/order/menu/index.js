@@ -8,6 +8,7 @@ Page({
     currentCategory: 0,
     scrollToView: '',
     starCoins: 0,
+    sidebarScrollTo: '',
     cartSummary: { totalCount: 0, totalPrice: 0, totalCalories: 0 }
   },
 
@@ -25,6 +26,8 @@ Page({
         this.setData({
           categories: res.categories || [],
           dishMap: res.dishes || {}
+        }, () => {
+          setTimeout(() => this.cacheSectionOffsets(), 300)
         })
       }
     }).catch(() => {
@@ -35,10 +38,27 @@ Page({
 
   onCategoryTap(e) {
     const { index, id } = e.currentTarget.dataset
-    this.setData({
-      currentCategory: index,
-      scrollToView: 'cat_' + id
-    })
+    const targetView = 'cat_' + id
+    const sideView = 'side_' + id
+    this._tapping = true
+
+    // 仅当 scrollToView 与目标相同时才需要两步（强制重新滚动）
+    if (this.data.scrollToView === targetView) {
+      this.setData({
+        currentCategory: index,
+        sidebarScrollTo: sideView,
+        scrollToView: ''
+      }, () => {
+        this.setData({ scrollToView: targetView })
+      })
+    } else {
+      this.setData({
+        currentCategory: index,
+        sidebarScrollTo: sideView,
+        scrollToView: targetView
+      })
+    }
+    setTimeout(() => { this._tapping = false }, 600)
   },
 
   onDishTap(e) {
@@ -79,7 +99,46 @@ Page({
     this.setData({ cartSummary: summary })
   },
 
-  onDishScroll() {
-    // 可选：根据滚动位置联动左侧分类高亮
+  /* ---- 锚点偏移量驱动的滚动联动 ---- */
+
+  cacheSectionOffsets() {
+    this.createSelectorQuery()
+      .selectAll('.category-section')
+      .boundingClientRect()
+      .select('.dish-list')
+      .boundingClientRect()
+      .select('.dish-list')
+      .scrollOffset()
+      .exec(res => {
+        const sections = res[0]
+        const container = res[1]
+        const scroll = res[2]
+        if (!sections || !sections.length || !container || !scroll) return
+        // 绝对偏移量 = 视口相对位置差 + 当前滚动距离
+        const st = scroll.scrollTop
+        this._sectionOffsets = sections.map(s => s.top - container.top + st)
+      })
+  },
+
+  onDishScroll(e) {
+    if (this._tapping || !this._sectionOffsets) return
+    if (this._scrollTimer) return
+    this._scrollTimer = setTimeout(() => {
+      this._scrollTimer = null
+      const scrollTop = e.detail.scrollTop
+      let current = 0
+      for (let i = 0; i < this._sectionOffsets.length; i++) {
+        if (this._sectionOffsets[i] <= scrollTop + 10) {
+          current = i
+        }
+      }
+      if (current !== this.data.currentCategory) {
+        const cat = this.data.categories[current]
+        this.setData({
+          currentCategory: current,
+          sidebarScrollTo: cat ? 'side_' + cat._id : ''
+        })
+      }
+    }, 50)
   }
 })

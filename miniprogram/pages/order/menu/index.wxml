@@ -8,11 +8,12 @@
 
   <view class="menu-body">
     <!-- 左侧分类栏 -->
-    <scroll-view class="category-sidebar" scroll-y>
+    <scroll-view class="category-sidebar" scroll-y scroll-into-view="{{sidebarScrollTo}}" scroll-with-animation>
       <view
         class="category-item {{currentCategory === index ? 'active' : ''}}"
         wx:for="{{categories}}"
         wx:key="_id"
+        id="side_{{item._id}}"
         bindtap="onCategoryTap"
         data-index="{{index}}"
         data-id="{{item._id}}"
@@ -30,6 +31,7 @@
       bindscroll="onDishScroll"
     >
       <view
+        class="category-section"
         wx:for="{{categories}}"
         wx:key="_id"
         id="cat_{{item._id}}"
