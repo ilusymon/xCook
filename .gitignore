@@ -5,6 +5,7 @@ package-lock.json
 
 # 敏感配置（含 API Token 等密钥）
 miniprogram/config/secret.config.js
+backend/.env
 
 # IDE
 .idea/

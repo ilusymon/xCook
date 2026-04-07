@@ -45,10 +45,9 @@ Page({
       order.items = order.items.map(item => {
         const optionTags = []
         if (item.selectedOptions) {
-          item.selectedOptions.forEach(opt => {
-            if (opt.selected) {
-              opt.selected.forEach(v => optionTags.push(v))
-            }
+          Object.keys(item.selectedOptions).forEach(groupName => {
+            const selected = item.selectedOptions[groupName] || []
+            selected.forEach(v => optionTags.push(v))
           })
         }
         return { ...item, optionTags }

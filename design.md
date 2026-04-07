@@ -5,9 +5,10 @@
 星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单制作。使用虚拟「星星币」作为支付方式，不接入真实支付。
 
 ### 1.1 核心目标
-- 让情侣间的做饭点餐变得有仪式感和趣味性
-- 厨师可以完整管理菜品分类、菜品的食材、步骤、视频
-- 点菜人可以方便地浏览、选择口味偏好、追踪订单
+- 让情侣间的做饭点餐更有仪式感和趣味性
+- 厨师可以完整管理菜品分类、菜品、食材、步骤、视频
+- 点菜人可以方便浏览、选择口味、下单并追踪订单
+- 将原云开发方案替换为可自部署的 `Go + MySQL + MinIO` 架构
 
 ---
 
@@ -17,407 +18,327 @@
 |------|------|
 | 前端框架 | 微信小程序原生 MINA 框架 |
 | UI 组件库 | iView Weapp |
-| 后端 | 微信云开发（CloudBase） |
-| 数据库 | 云开发数据库（MongoDB-like） |
-| 图片存储 | GitCode 仓库图床（压缩 + base64 上传） |
-| 实时通信 | 数据库实时推送（watch） |
+| 后端 | Go 1.25 + Gin |
+| 数据库 | MySQL 8 + GORM |
+| 图片存储 | MinIO |
+| 鉴权 | `wx.login` + 后端 `code2session` + JWT |
+| 实时通信 | 小程序轮询 |
+
+### 2.1 架构说明
+
+- 小程序不再依赖 `wx.cloud`
+- 原云函数能力统一由 Go 后端暴露为 HTTP API
+- 业务数据从云数据库迁移到 MySQL
+- 菜品封面图、步骤图上传至 MinIO
+- 原数据库 `watch` 实时监听改为前端定时轮询
 
 ---
 
 ## 3. 项目结构
 
-```
+```text
 xCook/
-├── project.config.json          # 小程序项目配置
-├── package.json                 # npm 依赖（iview-weapp）
-├── design.md                    # 本设计文档
-├── README.md                    # 项目说明
+├── project.config.json
+├── package.json
+├── design.md
+├── README.md
+├── docker-compose.yml
+│
+├── backend/
+│   ├── cmd/
+│   │   └── api/
+│   │       └── main.go            # Go 服务启动入口
+│   ├── internal/
+│   │   ├── app/                   # 应用装配
+│   │   ├── auth/                  # JWT
+│   │   ├── config/                # 环境配置
+│   │   ├── handler/               # HTTP 处理器
+│   │   ├── middleware/            # 登录中间件
+│   │   ├── model/                 # GORM 模型
+│   │   ├── service/               # 业务逻辑
+│   │   ├── storage/               # MinIO 上传
+│   │   └── wechat/                # 微信 code2session
+│   ├── .env.example
+│   └── go.mod
 │
 ├── miniprogram/
-│   ├── app.js                   # 全局逻辑（云初始化、购物车管理）
-│   ├── app.json                 # 全局配置（页面路由、tabBar）
-│   ├── app.wxss                 # 全局样式（CSS 变量、通用类）
-│   ├── sitemap.json
-│   │
-│   ├── images/                  # 图标资源
-│   │   ├── tab-home.png / tab-home-active.png
-│   │   ├── tab-cart.png / tab-cart-active.png
-│   │   ├── tab-order.png / tab-order-active.png
-│   │   ├── tab-chef.png / tab-chef-active.png
-│   │   └── star-coin.png
-│   │
+│   ├── app.js                     # 全局逻辑（登录、购物车）
+│   ├── app.json
+│   ├── app.wxss
+│   ├── config/
+│   │   └── secret.config.js       # 小程序 API 地址等本地配置
 │   ├── utils/
-│   │   ├── cloud.js             # 云函数调用封装
-│   │   ├── upload.js            # 图片压缩 & GitCode 仓库图床上传
-│   │   ├── auth.js              # 用户角色与权限
-│   │   ├── constants.js         # 常量定义
-│   │   └── format.js            # 格式化工具
-│   │
+│   │   ├── api.js                 # HTTP / 登录态封装
+│   │   ├── cloud.js               # 兼容层：页面仍按原函数名调用
+│   │   ├── upload.js              # 图片压缩 + 上传到后端
+│   │   ├── auth.js
+│   │   ├── constants.js
+│   │   └── format.js
 │   ├── components/
-│   │   ├── dish-card/           # 菜品卡片
-│   │   ├── cart-bar/            # 悬浮购物车栏
-│   │   ├── option-picker/       # 口味选项选择器
-│   │   ├── star-coin-badge/     # 星星币余额徽章
-│   │   ├── order-status-tag/    # 订单状态标签
-│   │   ├── step-card/           # 制作步骤卡片
-│   │   ├── material-list/       # 食材清单
-│   │   └── home-btn/            # 首页导航按钮
-│   │
 │   └── pages/
-│       ├── index/               # 首页（角色选择）
-│       │
-│       ├── order/               # ── 点菜端 ──
-│       │   ├── menu/            # 菜单浏览（左分类 + 右列表）
-│       │   ├── dish-detail/     # 菜品详情 + 选项选择
-│       │   ├── cart/            # 购物车
-│       │   ├── checkout/        # 确认下单 + 星星币支付
-│       │   ├── order-list/      # 订单列表
-│       │   └── order-detail/    # 订单详情 + 状态跟踪
-│       │
-│       └── chef/                # ── 厨师端 ──
-│           ├── dashboard/       # 厨房首页（统计 + 快捷入口）
-│           ├── category-manage/ # 分类管理（增删改排序）
-│           ├── dish-manage/     # 菜品管理列表
-│           ├── dish-edit/       # 菜品编辑（选项组/食材/步骤/视频）
-│           ├── cook-view/       # 沉浸式烹饪指引
-│           └── order-manage/    # 订单管理（接单/制作/完成）
 │
-└── cloudfunctions/
-    ├── getUserInfo/             # 获取/创建用户
-    ├── getMenu/                 # 获取菜单（分类+菜品）
-    ├── getDishDetail/           # 获取菜品详情
-    ├── saveDish/                # 新建/更新菜品
-    ├── deleteDish/              # 软删除菜品
-    ├── placeOrder/              # 下单（服务端验价+扣币）
-    ├── getOrders/               # 查询订单列表/详情
-    ├── updateOrderStatus/       # 更新订单状态
-    ├── adjustStarCoins/         # 调整星星币余额
-    ├── initCategories/          # 初始化默认分类
-    └── saveCategory/            # 新建/更新/删除分类
+└── cloudfunctions/                # 旧实现，仅作迁移参考
 ```
 
 ---
 
 ## 4. 数据库设计
 
-### 4.1 users 集合
+MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改为 JSON 列存储。
+
+### 4.1 users 表
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| _id | string | 等于 openid |
-| openid | string | 微信 openid |
-| nickName | string | 昵称 |
-| avatarUrl | string | 头像 |
-| role | string | `orderer` / `chef` / `both` |
-| starCoins | number | 星星币余额（初始赠送 100） |
-| coinLog | array | 星星币变动记录 |
-| createdAt | date | 注册时间 |
+| id | varchar(64) | 主键，等于 openid |
+| openid | varchar(64) | 微信 openid |
+| nick_name | varchar(128) | 昵称 |
+| avatar_url | varchar(1024) | 头像 |
+| role | varchar(32) | `orderer` / `chef` / `both` |
+| star_coins | bigint | 星星币余额，默认 100 |
+| coin_log | json | 星星币变动记录 |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
 
-### 4.2 categories 集合
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| _id | string | 自动生成 |
-| name | string | 分类名（可自定义，默认：荤菜/素菜/汤品/主食/甜品/饮品） |
-| icon | string | 图标标识 |
-| sortOrder | number | 排序序号 |
-| isActive | boolean | 是否启用 |
-| createdAt | date | 创建时间 |
-| updatedAt | date | 更新时间 |
-
-### 4.3 dishes 集合
+### 4.2 categories 表
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| _id | string | 自动生成 |
-| name | string | 菜品名称 |
-| description | string | 简短描述 |
-| coverImage | string | 封面图（cloud fileID） |
-| categoryId | string | 所属分类 ID |
-| price | number | 星星币价格 |
-| calories | number | 卡路里（kcal） |
-| preparationTime | number | 制作时间（分钟） |
-| difficulty | number | 难度（1简单 2中等 3困难） |
-| isAvailable | boolean | 是否上架 |
-| isDeleted | boolean | 是否已删除（软删除） |
-| optionGroups | array | 选项组 |
-| materials | array | 制作材料 |
-| steps | array | 制作步骤 |
-| videoUrl | string | 制作视频链接 |
-| createdBy | string | 创建者 openid |
-| createdAt | date | 创建时间 |
+| id | varchar(64) | 主键 |
+| name | varchar(64) | 分类名 |
+| icon | varchar(64) | 图标标识 |
+| sort_order | int | 排序序号 |
+| is_active | tinyint | 是否启用 |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
 
-#### optionGroups 结构
-```json
-[
-  {
-    "groupName": "辣度",
-    "type": "single",
-    "required": true,
-    "options": [
-      { "label": "不辣", "value": "不辣", "extraPrice": 0 },
-      { "label": "微辣", "value": "微辣", "extraPrice": 0 },
-      { "label": "中辣", "value": "中辣", "extraPrice": 0 },
-      { "label": "特辣", "value": "特辣", "extraPrice": 2 }
-    ]
-  },
-  {
-    "groupName": "加料",
-    "type": "multi",
-    "required": false,
-    "options": [
-      { "label": "加葱", "value": "加葱", "extraPrice": 0 },
-      { "label": "加蒜", "value": "加蒜", "extraPrice": 0 },
-      { "label": "加蛋", "value": "加蛋", "extraPrice": 3 }
-    ]
-  }
-]
-```
-
-#### materials 结构
-```json
-[
-  { "name": "鸡胸肉", "amount": "200g", "note": "去皮" },
-  { "name": "青椒", "amount": "2个", "note": "" }
-]
-```
-
-#### steps 结构
-```json
-[
-  {
-    "stepNumber": 1,
-    "description": "鸡胸肉切丁，加料酒、盐腌制15分钟",
-    "image": "cloud://xxx",
-    "duration": 15
-  }
-]
-```
-
-### 4.4 orders 集合
+### 4.3 dishes 表
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| _id | string | 自动生成 |
-| orderNumber | string | 订单号（XC+日期+随机码） |
-| userId | string | 下单人 openid |
-| status | string | `placed` / `accepted` / `cooking` / `done` / `cancelled` |
-| items | array | 订单菜品明细 |
-| totalPrice | number | 总价（星星币） |
-| totalCalories | number | 总热量 |
-| note | string | 备注 |
-| statusHistory | array | 状态变更历史 |
-| createdAt | date | 创建时间 |
+| id | varchar(64) | 主键 |
+| name | varchar(128) | 菜品名称 |
+| description | text | 简短描述 |
+| cover_image | varchar(1024) | 封面图 URL（MinIO） |
+| category_id | varchar(64) | 所属分类 ID |
+| price | bigint | 星星币价格 |
+| calories | bigint | 卡路里 |
+| preparation_time | int | 制作时间（分钟） |
+| difficulty | int | 难度 |
+| is_available | tinyint | 是否上架 |
+| is_deleted | tinyint | 是否软删除 |
+| option_groups | json | 口味选项组 |
+| materials | json | 食材清单 |
+| steps | json | 制作步骤 |
+| video_url | varchar(1024) | 视频链接 |
+| created_by | varchar(64) | 创建者 openid |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
 
-#### 订单状态流转
-```
-placed → accepted → cooking → done
-  ↓         ↓
-cancelled  cancelled
-```
+### 4.4 orders 表
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | varchar(64) | 主键 |
+| order_number | varchar(32) | 订单号 |
+| user_id | varchar(64) | 下单人 openid |
+| status | varchar(32) | `placed` / `accepted` / `cooking` / `done` / `cancelled` |
+| items | json | 菜品明细 |
+| total_price | bigint | 总价 |
+| total_calories | bigint | 总热量 |
+| note | text | 备注 |
+| status_history | json | 状态流转历史 |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
+
+### 4.5 JSON 结构
+
+`optionGroups`、`materials`、`steps`、`items`、`coinLog`、`statusHistory` 保持与原设计一致，便于前端平滑迁移。
 
 ---
 
 ## 5. 页面设计
 
+页面信息架构与原设计保持一致，不因后端迁移而调整。
+
 ### 5.1 点菜端
-
-#### 首页 (index)
-- 角色选择入口：「我要点菜」/「我要做菜」
-- 星星币余额显示
-
-#### 菜单页 (order/menu)
-- 左侧分类侧边栏，右侧菜品列表
-- 菜品卡片展示封面图、名称、卡路里、价格、快速添加按钮
-- 底部悬浮购物车栏（数量、总价、总卡路里）
-
-#### 菜品详情页 (order/dish-detail)
-- 大图封面 + 基本信息（名称、描述、卡路里、制作时间、难度）
-- 口味选项选择器（单选/多选，支持加价）
-- 数量调节
-- 底部合计 + 加入购物车按钮
-
-#### 购物车页 (order/cart)
-- 购物车列表（封面、名称、已选选项标签、价格、数量调节）
-- 删除 / 清空购物车
-- 底部结算栏
-
-#### 下单确认页 (order/checkout)
-- 订单摘要
-- 备注输入
-- 余额对比（余额不足提醒）
-- 星星币支付按钮
-
-#### 订单列表页 (order/order-list)
-- 全部 / 进行中 / 已完成 标签筛选
-- 订单卡片（单号、状态标签、菜品摘要、时间、价格）
-
-#### 订单详情页 (order/order-detail)
-- 状态步骤条（下单→接单→制作→完成）
-- 实时状态更新（数据库 watch）
-- 菜品明细 + 备注 + 合计
-- 可取消（仅 placed 状态）
+- 首页：角色选择、余额展示
+- 菜单页：左分类右菜品、购物车汇总
+- 菜品详情页：封面、描述、难度、选项选择
+- 购物车页：增减、删除、汇总
+- 结算页：备注、余额校验、下单
+- 订单列表页：全部 / 进行中 / 已完成
+- 订单详情页：状态进度、明细、取消订单
 
 ### 5.2 厨师端
-
-#### 厨房首页 (chef/dashboard)
-- 问候区域
-- 新订单提醒横幅
-- 统计卡片（待处理/今日订单/菜品总数）
-- 快捷操作：管理菜品、新增菜品、订单管理、分类管理
-
-#### 分类管理 (chef/category-manage)
-- 分类列表，展示图标、名称、启用状态
-- 内联编辑分类名称和图标（10种图标可选）
-- 上移/下移调整分类排序
-- 启用/停用开关
-- 添加新分类、删除分类（有菜品时阻止删除）
-
-#### 菜品管理 (chef/dish-manage)
-- 按分类分组展示菜品
-- 每道菜支持：上下架开关、编辑、查看做法、删除
-- 浮动添加按钮
-
-#### 菜品编辑 (chef/dish-edit)
-- 封面图上传
-- 基本信息表单（名称、描述、价格、卡路里、时间、难度、分类）
-- 选项组管理（动态增删选项组和选项，设置单选/多选、必选/可选、加价）
-- 制作材料管理（动态增删，名称+用量+备注）
-- 制作步骤管理（动态增删，描述+图片+时长，支持拖拽排序）
-- 制作视频链接
-- 保存按钮（含图片压缩上传到第三方图床）
-
-#### 烹饪指引 (chef/cook-view)
-- 菜品封面头部
-- 食材清单（可交互式勾选）
-- 步骤时间线（当前步骤高亮，已完步骤标记）
-- 底部导航（上一步/看视频/下一步）
-
-#### 订单管理 (chef/order-manage)
-- 新订单 / 制作中 / 已完成 标签筛选
-- 新订单实时推送（数据库 watch）
-- 操作按钮：接单 → 开始制作 → 完成
+- 厨房首页：待处理数、菜品总数、快捷入口
+- 分类管理：增删改排序、启停
+- 菜品管理：上下架、编辑、删除
+- 菜品编辑：图片、基本信息、选项、材料、步骤、视频
+- 烹饪指引：步骤时间线、材料勾选
+- 订单管理：接单、开始制作、完成
 
 ---
 
 ## 6. UI 设计规范
 
-### 6.1 色彩体系
+UI 规范与原方案一致：
 
-| 角色 | 色值 | 用途 |
-|------|------|------|
-| 主色 | `#FF6B81` | 按钮、强调、品牌色 |
-| 主色浅 | `#FFB8C6` | 选中态背景 |
-| 主色深 | `#E84660` | 按钮按下态 |
-| 辅色（金） | `#FFC048` | 星星币、价格 |
-| 背景色 | `#FFF5F5` | 页面底色 |
-| 卡片色 | `#FFFFFF` | 卡片背景 |
-| 文字色 | `#4A3333` | 主文字 |
-| 次要文字 | `#9B8888` | 辅助说明 |
-| 成功色 | `#5FD068` | 完成状态 |
-| 警告色 | `#FF9F43` | 卡路里标签 |
-| 分割线 | `#FFE4E4` | 边框、分割 |
-
-### 6.2 圆角规范
-
-| 元素 | 圆角 |
-|------|------|
-| 页面卡片 | 24rpx |
-| 按钮（胶囊） | 40rpx |
-| 图片 | 20rpx |
-| 标签 | 16rpx |
-| 输入框 | 16rpx |
-| FAB 按钮 | 50% |
-
-### 6.3 阴影
-- 卡片：`0 4rpx 16rpx rgba(255, 107, 129, 0.08)`
-- 按钮：`0 6rpx 20rpx rgba(255, 107, 129, 0.3)`
-- 底部栏：`0 -4rpx 20rpx rgba(255, 107, 129, 0.12)`
-
-### 6.4 动效
-- 按钮按下：`scale(0.97)` + 色彩加深
-- 列表项出现：`fadeIn 0.3s ease`
-- 购物车添加：`bounce 0.3s`
+- 主色：`#FF6B81`
+- 辅色：`#FFC048`
+- 背景色：`#FFF5F5`
+- 卡片圆角：`24rpx`
+- 胶囊按钮：`40rpx`
+- 柔和阴影 + 轻量动效
 
 ---
 
-## 7. 云函数设计
+## 7. 后端 API 设计
 
-### 7.1 getUserInfo
-- 获取/自动创建用户记录
-- 新用户赠送 100 星星币
+### 7.1 登录
 
-### 7.2 getMenu
-- 返回所有启用分类 + 按分类分组的可用菜品
+`POST /api/auth/login`
 
-### 7.3 getDishDetail
-- 根据 dishId 返回完整菜品数据
+请求体：
 
-### 7.4 saveDish
-- 有 `_id` 时更新，无 `_id` 时新建
-- 自动设置 `createdBy`、时间戳
+```json
+{
+  "code": "wx.login 返回的 code"
+}
+```
 
-### 7.5 deleteDish
-- 软删除（`isDeleted: true`）
+返回：
 
-### 7.6 placeOrder
-- **服务端验价**：重新查询菜品价格计算，不信任客户端
-- 验证菜品可用性
-- 验证星星币余额
-- 原子扣减星星币（`_.inc(-totalPrice)`）
-- 创建订单记录
+```json
+{
+  "token": "jwt-token",
+  "user": {
+    "_id": "openid",
+    "openid": "openid",
+    "role": "both",
+    "starCoins": 100
+  }
+}
+```
 
-### 7.7 getOrders
-- 支持按角色、状态、分页查询
-- 支持查询单个订单详情
+### 7.2 云函数兼容分发
 
-### 7.8 updateOrderStatus
-- 验证状态转换合法性
-- 取消订单时自动退还星星币
-- 记录状态变更历史
+为减少小程序页面改动，后端保留统一函数分发入口：
 
-### 7.9 adjustStarCoins
-- 手动调整星星币（伴侣互赠等场景）
+`POST /api/functions/:name`
 
-### 7.10 initCategories
-- 初始化默认 6 个菜品分类（幂等操作）
+支持的 `name`：
 
-### 7.11 saveCategory
-- 有 `_id` 时更新分类，无 `_id` 时新建（自动排到最后）
-- `action: 'delete'` 时删除分类（需先检查是否有关联菜品）
-- 自动维护 `createdAt` / `updatedAt` 时间戳
+- `getUserInfo`
+- `getMenu`
+- `getDishDetail`
+- `saveDish`
+- `deleteDish`
+- `placeOrder`
+- `getOrders`
+- `updateOrderStatus`
+- `adjustStarCoins`
+- `initCategories`
+- `saveCategory`
+
+### 7.3 图片上传
+
+`POST /api/uploads/images`
+
+- 请求方式：`multipart/form-data`
+- 字段：`file`
+- 后端将图片写入 MinIO，并返回公开访问 URL
 
 ---
 
 ## 8. 关键数据流
 
-### 8.1 下单流程
-```
-点菜端选菜 → 加入本地购物车 → 确认下单
-→ 调用 placeOrder 云函数
-→ 服务端验价 → 检查余额 → 原子扣币 → 创建订单
-→ 返回订单ID → 跳转订单详情
-→ 开启 watch 实时监听状态变化
+### 8.1 启动与登录流程
+
+```text
+小程序启动
+→ wx.login
+→ /api/auth/login
+→ 后端调用 jscode2session 获取 openid
+→ 签发 JWT
+→ 调用 getUserInfo 获取/创建用户
 ```
 
-### 8.2 厨师接单流程
+### 8.2 下单流程
+
+```text
+点菜端选菜
+→ 加入本地购物车
+→ 确认下单
+→ POST /api/functions/placeOrder
+→ 后端重新查菜品验价
+→ 锁定用户余额并扣减星星币
+→ 创建订单
+→ 返回订单ID
+→ 订单详情页轮询获取状态
 ```
-厨师端 watch 监听新订单
-→ 订单列表实时更新
-→ 点击「接单」→ updateOrderStatus(accepted)
-→ 点击「开始制作」→ updateOrderStatus(cooking)
-→ 可查看菜品做法（cook-view 页面）
-→ 点击「完成」→ updateOrderStatus(done)
-→ 点菜端实时收到状态更新
+
+### 8.3 厨师接单流程
+
+```text
+厨师端进入订单页
+→ 轮询 placed 订单
+→ 点击接单
+→ updateOrderStatus(accepted)
+→ 点击开始制作
+→ updateOrderStatus(cooking)
+→ 点击完成
+→ updateOrderStatus(done)
+→ 点菜端轮询详情页看到状态变化
+```
+
+### 8.4 图片上传流程
+
+```text
+小程序选择图片
+→ 本地压缩
+→ POST /api/uploads/images
+→ 后端上传至 MinIO
+→ 返回图片 URL
+→ 保存菜品时写入 dishes.cover_image / steps.image
 ```
 
 ---
 
-## 9. 安全考量
+## 9. 安全与一致性设计
 
-- **服务端验价**：placeOrder 不信任客户端传入的价格，服务端重新查询计算
-- **状态机校验**：updateOrderStatus 验证状态转换的合法性
-- **原子操作**：星星币扣减使用 `_.inc()` 保证原子性
-- **软删除**：菜品删除为逻辑删除，保留历史订单引用完整性
-- **openid 鉴权**：云函数通过 `cloud.getWXContext()` 获取可信 openid
-- **图片上传**：使用 GitCode 仓库作为图床，上传前自动压缩（quality=80），通过 GitCode v5 API 将 base64 内容写入仓库，返回 raw URL。需在小程序管理后台添加 `https://api.gitcode.com` 和 `https://raw.gitcode.com` 到 request 合法域名
+- **服务端验价**：`placeOrder` 不信任客户端价格，后端重新查询菜品计算
+- **状态机校验**：`updateOrderStatus` 校验订单状态转换是否合法
+- **事务保证**：下单与取消订单使用数据库事务保证余额和订单一致
+- **软删除**：菜品采用 `is_deleted` 逻辑删除
+- **JWT 鉴权**：业务接口统一通过 Bearer Token 识别用户
+- **微信身份来源**：正式环境通过 `code2session` 获取可信 openid
+- **图片隔离**：图片由 MinIO 单独管理，业务表仅保存 URL
+
+---
+
+## 10. 部署建议
+
+### 10.1 本地开发
+
+- 用 `docker compose up -d` 启动 MySQL 和 MinIO
+- `backend/.env` 配置数据库、对象存储和微信参数
+- `go run ./cmd/api` 启动后端
+- 小程序 `secret.config.js` 指向后端地址
+
+### 10.2 生产环境
+
+- Go 服务部署到云主机 / 容器平台
+- MySQL 使用托管或独立实例
+- MinIO 可自建，也可替换为兼容 S3 的对象存储
+- `MINIO_PUBLIC_BASE_URL` 配置为对外可访问域名
+- 合法 request 域名、下载域名在微信小程序后台配置
+
+---
+
+## 11. 迁移说明
+
+- `cloudfunctions/` 保留作为旧逻辑参考，不再是运行时依赖
+- `miniprogram/utils/cloud.js` 已从“云函数调用层”改为“HTTP 兼容层”
+- `watchOrder` / `watchNewOrders` 已改为轮询实现
+- `upload.js` 已从 GitCode 图床切换为后端 + MinIO

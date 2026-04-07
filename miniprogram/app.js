@@ -1,27 +1,9 @@
-// 从私有配置读取敏感信息（secret.config.js 被 .gitignore 排除）
-let secretConfig = {}
-try {
-  secretConfig = require('./config/secret.config')
-} catch (e) {
-  console.warn('未找到 secret.config.js，请参照 secret.config.example.js 创建配置文件')
-}
+const cloud = require('./utils/cloud')
 
 App({
   onLaunch() {
-    if (!wx.cloud) {
-      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
-      return
-    }
-    const cloudEnv = secretConfig.CLOUD_ENV || ''
-    if (!cloudEnv) {
-      console.error('请在 miniprogram/config/secret.config.js 中配置 CLOUD_ENV')
-    }
-    wx.cloud.init({
-      env: cloudEnv,
-      traceUser: true
-    })
-    this.loadUserInfo()
     this.loadCart()
+    this.loadUserInfo()
   },
 
   globalData: {
@@ -34,10 +16,7 @@ App({
 
   // 加载用户信息
   loadUserInfo() {
-    wx.cloud.callFunction({
-      name: 'getUserInfo'
-    }).then(res => {
-      const user = res.result
+    return cloud.getUserInfo().then(user => {
       if (user) {
         this.globalData.userInfo = user
         this.globalData.openid = user.openid
@@ -45,7 +24,7 @@ App({
         this.globalData.starCoins = user.starCoins
       }
     }).catch(err => {
-      console.error('获取用户信息失败', err)
+      console.error('初始化用户信息失败', err)
     })
   },
 

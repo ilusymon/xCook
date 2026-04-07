@@ -1,28 +1,29 @@
-# 星厨房 — 情侣点餐微信小程序
+# 星厨房
 
 > 属于我们的小厨房
 
-星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单烹饪。使用虚拟「星星币」支付，让做饭点餐变得有仪式感。
+星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单烹饪。使用虚拟「星星币」支付，不接入真实支付。
+
+当前版本已将原来的「微信云开发 + 云函数 + 云数据库 + GitCode 图床」方案，替换为：
+
+- `Go` 后端服务
+- `MySQL` 业务数据库
+- `MinIO` 图片存储
+- 小程序侧 `HTTP API + 轮询` 替代 `wx.cloud + watch`
 
 ## 功能特性
 
 ### 点菜端
-- 分类浏览 — 左侧分类栏 + 右侧菜品列表，快速找到想吃的
-- 口味选择 — 支持辣度、加料等多种自定义选项（单选/多选），可额外加价
-- 卡路里显示 — 每道菜标注热量，健康饮食心中有数
-- 购物车 — 添加、修改数量、删除，实时计算总价和总热量
-- 星星币支付 — 虚拟货币，不涉及真实支付
-- 订单追踪 — 实时查看订单状态（已下单 -> 已接单 -> 制作中 -> 已完成）
+- 分类浏览，快速查看想吃的菜
+- 口味/加料选项选择，支持单选、多选、加价
+- 购物车与星星币结算
+- 订单列表与订单详情状态跟踪
 
 ### 厨师端
-- 分类管理 — 新增、编辑、排序、启用/停用、删除分类，自定义图标
-- 菜品管理 — 新增、编辑、上下架、删除菜品
-- 选项设置 — 灵活配置口味选项组（如辣度、加料），支持单选/多选/必选/加价
-- 食材清单 — 自定义制作材料（名称、用量、备注）
-- 制作步骤 — 分步骤编排，支持图片和时长标注，可调整顺序
-- 制作视频 — 关联视频链接，烹饪时可直接查看
-- 沉浸式烹饪 — 步骤时间线导航，食材可勾选，一步步跟着做
-- 订单管理 — 新订单实时提醒，一键接单/开始制作/完成
+- 分类管理：新增、编辑、排序、启停、删除
+- 菜品管理：新增、编辑、上下架、软删除
+- 食材、步骤、视频配置
+- 订单管理：接单、开始制作、完成
 
 ## 技术栈
 
@@ -30,120 +31,138 @@
 |------|------|
 | 前端 | 微信小程序原生框架 |
 | UI 组件 | iView Weapp |
-| 后端 | 微信云开发（CloudBase） |
-| 数据库 | 云开发数据库 |
-| 图片存储 | GitCode 仓库图床 |
-| 实时通信 | 数据库 watch |
+| 后端 | Go + Gin |
+| 数据库 | MySQL + GORM |
+| 图片存储 | MinIO |
+| 鉴权 | 微信登录 + JWT |
+| 实时更新 | 小程序轮询 |
+
+## 项目结构
+
+```text
+xCook/
+├── backend/                  # Go 后端
+│   ├── cmd/api/              # 服务启动入口
+│   ├── internal/             # 配置、鉴权、模型、业务、上传
+│   └── .env.example
+├── miniprogram/              # 微信小程序
+├── cloudfunctions/           # 旧云函数实现（保留作迁移参考）
+├── design.md                 # 技术设计文档
+└── docker-compose.yml        # MySQL / MinIO 本地依赖
+```
 
 ## 快速开始
 
-### 1. 环境准备
+### 1. 启动基础服务
 
-- 安装微信开发者工具
-- 注册微信小程序账号，获取 AppID
+在项目根目录运行：
 
-### 2. 配置项目
+```bash
+docker compose up -d
+```
 
-1. 用微信开发者工具打开 `xCook` 目录
-2. 配置敏感信息：
-   ```bash
-   cd miniprogram/config
-   cp secret.config.example.js secret.config.js
-   ```
-   编辑 `secret.config.js`，填入以下配置：
-   | 字段 | 说明 | 获取方式 |
-   |------|------|----------|
-   | `CLOUD_ENV` | 云开发环境 ID | 微信开发者工具 → 云开发控制台 → 设置 |
-   | `GITCODE_OWNER` | GitCode 用户名 | 你的 [GitCode](https://gitcode.com) 用户名 |
-   | `GITCODE_REPO` | 图床仓库名 | 创建一个**公开**仓库用于存放图片 |
-   | `GITCODE_TOKEN` | GitCode 私人令牌 | 个人设置 → 安全设置 → 私人令牌 |
+启动后：
 
-   > `secret.config.js` 已被 `.gitignore` 排除，不会提交到仓库
+- MySQL: `127.0.0.1:3306`
+- MinIO API: `http://127.0.0.1:9000`
+- MinIO Console: `http://127.0.0.1:9001`
 
-3. 修改 `project.config.json` 中的 `appid` 为你的小程序 AppID
+### 2. 配置后端
 
-### 3. 云开发配置
+```bash
+cd backend
+cp .env.example .env
+```
 
-1. 在微信开发者工具中开通云开发
-2. 创建以下数据库集合：
-   - `users`
-   - `categories`
-   - `dishes`
-   - `orders`
-3. 部署所有云函数（右键云函数目录 -> 上传并部署）
-4. 调用 `initCategories` 云函数初始化默认分类
+按需修改 `.env`：
 
-### 4. 安装前端依赖
+- `MYSQL_*` 指向你的 MySQL
+- `MINIO_*` 指向你的 MinIO
+- `WECHAT_APP_ID` / `WECHAT_APP_SECRET` 填小程序后台配置
+- 本地联调时可先保留 `WECHAT_ALLOW_DEBUG_AUTH=true`
+
+### 3. 启动后端
+
+```bash
+cd backend
+go run ./cmd/api
+```
+
+服务默认监听 `http://127.0.0.1:8080`。
+
+### 4. 配置小程序
+
+复制配置模板：
+
+```bash
+cd miniprogram/config
+cp secret.config.example.js secret.config.js
+```
+
+编辑 `secret.config.js`：
+
+- `API_BASE_URL`: 后端地址
+- `POLL_INTERVAL`: 订单轮询间隔，默认 `5000`
+- `DEBUG_OPEN_ID`: 本地调试可填一个固定值；正式环境留空
+
+如果是真机调试，请把 `API_BASE_URL` 改成你电脑的局域网 IP，而不是 `127.0.0.1`。
+
+### 5. 安装前端依赖
 
 ```bash
 cd miniprogram
 npm install
 ```
 
-在微信开发者工具中点击 **工具 -> 构建 npm**。
+然后在微信开发者工具中执行“工具 -> 构建 npm”。
 
-### 5. 运行
+### 6. 初始化默认分类
 
-在微信开发者工具中编译运行即可。
+后端启动后，任选一种方式初始化：
 
-## 数据库集合
+1. 登录小程序后调用 `initCategories`
+2. 使用接口调试工具请求：
 
-| 集合名 | 说明 |
-|--------|------|
-| `users` | 用户信息（角色、星星币） |
-| `categories` | 菜品分类（支持自定义增删改排序） |
-| `dishes` | 菜品详情（含选项/食材/步骤/视频） |
-| `orders` | 订单记录（含状态流转历史） |
-
-## 云函数
-
-| 函数名 | 说明 |
-|--------|------|
-| `getUserInfo` | 获取/创建用户 |
-| `getMenu` | 获取菜单（分类+菜品） |
-| `getDishDetail` | 获取菜品详情 |
-| `saveDish` | 新建/更新菜品 |
-| `deleteDish` | 软删除菜品 |
-| `placeOrder` | 下单（服务端验价+扣币） |
-| `getOrders` | 查询订单 |
-| `updateOrderStatus` | 更新订单状态 |
-| `adjustStarCoins` | 调整星星币 |
-| `initCategories` | 初始化默认分类 |
-| `saveCategory` | 新建/更新/删除分类 |
-
-## 项目结构
-
-```
-xCook/
-├── project.config.json
-├── design.md                 # 技术设计文档
-├── miniprogram/
-│   ├── app.js / app.json / app.wxss
-│   ├── images/               # 图标资源
-│   ├── utils/                # 工具函数（含图床上传模块）
-│   ├── components/           # 自定义组件（8个）
-│   └── pages/
-│       ├── index/            # 首页（角色选择）
-│       ├── order/            # 点菜端（6个页面）
-│       └── chef/             # 厨师端（6个页面）
-└── cloudfunctions/           # 云函数（11个）
+```text
+POST /api/functions/initCategories
+Authorization: Bearer <token>
 ```
 
-## 设计规范
+## 主要接口
 
-- **主色**: `#FF6B81` (温暖珊瑚粉)
-- **辅色**: `#FFC048` (温暖金色，星星币)
-- **背景**: `#FFF5F5` (极淡粉底)
-- **风格**: 圆角卡片(24rpx)、胶囊按钮(40rpx)、柔和阴影
-- 详细设计规范见 [design.md](./design.md)
+### 登录与上传
+- `POST /api/auth/login`：微信登录换取 JWT
+- `POST /api/uploads/images`：上传图片到 MinIO
+
+### 业务接口
+
+后端保留了与原云函数同名的函数分发入口，便于小程序平滑迁移：
+
+- `POST /api/functions/getUserInfo`
+- `POST /api/functions/getMenu`
+- `POST /api/functions/getDishDetail`
+- `POST /api/functions/saveDish`
+- `POST /api/functions/deleteDish`
+- `POST /api/functions/placeOrder`
+- `POST /api/functions/getOrders`
+- `POST /api/functions/updateOrderStatus`
+- `POST /api/functions/adjustStarCoins`
+- `POST /api/functions/initCategories`
+- `POST /api/functions/saveCategory`
+
+## 迁移说明
+
+- `miniprogram/utils/cloud.js` 已改为 HTTP API 封装，页面调用方式基本不变
+- `miniprogram/utils/upload.js` 已改为上传到后端，再由后端写入 MinIO
+- 原来的 `watch` 实时监听已替换为前端轮询
+- `cloudfunctions/` 目录保留，仅用于参考原始业务逻辑
 
 ## 注意事项
 
-- 本项目不接入任何真实支付，使用虚拟「星星币」
-- 新用户自动赠送 100 星星币
-- 图片上传使用 GitCode 仓库图床，上传前自动压缩（质量 80%），通过 API 写入公开仓库后返回 raw URL。需在小程序后台添加 `api.gitcode.com` 和 `raw.gitcode.com` 到合法域名
-- `images/` 目录下为程序生成的占位图标，建议替换为专业设计的 PNG 图标（推荐 81x81px）
-- `star-coin.png` 用于星星币标识，建议设计一个金色星星图标
+- 正式环境必须配置 `WECHAT_APP_ID` 和 `WECHAT_APP_SECRET`
+- 本地开发若使用真机，请在小程序后台配置合法 request 域名
+- MinIO 返回的是公开访问 URL，建议给存储桶配置只读访问
+- 当前项目默认通过 GORM `AutoMigrate` 自动建表
 
 ## License
 

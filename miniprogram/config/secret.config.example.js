@@ -11,15 +11,13 @@
  */
 
 module.exports = {
-  // 微信云开发环境 ID
-  // 获取方式：微信开发者工具 -> 云开发控制台 -> 设置 -> 环境 ID
-  CLOUD_ENV: '',
+  // Go 后端地址
+  // 真机调试请改成你的局域网 IP，例如 http://192.168.1.10:8080
+  API_BASE_URL: 'http://127.0.0.1:8080',
 
-  // GitCode 图床配置
-  // 获取方式：在 https://gitcode.com 创建一个公开仓库用于存放图片
-  // 然后在 个人设置 -> 安全设置 -> 私人令牌 中创建 Token
-  GITCODE_OWNER: '',       // GitCode 用户名
-  GITCODE_REPO: '',        // 仓库名（需要是公开仓库）
-  GITCODE_BRANCH: 'main',  // 分支名
-  GITCODE_TOKEN: '',       // 私人令牌（需要 projects 权限）
+  // 轮询间隔（毫秒）
+  POLL_INTERVAL: 5000,
+
+  // 本地联调时可选，用于后端开启 WECHAT_ALLOW_DEBUG_AUTH=true 的场景
+  DEBUG_OPEN_ID: '',
 }

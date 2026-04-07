@@ -1,23 +1,19 @@
 /**
- * 云开发数据库 & 云函数调用封装
+ * 自建 Go 服务 API 封装
  */
 
-const db = wx.cloud.database()
-const _ = db.command
+const api = require('./api')
 
-// 集合引用
-const collections = {
-  categories: db.collection('categories'),
-  dishes: db.collection('dishes'),
-  orders: db.collection('orders'),
-  users: db.collection('users')
-}
+const db = null
+const _ = null
+const collections = {}
 
-/**
- * 调用云函数
- */
 function callFunction(name, data = {}) {
-  return wx.cloud.callFunction({ name, data }).then(res => res.result)
+  return api.request({
+    url: `/api/functions/${name}`,
+    method: 'POST',
+    data
+  })
 }
 
 /**
@@ -102,35 +98,28 @@ function adjustStarCoins(targetUserId, amount, reason) {
  * 监听订单变化（实时）
  */
 function watchOrder(orderId, onChange) {
-  return collections.orders.where({ _id: orderId }).watch({
-    onChange(snapshot) {
-      if (snapshot.docs.length > 0) {
-        onChange(snapshot.docs[0])
-      }
-    },
-    onError(err) {
-      console.error('监听订单失败', err)
-    }
-  })
+  return createPollWatcher(
+    () => callFunction('getOrders', { orderId }),
+    (res) => res && res.order ? res.order : null,
+    onChange,
+    '监听订单失败'
+  )
 }
 
 /**
  * 监听新订单（厨师端）
  */
 function watchNewOrders(onChange) {
-  return collections.orders.where({ status: 'placed' }).watch({
-    onChange(snapshot) {
-      onChange(snapshot.docs)
-    },
-    onError(err) {
-      console.error('监听新订单失败', err)
-    }
-  })
+  return createPollWatcher(
+    () => getOrders('chef', 'placed', 1, 50),
+    (res) => res && res.orders ? res.orders : [],
+    onChange,
+    '监听新订单失败'
+  )
 }
 
 /**
- * 上传图片到 GitCode 仓库图床
- * 自动压缩后转 base64 上传，返回 raw URL
+ * 上传图片到后端
  * @param {string} filePath - 本地图片路径
  * @param {string} _cloudPath - 已废弃参数，保留兼容
  * @param {Object} options - 上传选项（quality, compress）
@@ -138,6 +127,44 @@ function watchNewOrders(onChange) {
 function uploadImage(filePath, _cloudPath, options) {
   const upload = require('./upload')
   return upload.uploadImage(filePath, options)
+}
+
+function createPollWatcher(fetcher, formatter, onChange, errorLabel) {
+  let closed = false
+  let timer = null
+  let lastValue = ''
+
+  const poll = () => {
+    fetcher()
+      .then((res) => {
+        if (closed) return
+        const value = formatter(res)
+        const serialized = JSON.stringify(value || null)
+        if (serialized !== lastValue) {
+          lastValue = serialized
+          onChange(value)
+        }
+      })
+      .catch((err) => {
+        console.error(errorLabel, err)
+      })
+      .finally(() => {
+        if (!closed) {
+          timer = setTimeout(poll, api.POLL_INTERVAL)
+        }
+      })
+  }
+
+  poll()
+
+  return {
+    close() {
+      closed = true
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+  }
 }
 
 module.exports = {
