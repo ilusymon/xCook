@@ -99,6 +99,13 @@ func (c MySQLConfig) DSN() string {
 	)
 }
 
+func (c MySQLConfig) MigrationDSN() string {
+	return fmt.Sprintf(
+		"%s&multiStatements=true",
+		c.DSN(),
+	)
+}
+
 func getEnv(key, fallback string) string {
 	if value := os.Getenv(key); value != "" {
 		return value

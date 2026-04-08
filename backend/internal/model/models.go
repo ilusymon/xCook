@@ -6,13 +6,13 @@ type CoinLogEntry struct {
 	Type      string    `json:"type"`
 	Amount    int64     `json:"amount"`
 	Reason    string    `json:"reason"`
-	OrderID   string    `json:"orderId,omitempty"`
-	By        string    `json:"by,omitempty"`
+	OrderID   uint64    `json:"orderId,omitempty"`
+	By        uint64    `json:"by,omitempty"`
 	Timestamp time.Time `json:"timestamp"`
 }
 
 type Category struct {
-	ID        string    `gorm:"primaryKey;size:64" json:"_id"`
+	ID        uint64    `gorm:"primaryKey;autoIncrement" json:"_id"`
 	Name      string    `gorm:"size:64;not null" json:"name"`
 	Icon      string    `gorm:"size:64;not null" json:"icon"`
 	SortOrder int       `gorm:"not null" json:"sortOrder"`
@@ -48,11 +48,11 @@ type Step struct {
 }
 
 type Dish struct {
-	ID              string        `gorm:"primaryKey;size:64" json:"_id"`
+	ID              uint64        `gorm:"primaryKey;autoIncrement" json:"_id"`
 	Name            string        `gorm:"size:128;not null" json:"name"`
 	Description     string        `gorm:"type:text" json:"description"`
 	CoverImage      string        `gorm:"size:1024" json:"coverImage"`
-	CategoryID      string        `gorm:"size:64;index;not null" json:"categoryId"`
+	CategoryID      uint64        `gorm:"index;not null" json:"categoryId"`
 	Price           int64         `gorm:"not null" json:"price"`
 	Calories        int64         `gorm:"not null;default:0" json:"calories"`
 	PreparationTime int           `gorm:"not null;default:0" json:"preparationTime"`
@@ -63,13 +63,13 @@ type Dish struct {
 	Materials       []Material    `gorm:"type:json;serializer:json" json:"materials"`
 	Steps           []Step        `gorm:"type:json;serializer:json" json:"steps"`
 	VideoURL        string        `gorm:"size:1024" json:"videoUrl"`
-	CreatedBy       string        `gorm:"size:64;index;not null" json:"createdBy"`
+	CreatedBy       uint64        `gorm:"index;not null" json:"createdBy"`
 	CreatedAt       time.Time     `json:"createdAt"`
 	UpdatedAt       time.Time     `json:"updatedAt"`
 }
 
 type OrderItem struct {
-	DishID          string              `json:"dishId"`
+	DishID          uint64              `json:"dishId"`
 	DishName        string              `json:"dishName"`
 	CoverImage      string              `json:"coverImage"`
 	UnitPrice       int64               `json:"unitPrice"`
@@ -83,13 +83,13 @@ type OrderItem struct {
 type StatusHistoryEntry struct {
 	Status    string    `json:"status"`
 	Timestamp time.Time `json:"timestamp"`
-	By        string    `json:"by"`
+	By        uint64    `json:"by"`
 }
 
 type Order struct {
-	ID            string               `gorm:"primaryKey;size:64" json:"_id"`
+	ID            uint64               `gorm:"primaryKey;autoIncrement" json:"_id"`
 	OrderNumber   string               `gorm:"size:32;uniqueIndex;not null" json:"orderNumber"`
-	UserID        string               `gorm:"size:64;index;not null" json:"userId"`
+	UserID        uint64               `gorm:"index;not null" json:"userId"`
 	Status        string               `gorm:"size:32;index;not null" json:"status"`
 	Items         []OrderItem          `gorm:"type:json;serializer:json" json:"items"`
 	TotalPrice    int64                `gorm:"not null" json:"totalPrice"`
@@ -101,7 +101,7 @@ type Order struct {
 }
 
 type User struct {
-	ID        string         `gorm:"primaryKey;size:64" json:"_id"`
+	ID        uint64         `gorm:"primaryKey;autoIncrement" json:"_id"`
 	OpenID    string         `gorm:"size:64;uniqueIndex;not null" json:"openid"`
 	NickName  string         `gorm:"size:128" json:"nickName"`
 	AvatarURL string         `gorm:"size:1024" json:"avatarUrl"`

@@ -15,6 +15,11 @@ module.exports = {
   // 真机调试请改成你的局域网 IP，例如 http://192.168.1.10:8080
   API_BASE_URL: 'http://127.0.0.1:8080',
 
+  // 图片访问根地址
+  // 数据库只存相对路径，例如 images/20260408/xxx.jpg
+  // 这里建议配置成 MinIO 桶地址，例如 http://127.0.0.1:9000/xcook-images
+  IMAGE_BASE_URL: 'http://127.0.0.1:9000/xcook-images',
+
   // 轮询间隔（毫秒）
   POLL_INTERVAL: 5000,
 

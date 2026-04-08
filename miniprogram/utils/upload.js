@@ -3,6 +3,7 @@
  */
 
 const api = require('./api')
+const media = require('./media')
 
 // ─── 工具函数 ────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ function compressImage(filePath, quality = 80) {
  * @param {Object} options - 可选配置
  * @param {number} options.quality - 压缩质量 0-100，默认 80
  * @param {boolean} options.compress - 是否压缩，默认 true
- * @returns {Promise<string>} 上传后的图片 URL
+ * @returns {Promise<string>} 上传后的图片访问地址
  */
 async function uploadImage(filePath, options = {}) {
   const { quality = 80, compress = true } = options
@@ -52,12 +53,13 @@ async function uploadImage(filePath, options = {}) {
   }
 
   const res = await api.uploadFile(uploadPath)
-  if (!res || !res.url) {
+  if (!res || !res.path) {
     throw new Error('上传失败，未返回图片地址')
   }
 
-  console.log('[Upload] 上传成功:', res.url)
-  return res.url
+  const imageUrl = media.resolveMediaUrl(res.path)
+  console.log('[Upload] 上传成功:', imageUrl)
+  return imageUrl
 }
 
 /**

@@ -6,6 +6,7 @@ try {
 }
 
 const API_BASE_URL = (secretConfig.API_BASE_URL || '').replace(/\/$/, '')
+const IMAGE_BASE_URL = (secretConfig.IMAGE_BASE_URL || '').replace(/\/$/, '')
 const DEBUG_OPEN_ID = secretConfig.DEBUG_OPEN_ID || ''
 const POLL_INTERVAL = Number(secretConfig.POLL_INTERVAL || 5000)
 const TOKEN_KEY = 'xcook_token'
@@ -17,6 +18,10 @@ function getBaseUrl() {
     throw new Error('请在 miniprogram/config/secret.config.js 中配置 API_BASE_URL')
   }
   return API_BASE_URL
+}
+
+function getImageBaseUrl() {
+  return IMAGE_BASE_URL
 }
 
 function getToken() {
@@ -174,5 +179,6 @@ module.exports = {
   clearToken,
   getToken,
   getBaseUrl,
+  getImageBaseUrl,
   POLL_INTERVAL
 }

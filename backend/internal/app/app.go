@@ -27,7 +27,7 @@ type App struct {
 func New() (*App, error) {
 	cfg := config.Load()
 
-	if err := migrate.Up(cfg.MySQL.DSN()); err != nil {
+	if err := migrate.Up(cfg.MySQL.MigrationDSN()); err != nil {
 		return nil, err
 	}
 

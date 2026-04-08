@@ -29,14 +29,17 @@ func (h *UploadHandler) UploadImage(c *gin.Context) {
 		return
 	}
 
-	url, err := h.minioService.UploadImage(c.Request.Context(), file, fileHeader)
+	result, err := h.minioService.UploadImage(c.Request.Context(), file, fileHeader)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"url":     url,
+		"success":      true,
+		"path":         result.Path,
+		"url":          result.URL,
+		"originalPath": result.OriginalPath,
+		"originalUrl":  result.OriginalURL,
 	})
 }

@@ -103,7 +103,7 @@ func (h *RestHandler) ListOrders(c *gin.Context) {
 
 func (h *RestHandler) GetOrder(c *gin.Context) {
 	result, err := h.functionService.GetOrders(c.Request.Context(), middleware.OpenIDFromContext(c), service.GetOrdersInput{
-		OrderID: c.Param("id"),
+		OrderID: parseUintParam(c.Param("id")),
 	})
 	h.respond(c, result, err)
 }
@@ -128,7 +128,7 @@ func (h *RestHandler) CreateCategory(c *gin.Context) {
 	if !ok {
 		return
 	}
-	result, err := h.functionService.SaveCategory(c.Request.Context(), "", payload, "")
+	result, err := h.functionService.SaveCategory(c.Request.Context(), "", payload, 0)
 	h.respond(c, result, err)
 }
 
@@ -138,12 +138,12 @@ func (h *RestHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 	payload["_id"] = c.Param("id")
-	result, err := h.functionService.SaveCategory(c.Request.Context(), "", payload, "")
+	result, err := h.functionService.SaveCategory(c.Request.Context(), "", payload, 0)
 	h.respond(c, result, err)
 }
 
 func (h *RestHandler) DeleteCategory(c *gin.Context) {
-	result, err := h.functionService.SaveCategory(c.Request.Context(), "delete", nil, c.Param("id"))
+	result, err := h.functionService.SaveCategory(c.Request.Context(), "delete", nil, parseUintParam(c.Param("id")))
 	h.respond(c, result, err)
 }
 
@@ -156,7 +156,7 @@ func (h *RestHandler) AdjustStarCoins(c *gin.Context) {
 	result, err := h.functionService.AdjustStarCoins(
 		c.Request.Context(),
 		middleware.OpenIDFromContext(c),
-		c.Param("id"),
+		parseUintParam(c.Param("id")),
 		request.Amount,
 		request.Reason,
 	)
@@ -190,4 +190,9 @@ func withDefault(value, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+func parseUintParam(value string) uint64 {
+	parsed, _ := strconv.ParseUint(value, 10, 64)
+	return parsed
 }

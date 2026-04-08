@@ -3,6 +3,7 @@
  */
 
 const api = require('./api')
+const media = require('./media')
 
 const db = null
 const _ = null
@@ -27,7 +28,7 @@ function getMenu(role) {
     url: '/api/menu',
     method: 'GET',
     data: role ? { role } : undefined
-  })
+  }).then(media.normalizeMenuResponse)
 }
 
 /**
@@ -37,19 +38,20 @@ function getDishDetail(dishId) {
   return api.request({
     url: `/api/dishes/${dishId}`,
     method: 'GET'
-  })
+  }).then(media.normalizeDish)
 }
 
 /**
  * 保存菜品（新建或更新）
  */
 function saveDish(dish) {
+  const payload = media.denormalizeDish(dish)
   const method = dish && dish._id ? 'PUT' : 'POST'
   const url = dish && dish._id ? `/api/dishes/${dish._id}` : '/api/dishes'
   return api.request({
     url,
     method,
-    data: dish
+    data: payload
   })
 }
 
@@ -85,14 +87,14 @@ function getOrders(role, status, page = 1, pageSize = 10) {
     url: '/api/orders',
     method: 'GET',
     data
-  })
+  }).then(media.normalizeOrdersResponse)
 }
 
 function getOrderDetail(orderId) {
   return api.request({
     url: `/api/orders/${orderId}`,
     method: 'GET'
-  })
+  }).then(media.normalizeOrderDetailResponse)
 }
 
 /**

@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -20,11 +19,11 @@ type FunctionService struct {
 }
 
 type getDishDetailInput struct {
-	DishID string `json:"dishId"`
+	DishID uint64 `json:"dishId"`
 }
 
 type deleteDishInput struct {
-	DishID string `json:"dishId"`
+	DishID uint64 `json:"dishId"`
 }
 
 type placeOrderInput struct {
@@ -37,13 +36,13 @@ type getOrdersInput struct {
 	Status   string `json:"status"`
 	Page     int    `json:"page"`
 	PageSize int    `json:"pageSize"`
-	OrderID  string `json:"orderId"`
+	OrderID  uint64 `json:"orderId"`
 }
 
 type GetOrdersInput = getOrdersInput
 
 type updateOrderStatusInput struct {
-	OrderID   string `json:"orderId"`
+	OrderID   uint64 `json:"orderId"`
 	NewStatus string `json:"newStatus"`
 }
 
@@ -54,11 +53,11 @@ type saveDishInput struct {
 type saveCategoryInput struct {
 	Action     string         `json:"action"`
 	Category   map[string]any `json:"category"`
-	CategoryID string         `json:"categoryId"`
+	CategoryID uint64         `json:"categoryId"`
 }
 
 type adjustStarCoinsInput struct {
-	TargetUserID string `json:"targetUserId"`
+	TargetUserID uint64 `json:"targetUserId"`
 	Amount       int64  `json:"amount"`
 	Reason       string `json:"reason"`
 }
@@ -89,7 +88,6 @@ func (s *FunctionService) GetUserInfo(ctx context.Context, openID string) (*mode
 
 	now := time.Now()
 	user = model.User{
-		ID:        openID,
 		OpenID:    openID,
 		Role:      "both",
 		StarCoins: 100,
@@ -128,11 +126,12 @@ func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]
 
 	dishMap := make(map[string][]model.Dish, len(categories))
 	for _, category := range categories {
-		dishMap[category.ID] = []model.Dish{}
+		dishMap[fmt.Sprintf("%d", category.ID)] = []model.Dish{}
 	}
 	for _, dish := range dishes {
-		if _, ok := dishMap[dish.CategoryID]; ok {
-			dishMap[dish.CategoryID] = append(dishMap[dish.CategoryID], dish)
+		key := fmt.Sprintf("%d", dish.CategoryID)
+		if _, ok := dishMap[key]; ok {
+			dishMap[key] = append(dishMap[key], dish)
 		}
 	}
 
@@ -143,12 +142,13 @@ func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]
 }
 
 func (s *FunctionService) GetDishDetail(ctx context.Context, dishID string) (*model.Dish, error) {
-	if dishID == "" {
+	id := uintValue(dishID)
+	if id == 0 {
 		return nil, nil
 	}
 
 	var dish model.Dish
-	if err := s.db.WithContext(ctx).First(&dish, "id = ?", dishID).Error; err != nil {
+	if err := s.db.WithContext(ctx).First(&dish, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -160,8 +160,8 @@ func (s *FunctionService) GetDishDetail(ctx context.Context, dishID string) (*mo
 
 func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map[string]any) (map[string]any, error) {
 	now := time.Now()
-	dishID := stringValue(input["_id"])
-	if dishID != "" {
+	dishID := uintValue(input["_id"])
+	if dishID > 0 {
 		var dish model.Dish
 		if err := s.db.WithContext(ctx).First(&dish, "id = ?", dishID).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -176,7 +176,7 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 		if strings.TrimSpace(dish.Name) == "" {
 			return nil, badRequest("缺少菜品名称")
 		}
-		if strings.TrimSpace(dish.CategoryID) == "" {
+		if dish.CategoryID == 0 {
 			return nil, badRequest("缺少分类")
 		}
 		dish.UpdatedAt = now
@@ -188,12 +188,16 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 	}
 
 	dish := model.Dish{
-		ID:        uuid.NewString(),
 		IsDeleted: false,
-		CreatedBy: openID,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+
+	currentUser, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
+		return nil, err
+	}
+	dish.CreatedBy = currentUser.ID
 
 	if err := applyDishPatch(&dish, input); err != nil {
 		return nil, badRequest("菜品参数错误")
@@ -201,7 +205,7 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 	if strings.TrimSpace(dish.Name) == "" {
 		return nil, badRequest("缺少菜品名称")
 	}
-	if strings.TrimSpace(dish.CategoryID) == "" {
+	if dish.CategoryID == 0 {
 		return nil, badRequest("缺少分类")
 	}
 	if dish.Difficulty == 0 {
@@ -219,12 +223,13 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 }
 
 func (s *FunctionService) DeleteDish(ctx context.Context, dishID string) (map[string]any, error) {
-	if dishID == "" {
+	id := uintValue(dishID)
+	if id == 0 {
 		return nil, badRequest("缺少菜品ID")
 	}
 
 	if err := s.db.WithContext(ctx).Model(&model.Dish{}).
-		Where("id = ?", dishID).
+		Where("id = ?", id).
 		Updates(map[string]any{
 			"is_deleted": true,
 			"updated_at": time.Now(),
@@ -244,7 +249,7 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var user model.User
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where("id = ?", openID).
+			Where("open_id = ?", openID).
 			First(&user).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return notFound("用户不存在")
@@ -295,16 +300,15 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 
 		now := time.Now()
 		order := model.Order{
-			ID:            uuid.NewString(),
 			OrderNumber:   generateOrderNumber(now),
-			UserID:        openID,
+			UserID:        user.ID,
 			Status:        "placed",
 			Items:         verifiedItems,
 			TotalPrice:    totalPrice,
 			TotalCalories: totalCalories,
 			Note:          strings.TrimSpace(note),
 			StatusHistory: []model.StatusHistoryEntry{
-				{Status: "placed", Timestamp: now, By: openID},
+				{Status: "placed", Timestamp: now, By: user.ID},
 			},
 			CreatedAt: now,
 			UpdatedAt: now,
@@ -357,7 +361,7 @@ func (s *FunctionService) PlaceOrderFromAny(ctx context.Context, openID string, 
 }
 
 func (s *FunctionService) GetOrders(ctx context.Context, openID string, input getOrdersInput) (map[string]any, error) {
-	if input.OrderID != "" {
+	if input.OrderID != 0 {
 		var order model.Order
 		if err := s.db.WithContext(ctx).First(&order, "id = ?", input.OrderID).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -379,7 +383,11 @@ func (s *FunctionService) GetOrders(ctx context.Context, openID string, input ge
 
 	query := s.db.WithContext(ctx).Model(&model.Order{})
 	if input.Role != "chef" {
-		query = query.Where("user_id = ?", openID)
+		user, err := s.mustGetUserByOpenID(ctx, openID)
+		if err != nil {
+			return nil, err
+		}
+		query = query.Where("user_id = ?", user.ID)
 	}
 
 	switch input.Status {
@@ -415,14 +423,20 @@ func (s *FunctionService) GetOrders(ctx context.Context, openID string, input ge
 }
 
 func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID, newStatus string) (map[string]any, error) {
-	if orderID == "" || newStatus == "" {
+	id := uintValue(orderID)
+	if id == 0 || newStatus == "" {
 		return nil, badRequest("参数不完整")
 	}
 
-	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+	currentUser, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var order model.Order
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			First(&order, "id = ?", orderID).Error; err != nil {
+			First(&order, "id = ?", id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return badRequest("订单不存在")
 			}
@@ -439,7 +453,7 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 		order.StatusHistory = append(order.StatusHistory, model.StatusHistoryEntry{
 			Status:    newStatus,
 			Timestamp: now,
-			By:        openID,
+			By:        currentUser.ID,
 		})
 		order.UpdatedAt = now
 
@@ -478,9 +492,14 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 	return map[string]any{"success": true}, nil
 }
 
-func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID, targetUserID string, amount int64, reason string) (map[string]any, error) {
-	if targetUserID == "" || amount == 0 {
+func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID string, targetUserID uint64, amount int64, reason string) (map[string]any, error) {
+	if targetUserID == 0 || amount == 0 {
 		return nil, badRequest("参数不完整")
+	}
+
+	currentUser, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
+		return nil, err
 	}
 
 	var user model.User
@@ -508,7 +527,7 @@ func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID, targetUse
 		Type:      entryType,
 		Amount:    abs(amount),
 		Reason:    reason,
-		By:        openID,
+		By:        currentUser.ID,
 		Timestamp: time.Now(),
 	})
 	user.UpdatedAt = time.Now()
@@ -520,9 +539,9 @@ func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID, targetUse
 	return map[string]any{"success": true}, nil
 }
 
-func (s *FunctionService) SaveCategory(ctx context.Context, action string, category map[string]any, categoryID string) (map[string]any, error) {
+func (s *FunctionService) SaveCategory(ctx context.Context, action string, category map[string]any, categoryID uint64) (map[string]any, error) {
 	if action == "delete" {
-		if categoryID == "" {
+		if categoryID == 0 {
 			return nil, badRequest("缺少分类ID")
 		}
 
@@ -546,8 +565,8 @@ func (s *FunctionService) SaveCategory(ctx context.Context, action string, categ
 	}
 
 	now := time.Now()
-	inputID := stringValue(category["_id"])
-	if inputID != "" {
+	inputID := uintValue(category["_id"])
+	if inputID > 0 {
 		var existing model.Category
 		if err := s.db.WithContext(ctx).First(&existing, "id = ?", inputID).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -577,7 +596,6 @@ func (s *FunctionService) SaveCategory(ctx context.Context, action string, categ
 	}
 
 	created := model.Category{
-		ID:        uuid.NewString(),
 		SortOrder: nextSort,
 		Name:      "新分类",
 		Icon:      "default",
@@ -729,6 +747,43 @@ func defaultString(value, fallback string) string {
 func stringValue(value any) string {
 	text, _ := value.(string)
 	return strings.TrimSpace(text)
+}
+
+func uintValue(value any) uint64 {
+	switch v := value.(type) {
+	case uint64:
+		return v
+	case uint:
+		return uint64(v)
+	case int:
+		if v > 0 {
+			return uint64(v)
+		}
+	case int64:
+		if v > 0 {
+			return uint64(v)
+		}
+	case float64:
+		if v > 0 {
+			return uint64(v)
+		}
+	case string:
+		var parsed uint64
+		_, _ = fmt.Sscanf(strings.TrimSpace(v), "%d", &parsed)
+		return parsed
+	}
+	return 0
+}
+
+func (s *FunctionService) mustGetUserByOpenID(ctx context.Context, openID string) (*model.User, error) {
+	var user model.User
+	if err := s.db.WithContext(ctx).Where("open_id = ?", openID).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, notFound("用户不存在")
+		}
+		return nil, err
+	}
+	return &user, nil
 }
 
 func generateOrderNumber(now time.Time) string {
