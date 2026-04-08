@@ -13,7 +13,7 @@ import (
 	"xcook/backend/internal/config"
 	"xcook/backend/internal/handler"
 	"xcook/backend/internal/middleware"
-	"xcook/backend/internal/model"
+	"xcook/backend/internal/migrate"
 	"xcook/backend/internal/service"
 	"xcook/backend/internal/storage"
 	"xcook/backend/internal/wechat"
@@ -27,17 +27,12 @@ type App struct {
 func New() (*App, error) {
 	cfg := config.Load()
 
-	db, err := gorm.Open(mysql.Open(cfg.MySQL.DSN()), &gorm.Config{})
-	if err != nil {
+	if err := migrate.Up(cfg.MySQL.DSN()); err != nil {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(
-		&model.User{},
-		&model.Category{},
-		&model.Dish{},
-		&model.Order{},
-	); err != nil {
+	db, err := gorm.Open(mysql.Open(cfg.MySQL.DSN()), &gorm.Config{})
+	if err != nil {
 		return nil, err
 	}
 
@@ -51,7 +46,7 @@ func New() (*App, error) {
 	wechatClient := wechat.NewClient(cfg.Wechat.AppID, cfg.Wechat.AppSecret)
 
 	authHandler := handler.NewAuthHandler(tokenManager, wechatClient, functionService, cfg.Wechat.AllowDebugAuth)
-	functionHandler := handler.NewFunctionHandler(functionService)
+	restHandler := handler.NewRestHandler(functionService)
 	uploadHandler := handler.NewUploadHandler(minioService)
 
 	router := gin.Default()
@@ -61,7 +56,20 @@ func New() (*App, error) {
 	router.POST("/api/auth/login", authHandler.Login)
 
 	api := router.Group("/api", middleware.AuthRequired(tokenManager))
-	api.POST("/functions/:name", functionHandler.Handle)
+	api.GET("/users/me", restHandler.GetCurrentUser)
+	api.POST("/users/:id/star-coins/adjust", restHandler.AdjustStarCoins)
+	api.GET("/menu", restHandler.GetMenu)
+	api.GET("/dishes/:id", restHandler.GetDish)
+	api.POST("/dishes", restHandler.CreateDish)
+	api.PUT("/dishes/:id", restHandler.UpdateDish)
+	api.DELETE("/dishes/:id", restHandler.DeleteDish)
+	api.GET("/orders", restHandler.ListOrders)
+	api.GET("/orders/:id", restHandler.GetOrder)
+	api.POST("/orders", restHandler.CreateOrder)
+	api.PATCH("/orders/:id/status", restHandler.UpdateOrderStatus)
+	api.POST("/categories", restHandler.CreateCategory)
+	api.PATCH("/categories/:id", restHandler.UpdateCategory)
+	api.DELETE("/categories/:id", restHandler.DeleteCategory)
 	api.POST("/uploads/images", uploadHandler.UploadImage)
 
 	return &App{

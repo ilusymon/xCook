@@ -40,6 +40,8 @@ type getOrdersInput struct {
 	OrderID  string `json:"orderId"`
 }
 
+type GetOrdersInput = getOrdersInput
+
 type updateOrderStatusInput struct {
 	OrderID   string `json:"orderId"`
 	NewStatus string `json:"newStatus"`
@@ -61,15 +63,6 @@ type adjustStarCoinsInput struct {
 	Reason       string `json:"reason"`
 }
 
-var defaultCategories = []model.Category{
-	{Name: "荤菜", Icon: "meat", SortOrder: 1, IsActive: true},
-	{Name: "素菜", Icon: "vegetable", SortOrder: 2, IsActive: true},
-	{Name: "汤品", Icon: "soup", SortOrder: 3, IsActive: true},
-	{Name: "主食", Icon: "staple", SortOrder: 4, IsActive: true},
-	{Name: "甜品", Icon: "dessert", SortOrder: 5, IsActive: true},
-	{Name: "饮品", Icon: "drink", SortOrder: 6, IsActive: true},
-}
-
 var validTransitions = map[string][]string{
 	"placed":   {"accepted", "cancelled"},
 	"accepted": {"cooking", "cancelled"},
@@ -80,75 +73,13 @@ func NewFunctionService(db *gorm.DB) *FunctionService {
 	return &FunctionService{db: db}
 }
 
-func (s *FunctionService) Dispatch(ctx context.Context, openID, name string, payload map[string]any) (any, error) {
-	switch name {
-	case "getUserInfo":
-		return s.GetUserInfo(ctx, openID)
-	case "getMenu":
-		role, _ := payload["role"].(string)
-		return s.GetMenu(ctx, role)
-	case "getDishDetail":
-		var input getDishDetailInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("dishId 参数错误")
-		}
-		return s.GetDishDetail(ctx, input.DishID)
-	case "saveDish":
-		var input saveDishInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("dish 参数错误")
-		}
-		return s.SaveDish(ctx, openID, input.Dish)
-	case "deleteDish":
-		var input deleteDishInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("dishId 参数错误")
-		}
-		return s.DeleteDish(ctx, input.DishID)
-	case "placeOrder":
-		var input placeOrderInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("订单参数错误")
-		}
-		return s.PlaceOrder(ctx, openID, input.Items, input.Note)
-	case "getOrders":
-		var input getOrdersInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("查询参数错误")
-		}
-		return s.GetOrders(ctx, openID, input)
-	case "updateOrderStatus":
-		var input updateOrderStatusInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("状态参数错误")
-		}
-		return s.UpdateOrderStatus(ctx, openID, input.OrderID, input.NewStatus)
-	case "adjustStarCoins":
-		var input adjustStarCoinsInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("星星币参数错误")
-		}
-		return s.AdjustStarCoins(ctx, openID, input.TargetUserID, input.Amount, input.Reason)
-	case "initCategories":
-		return s.InitCategories(ctx)
-	case "saveCategory":
-		var input saveCategoryInput
-		if err := decodePayload(payload, &input); err != nil {
-			return nil, badRequest("分类参数错误")
-		}
-		return s.SaveCategory(ctx, input.Action, input.Category, input.CategoryID)
-	default:
-		return nil, notFound("未找到对应函数")
-	}
-}
-
 func (s *FunctionService) GetUserInfo(ctx context.Context, openID string) (*model.User, error) {
 	if openID == "" {
 		return nil, unauthorized("未登录")
 	}
 
 	var user model.User
-	err := s.db.WithContext(ctx).Where("openid = ?", openID).First(&user).Error
+	err := s.db.WithContext(ctx).Where("open_id = ?", openID).First(&user).Error
 	if err == nil {
 		return &user, nil
 	}
@@ -411,6 +342,20 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 	return response, nil
 }
 
+func (s *FunctionService) PlaceOrderFromAny(ctx context.Context, openID string, items any, note string) (map[string]any, error) {
+	body, err := json.Marshal(items)
+	if err != nil {
+		return nil, badRequest("订单参数错误")
+	}
+
+	var parsed []model.OrderItem
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return nil, badRequest("订单参数错误")
+	}
+
+	return s.PlaceOrder(ctx, openID, parsed, note)
+}
+
 func (s *FunctionService) GetOrders(ctx context.Context, openID string, input getOrdersInput) (map[string]any, error) {
 	if input.OrderID != "" {
 		var order model.Order
@@ -573,31 +518,6 @@ func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID, targetUse
 	}
 
 	return map[string]any{"success": true}, nil
-}
-
-func (s *FunctionService) InitCategories(ctx context.Context) (map[string]any, error) {
-	var total int64
-	if err := s.db.WithContext(ctx).Model(&model.Category{}).Count(&total).Error; err != nil {
-		return nil, err
-	}
-	if total > 0 {
-		return map[string]any{"success": true, "message": "分类已存在，跳过初始化"}, nil
-	}
-
-	now := time.Now()
-	categories := make([]model.Category, 0, len(defaultCategories))
-	for _, category := range defaultCategories {
-		category.ID = uuid.NewString()
-		category.CreatedAt = now
-		category.UpdatedAt = now
-		categories = append(categories, category)
-	}
-
-	if err := s.db.WithContext(ctx).Create(&categories).Error; err != nil {
-		return nil, err
-	}
-
-	return map[string]any{"success": true, "message": fmt.Sprintf("已初始化 %d 个分类", len(categories))}, nil
 }
 
 func (s *FunctionService) SaveCategory(ctx context.Context, action string, category map[string]any, categoryID string) (map[string]any, error) {

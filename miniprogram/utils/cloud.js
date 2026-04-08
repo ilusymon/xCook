@@ -8,19 +8,14 @@ const db = null
 const _ = null
 const collections = {}
 
-function callFunction(name, data = {}) {
-  return api.request({
-    url: `/api/functions/${name}`,
-    method: 'POST',
-    data
-  })
-}
-
 /**
  * 获取用户信息
  */
 function getUserInfo() {
-  return callFunction('getUserInfo')
+  return api.request({
+    url: '/api/users/me',
+    method: 'GET'
+  })
 }
 
 /**
@@ -28,70 +23,121 @@ function getUserInfo() {
  * @param {string} role - 'chef' 时返回全部菜品（含下架），默认只返回上架菜品
  */
 function getMenu(role) {
-  return callFunction('getMenu', { role })
+  return api.request({
+    url: '/api/menu',
+    method: 'GET',
+    data: role ? { role } : undefined
+  })
 }
 
 /**
  * 获取菜品详情
  */
 function getDishDetail(dishId) {
-  return callFunction('getDishDetail', { dishId })
+  return api.request({
+    url: `/api/dishes/${dishId}`,
+    method: 'GET'
+  })
 }
 
 /**
  * 保存菜品（新建或更新）
  */
 function saveDish(dish) {
-  return callFunction('saveDish', { dish })
+  const method = dish && dish._id ? 'PUT' : 'POST'
+  const url = dish && dish._id ? `/api/dishes/${dish._id}` : '/api/dishes'
+  return api.request({
+    url,
+    method,
+    data: dish
+  })
 }
 
 /**
  * 删除菜品（软删除）
  */
 function deleteDish(dishId) {
-  return callFunction('deleteDish', { dishId })
+  return api.request({
+    url: `/api/dishes/${dishId}`,
+    method: 'DELETE'
+  })
 }
 
 /**
  * 下单
  */
 function placeOrder(items, note) {
-  return callFunction('placeOrder', { items, note })
+  return api.request({
+    url: '/api/orders',
+    method: 'POST',
+    data: { items, note }
+  })
 }
 
 /**
  * 获取订单列表
  */
 function getOrders(role, status, page = 1, pageSize = 10) {
-  return callFunction('getOrders', { role, status, page, pageSize })
+  const data = { page, pageSize }
+  if (role) data.role = role
+  if (status !== undefined) data.status = status
+  return api.request({
+    url: '/api/orders',
+    method: 'GET',
+    data
+  })
+}
+
+function getOrderDetail(orderId) {
+  return api.request({
+    url: `/api/orders/${orderId}`,
+    method: 'GET'
+  })
 }
 
 /**
  * 更新订单状态
  */
 function updateOrderStatus(orderId, newStatus) {
-  return callFunction('updateOrderStatus', { orderId, newStatus })
+  return api.request({
+    url: `/api/orders/${orderId}/status`,
+    method: 'PATCH',
+    data: { status: newStatus }
+  })
 }
 
 /**
  * 保存分类（新建或更新）
  */
 function saveCategory(category) {
-  return callFunction('saveCategory', { category })
+  const method = category && category._id ? 'PATCH' : 'POST'
+  const url = category && category._id ? `/api/categories/${category._id}` : '/api/categories'
+  return api.request({
+    url,
+    method,
+    data: category
+  })
 }
 
 /**
  * 删除分类
  */
 function deleteCategory(categoryId) {
-  return callFunction('saveCategory', { action: 'delete', categoryId })
+  return api.request({
+    url: `/api/categories/${categoryId}`,
+    method: 'DELETE'
+  })
 }
 
 /**
  * 调整星星币
  */
 function adjustStarCoins(targetUserId, amount, reason) {
-  return callFunction('adjustStarCoins', { targetUserId, amount, reason })
+  return api.request({
+    url: `/api/users/${targetUserId}/star-coins/adjust`,
+    method: 'POST',
+    data: { amount, reason }
+  })
 }
 
 /**
@@ -99,7 +145,7 @@ function adjustStarCoins(targetUserId, amount, reason) {
  */
 function watchOrder(orderId, onChange) {
   return createPollWatcher(
-    () => callFunction('getOrders', { orderId }),
+    () => getOrderDetail(orderId),
     (res) => res && res.order ? res.order : null,
     onChange,
     '监听订单失败'
@@ -171,7 +217,6 @@ module.exports = {
   db,
   _,
   collections,
-  callFunction,
   getUserInfo,
   getMenu,
   getDishDetail,
@@ -179,6 +224,7 @@ module.exports = {
   deleteDish,
   placeOrder,
   getOrders,
+  getOrderDetail,
   updateOrderStatus,
   saveCategory,
   deleteCategory,

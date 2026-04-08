@@ -20,6 +20,7 @@
 | UI 组件库 | iView Weapp |
 | 后端 | Go 1.25 + Gin |
 | 数据库 | MySQL 8 + GORM |
+| 数据库迁移 | golang-migrate |
 | 图片存储 | MinIO |
 | 鉴权 | `wx.login` + 后端 `code2session` + JWT |
 | 实时通信 | 小程序轮询 |
@@ -27,8 +28,9 @@
 ### 2.1 架构说明
 
 - 小程序不再依赖 `wx.cloud`
-- 原云函数能力统一由 Go 后端暴露为 HTTP API
+- 原云开发接口能力统一由 Go 后端暴露为 HTTP API
 - 业务数据从云数据库迁移到 MySQL
+- 表结构通过 `golang-migrate` 的版本化 SQL 管理
 - 菜品封面图、步骤图上传至 MinIO
 - 原数据库 `watch` 实时监听改为前端定时轮询
 
@@ -38,8 +40,6 @@
 
 ```text
 xCook/
-├── project.config.json
-├── package.json
 ├── design.md
 ├── README.md
 ├── docker-compose.yml
@@ -54,6 +54,7 @@ xCook/
 │   │   ├── config/                # 环境配置
 │   │   ├── handler/               # HTTP 处理器
 │   │   ├── middleware/            # 登录中间件
+│   │   ├── migrate/               # golang-migrate 执行器与 SQL 文件
 │   │   ├── model/                 # GORM 模型
 │   │   ├── service/               # 业务逻辑
 │   │   ├── storage/               # MinIO 上传
@@ -62,6 +63,8 @@ xCook/
 │   └── go.mod
 │
 ├── miniprogram/
+│   ├── project.config.json       # 微信开发者工具项目配置
+│   ├── package.json              # 小程序前端依赖
 │   ├── app.js                     # 全局逻辑（登录、购物车）
 │   ├── app.json
 │   ├── app.wxss
@@ -77,7 +80,6 @@ xCook/
 │   ├── components/
 │   └── pages/
 │
-└── cloudfunctions/                # 旧实现，仅作迁移参考
 ```
 
 ---
@@ -85,6 +87,7 @@ xCook/
 ## 4. 数据库设计
 
 MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改为 JSON 列存储。
+数据库表由 `golang-migrate` 维护，而不是运行时自动推断。
 
 ### 4.1 users 表
 
@@ -221,25 +224,24 @@ UI 规范与原方案一致：
 }
 ```
 
-### 7.2 云函数兼容分发
+### 7.2 RESTful 接口
 
-为减少小程序页面改动，后端保留统一函数分发入口：
+后端按资源拆分为 RESTful 路由：
 
-`POST /api/functions/:name`
-
-支持的 `name`：
-
-- `getUserInfo`
-- `getMenu`
-- `getDishDetail`
-- `saveDish`
-- `deleteDish`
-- `placeOrder`
-- `getOrders`
-- `updateOrderStatus`
-- `adjustStarCoins`
-- `initCategories`
-- `saveCategory`
+- `GET /api/users/me`
+- `POST /api/users/:id/star-coins/adjust`
+- `GET /api/menu`
+- `GET /api/dishes/:id`
+- `POST /api/dishes`
+- `PUT /api/dishes/:id`
+- `DELETE /api/dishes/:id`
+- `GET /api/orders`
+- `GET /api/orders/:id`
+- `POST /api/orders`
+- `PATCH /api/orders/:id/status`
+- `POST /api/categories`
+- `PATCH /api/categories/:id`
+- `DELETE /api/categories/:id`
 
 ### 7.3 图片上传
 
@@ -270,7 +272,7 @@ UI 规范与原方案一致：
 点菜端选菜
 → 加入本地购物车
 → 确认下单
-→ POST /api/functions/placeOrder
+→ POST /api/orders
 → 后端重新查菜品验价
 → 锁定用户余额并扣减星星币
 → 创建订单
@@ -323,7 +325,7 @@ UI 规范与原方案一致：
 
 - 用 `docker compose up -d` 启动 MySQL 和 MinIO
 - `backend/.env` 配置数据库、对象存储和微信参数
-- `go run ./cmd/api` 启动后端
+- `go run ./cmd/api` 启动后端，启动时自动执行迁移
 - 小程序 `secret.config.js` 指向后端地址
 
 ### 10.2 生产环境
@@ -338,7 +340,7 @@ UI 规范与原方案一致：
 
 ## 11. 迁移说明
 
-- `cloudfunctions/` 保留作为旧逻辑参考，不再是运行时依赖
-- `miniprogram/utils/cloud.js` 已从“云函数调用层”改为“HTTP 兼容层”
+- `miniprogram/utils/cloud.js` 已从“云能力调用层”改为“HTTP 兼容层”
 - `watchOrder` / `watchNewOrders` 已改为轮询实现
 - `upload.js` 已从 GitCode 图床切换为后端 + MinIO
+- 数据库建表与升级已从 `AutoMigrate` 切换为 `golang-migrate`

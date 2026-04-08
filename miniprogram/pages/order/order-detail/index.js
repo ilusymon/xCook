@@ -26,7 +26,7 @@ Page({
   },
 
   loadOrder(orderId) {
-    cloud.callFunction('getOrders', { orderId }).then(res => {
+    cloud.getOrderDetail(orderId).then(res => {
       if (res && res.order) {
         this.setOrderData(res.order)
       }

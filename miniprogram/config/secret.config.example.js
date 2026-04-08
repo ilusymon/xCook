@@ -7,7 +7,7 @@
  * 2. 填入你的真实密钥
  * 3. secret.config.js 已被 .gitignore 排除，不会被提交到仓库
  *
- * 注意：project.config.json 中的 appid 需要手动修改为你的小程序 AppID
+ * 注意：miniprogram/project.config.json 中的 appid 需要手动修改为你的小程序 AppID
  */
 
 module.exports = {

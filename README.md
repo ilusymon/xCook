@@ -4,7 +4,7 @@
 
 星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单烹饪。使用虚拟「星星币」支付，不接入真实支付。
 
-当前版本已将原来的「微信云开发 + 云函数 + 云数据库 + GitCode 图床」方案，替换为：
+当前版本已将原来的「微信云开发 + 云数据库 + GitCode 图床」方案，替换为：
 
 - `Go` 后端服务
 - `MySQL` 业务数据库
@@ -46,7 +46,6 @@ xCook/
 │   ├── internal/             # 配置、鉴权、模型、业务、上传
 │   └── .env.example
 ├── miniprogram/              # 微信小程序
-├── cloudfunctions/           # 旧云函数实现（保留作迁移参考）
 ├── design.md                 # 技术设计文档
 └── docker-compose.yml        # MySQL / MinIO 本地依赖
 ```
@@ -81,14 +80,14 @@ cp .env.example .env
 - `WECHAT_APP_ID` / `WECHAT_APP_SECRET` 填小程序后台配置
 - 本地联调时可先保留 `WECHAT_ALLOW_DEBUG_AUTH=true`
 
-### 3. 启动后端
+### 3. 运行数据库迁移并启动后端
 
 ```bash
 cd backend
 go run ./cmd/api
 ```
 
-服务默认监听 `http://127.0.0.1:8080`。
+服务启动时会先自动执行内嵌的 `golang-migrate` SQL 迁移，再监听 `http://127.0.0.1:8080`。
 
 ### 4. 配置小程序
 
@@ -116,17 +115,22 @@ npm install
 
 然后在微信开发者工具中执行“工具 -> 构建 npm”。
 
-### 6. 初始化默认分类
+打开项目时，请直接选择 [miniprogram](/D:/projects/laixm/xCook/miniprogram) 目录作为小程序项目根目录。
 
-后端启动后，任选一种方式初始化：
+## 数据库迁移
 
-1. 登录小程序后调用 `initCategories`
-2. 使用接口调试工具请求：
+项目已改为使用 `golang-migrate`，迁移文件位于：
 
 ```text
-POST /api/functions/initCategories
-Authorization: Bearer <token>
+backend/internal/migrate/sql/
 ```
+
+当前策略：
+
+- 启动服务时自动执行 `Up()`
+- 使用版本化 SQL，而不是 `GORM AutoMigrate`
+- 默认分类也通过 migration seed 初始化
+- 新增表结构时，继续追加新的 `*.up.sql` / `*.down.sql`
 
 ## 主要接口
 
@@ -136,33 +140,33 @@ Authorization: Bearer <token>
 
 ### 业务接口
 
-后端保留了与原云函数同名的函数分发入口，便于小程序平滑迁移：
-
-- `POST /api/functions/getUserInfo`
-- `POST /api/functions/getMenu`
-- `POST /api/functions/getDishDetail`
-- `POST /api/functions/saveDish`
-- `POST /api/functions/deleteDish`
-- `POST /api/functions/placeOrder`
-- `POST /api/functions/getOrders`
-- `POST /api/functions/updateOrderStatus`
-- `POST /api/functions/adjustStarCoins`
-- `POST /api/functions/initCategories`
-- `POST /api/functions/saveCategory`
+- `GET /api/users/me`
+- `POST /api/users/:id/star-coins/adjust`
+- `GET /api/menu`
+- `GET /api/dishes/:id`
+- `POST /api/dishes`
+- `PUT /api/dishes/:id`
+- `DELETE /api/dishes/:id`
+- `GET /api/orders`
+- `GET /api/orders/:id`
+- `POST /api/orders`
+- `PATCH /api/orders/:id/status`
+- `POST /api/categories`
+- `PATCH /api/categories/:id`
+- `DELETE /api/categories/:id`
 
 ## 迁移说明
 
 - `miniprogram/utils/cloud.js` 已改为 HTTP API 封装，页面调用方式基本不变
 - `miniprogram/utils/upload.js` 已改为上传到后端，再由后端写入 MinIO
 - 原来的 `watch` 实时监听已替换为前端轮询
-- `cloudfunctions/` 目录保留，仅用于参考原始业务逻辑
 
 ## 注意事项
 
 - 正式环境必须配置 `WECHAT_APP_ID` 和 `WECHAT_APP_SECRET`
 - 本地开发若使用真机，请在小程序后台配置合法 request 域名
 - MinIO 返回的是公开访问 URL，建议给存储桶配置只读访问
-- 当前项目默认通过 GORM `AutoMigrate` 自动建表
+- 当前项目通过 `golang-migrate` 初始化和升级表结构
 
 ## License
 
