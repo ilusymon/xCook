@@ -1,14 +1,9 @@
-const app = getApp()
+// 首页主题可配置为 blue 或 yellow，默认 blue。
+const HOME_THEME = 'blue'
 
 Page({
   data: {
-    starCoins: 0
-  },
-
-  onShow() {
-    this.setData({
-      starCoins: app.globalData.starCoins || 0
-    })
+    homeTheme: HOME_THEME
   },
 
   goOrder() {
@@ -17,5 +12,16 @@ Page({
 
   goChef() {
     wx.switchTab({ url: '/pages/chef/dashboard/index' })
+  },
+
+  goOrders() {
+    wx.switchTab({ url: '/pages/order/order-list/index' })
+  },
+
+  showPending() {
+    wx.showToast({
+      title: '待开发',
+      icon: 'none'
+    })
   }
 })

@@ -1,112 +1,299 @@
-.page-container {
+page {
+  background: #ddf3ff;
+}
+
+.home-page {
+  --page-bg: #ddf3ff;
+  --page-edge: #cbeafb;
+  --table-color: #a8ddf2;
+  --table-line: rgba(255, 255, 255, 0.78);
   min-height: 100vh;
-  background: #FFF5F5;
-  padding: 40rpx 32rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  overflow-x: hidden;
+  color: #3b2016;
+  background: radial-gradient(circle at 50% 30%, #effaff 0%, var(--page-bg) 58%, var(--page-edge) 100%);
 }
 
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 60rpx 0 50rpx;
+.theme-blue {
+  --page-bg: #ddf3ff;
+  --page-edge: #cbeafb;
+  --table-color: #a8ddf2;
 }
 
-.logo-wrap {
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FFB8C6, #FF6B81);
+.theme-yellow {
+  --page-bg: #fff1ae;
+  --page-edge: #ffe78c;
+  --table-color: #f3ca61;
+}
+
+.home-canvas {
+  position: relative;
+  width: 750rpx;
+  height: 100vh;
+  min-height: 1480rpx;
+  margin: 0 auto;
+}
+
+.brand-block {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 118rpx);
+  left: 50%;
+  width: 500rpx;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.brand-title-row,
+.brand-subtitle-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20rpx;
-  box-shadow: 0 8rpx 32rpx rgba(255, 107, 129, 0.3);
 }
 
-.logo-heart {
-  font-size: 64rpx;
-}
-
-.app-title {
+.brand-title {
+  margin: 0 22rpx;
+  font-family: 'Comic Sans MS', Georgia, serif;
   font-size: 52rpx;
-  font-weight: bold;
-  color: #4A3333;
-  margin-bottom: 8rpx;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 4rpx;
+  transform: rotate(-1deg);
 }
 
-.app-subtitle {
-  font-size: 26rpx;
-  color: #9B8888;
+.brand-heart {
+  color: #fa8990;
+  font-size: 32rpx;
+  font-weight: 700;
+  -webkit-text-stroke: 2rpx #3b2016;
 }
 
-/* 角色选择卡片 */
-.role-cards {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-  margin-bottom: 40rpx;
+.brand-subtitle-row {
+  margin-top: 10rpx;
 }
 
-.role-card {
-  background: #FFFFFF;
-  border-radius: 28rpx;
-  padding: 40rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 6rpx 24rpx rgba(255, 107, 129, 0.08);
-  transition: transform 0.2s ease;
+.brand-subtitle {
+  margin: 0 18rpx;
+  font-family: KaiTi, STKaiti, 'Microsoft YaHei', sans-serif;
+  font-size: 39rpx;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 9rpx;
 }
 
-.role-card:active {
-  transform: scale(0.97);
+.brand-star {
+  color: #ffc047;
+  font-size: 27rpx;
 }
 
-.role-emoji {
-  font-size: 72rpx;
-  margin-bottom: 16rpx;
-}
-
-.role-title {
-  font-size: 34rpx;
-  font-weight: bold;
-  color: #4A3333;
-  margin-bottom: 8rpx;
-}
-
-.role-desc {
-  font-size: 24rpx;
-  color: #9B8888;
-}
-
-/* 星星币 */
-.coin-section {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, #FFF8E6, #FFEFCC);
-  border-radius: 40rpx;
-  padding: 16rpx 32rpx;
-  border: 2rpx solid #FFE0A0;
-}
-
-.coin-icon {
-  width: 40rpx;
-  height: 40rpx;
-  margin-right: 10rpx;
-}
-
-.coin-amount {
+.brand-wave {
+  display: block;
+  height: 20rpx;
+  margin-top: -3rpx;
+  overflow: hidden;
+  color: #f88f96;
   font-size: 36rpx;
-  font-weight: bold;
-  color: #FFA500;
-  margin-right: 8rpx;
+  font-weight: 700;
+  line-height: 18rpx;
+  letter-spacing: -11rpx;
 }
 
-.coin-label {
+.hero-scene {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  width: 590rpx;
+  height: 464rpx;
+  transform: translateX(-50%);
+}
+
+.hero-main {
+  display: block;
+  width: 590rpx;
+  height: 464rpx;
+}
+
+.action-row {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  width: 650rpx;
+  height: 190rpx;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  transform: translateX(-50%);
+}
+
+.action-button {
+  position: relative;
+  flex: 0 0 145rpx;
+  width: 145rpx;
+  min-height: 178rpx;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: #3b2016;
+  line-height: 1;
+  background: transparent;
+  border: 0;
+  border-radius: 28rpx;
+}
+
+.action-button::after {
+  display: none;
+}
+
+.action-button--order {
+  left: auto;
+}
+
+.action-button--chef {
+  left: auto;
+}
+
+.action-button--record {
+  left: auto;
+}
+
+.action-button--relation {
+  left: auto;
+}
+
+.action-button--pressed {
+  transform: translateY(3rpx) scale(0.97);
+  opacity: 0.84;
+}
+
+.action-card {
+  width: 118rpx;
+  height: 122rpx;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 31rpx;
+  background: #fff6e9;
+  box-shadow: 0 5rpx 12rpx rgba(102, 87, 74, 0.06);
+}
+
+.action-image {
+  display: block;
+  width: 108rpx;
+  height: 108rpx;
+}
+
+.action-image--person {
+  margin-top: 17rpx;
+  transform: scale(1.16);
+}
+
+.action-image--notebook {
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.action-image--hearts {
+  width: 103rpx;
+  height: 85rpx;
+}
+
+.action-label {
+  display: block;
+  margin-top: 17rpx;
+  font-family: KaiTi, STKaiti, 'Microsoft YaHei', sans-serif;
   font-size: 24rpx;
-  color: #C89030;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 3rpx;
+  white-space: nowrap;
+}
+
+.quote-card {
+  position: absolute;
+  top: 76%;
+  left: 50%;
+  width: 552rpx;
+  height: 204rpx;
+  box-sizing: border-box;
+  padding: 9rpx;
+  border-radius: 39rpx;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 8rpx 24rpx rgba(87, 77, 68, 0.07);
+  transform: translateX(-50%);
+}
+
+.quote-card-inner {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3rpx dashed #ffc7bb;
+  border-radius: 32rpx;
+  background: rgba(255, 248, 237, 0.96);
+}
+
+.quote-image {
+  width: 205rpx;
+  height: 93rpx;
+  margin-top: -4rpx;
+}
+
+.quote-line {
+  display: flex;
+  align-items: center;
+  margin-top: 4rpx;
+}
+
+.quote-text {
+  font-family: KaiTi, STKaiti, 'Microsoft YaHei', sans-serif;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.quote-heart {
+  margin-left: 4rpx;
+  color: #f4868d;
+  font-size: 25rpx;
+}
+
+.flower-bed {
+  position: absolute;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 8rpx);
+  left: 0;
+  height: 92rpx;
+  overflow: hidden;
+}
+
+.flowers {
+  position: absolute;
+  bottom: -25rpx;
+  width: 150rpx;
+}
+
+.flowers--left {
+  left: 92rpx;
+}
+
+.flowers--right {
+  right: 90rpx;
+}
+
+.flower-star {
+  position: absolute;
+  color: #ffba37;
+  font-size: 24rpx;
+}
+
+.flower-star--left {
+  bottom: 46rpx;
+  left: 184rpx;
+}
+
+.flower-star--middle {
+  right: 218rpx;
+  bottom: 25rpx;
 }

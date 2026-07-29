@@ -1,32 +1,68 @@
-<view class="page-container">
-  <!-- Logo & 标题 -->
-  <view class="header">
-    <view class="logo-wrap">
-      <text class="logo-heart">⭐</text>
-    </view>
-    <text class="app-title">星厨房</text>
-    <text class="app-subtitle">属于我们的小厨房</text>
-  </view>
-
-  <!-- 角色选择卡片 -->
-  <view class="role-cards">
-    <view class="role-card orderer" bindtap="goOrder">
-      <text class="role-emoji">🍽️</text>
-      <text class="role-title">我要点菜</text>
-      <text class="role-desc">浏览菜单，选择喜欢的菜品</text>
+<view class="home-page theme-{{homeTheme}}">
+  <view class="home-canvas">
+    <view class="brand-block">
+      <view class="brand-title-row">
+        <text class="brand-heart">♥</text>
+        <text class="brand-title">Couple Order</text>
+        <text class="brand-heart">♥</text>
+      </view>
+      <view class="brand-subtitle-row">
+        <text class="brand-star">✦</text>
+        <text class="brand-subtitle">情侣点餐</text>
+        <text class="brand-star">✦</text>
+      </view>
+      <text class="brand-wave" aria-hidden="true">～～～～</text>
     </view>
 
-    <view class="role-card chef" bindtap="goChef">
-      <text class="role-emoji">👨‍🍳</text>
-      <text class="role-title">我要做菜</text>
-      <text class="role-desc">管理菜品，接单烹饪</text>
+    <view class="hero-scene" aria-label="情侣一起做饭和用餐的插画">
+      <image class="hero-main" src="/images/home/hero-couple.png" mode="aspectFit" aria-hidden="true" />
     </view>
-  </view>
 
-  <!-- 星星币余额 -->
-  <view class="coin-section" wx:if="{{starCoins >= 0}}">
-    <image class="coin-icon" src="/images/star-coin.png" />
-    <text class="coin-amount">{{starCoins}}</text>
-    <text class="coin-label">星星币</text>
+    <view class="action-row" aria-role="navigation" aria-label="首页快捷入口">
+      <button class="action-button action-button--order" hover-class="action-button--pressed" bindtap="goOrder" aria-label="我是吃货，进入点餐">
+        <view class="action-card">
+          <image class="action-image action-image--person" src="/images/home/girl.png" mode="aspectFit" />
+        </view>
+        <text class="action-label">我是吃货</text>
+      </button>
+
+      <button class="action-button action-button--chef" hover-class="action-button--pressed" bindtap="goChef" aria-label="我是大厨，进入厨房">
+        <view class="action-card">
+          <image class="action-image action-image--person" src="/images/home/chef.png" mode="aspectFit" />
+        </view>
+        <text class="action-label">我是大厨</text>
+      </button>
+
+      <button class="action-button action-button--record" hover-class="action-button--pressed" bindtap="goOrders" aria-label="记录一下，查看订单">
+        <view class="action-card">
+          <image class="action-image action-image--notebook" src="/images/home/notebook.png" mode="aspectFit" />
+        </view>
+        <text class="action-label">记录一下</text>
+      </button>
+
+      <button class="action-button action-button--relation" hover-class="action-button--pressed" bindtap="showPending" aria-label="绑定关系，待开发">
+        <view class="action-card">
+          <image class="action-image action-image--hearts" src="/images/home/hearts.png" mode="aspectFit" />
+        </view>
+        <text class="action-label">绑定关系</text>
+      </button>
+    </view>
+
+    <view class="quote-card">
+      <view class="quote-card-inner">
+        <image class="quote-image" src="/images/home/heart-bow.png" mode="aspectFit" aria-hidden="true" />
+        <view class="quote-line">
+          <text class="quote-text">和喜欢的人一起，吃遍世界的美味吧～</text>
+          <text class="quote-heart">♥</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="flower-bed" aria-hidden="true">
+      <image class="flowers flowers--left" src="/images/home/flowers-left.png" mode="widthFix" />
+      <text class="flower-star flower-star--left">✦</text>
+      <text class="flower-star flower-star--middle">✧</text>
+      <image class="flowers flowers--right" src="/images/home/flowers-right.png" mode="widthFix" />
+    </view>
   </view>
 </view>
