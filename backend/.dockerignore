@@ -1,0 +1,6 @@
+.env
+.git
+.idea
+Dockerfile*
+docker-compose*.yml
+deploy.*

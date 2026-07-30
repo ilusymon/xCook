@@ -35,7 +35,7 @@ page {
 
 .brand-block {
   position: absolute;
-  top: calc(env(safe-area-inset-top) + 118rpx);
+  top: calc(env(safe-area-inset-top) + 180rpx);
   left: 50%;
   width: 500rpx;
   text-align: center;
@@ -212,11 +212,11 @@ page {
   position: absolute;
   top: 76%;
   left: 50%;
-  width: 552rpx;
-  height: 204rpx;
+  width: 590rpx;
+  height: 220rpx;
   box-sizing: border-box;
-  padding: 9rpx;
-  border-radius: 39rpx;
+  padding: 10rpx;
+  border-radius: 42rpx;
   background: rgba(255, 255, 255, 0.28);
   box-shadow: 0 8rpx 24rpx rgba(87, 77, 68, 0.07);
   transform: translateX(-50%);
@@ -230,13 +230,13 @@ page {
   align-items: center;
   justify-content: center;
   border: 3rpx dashed #ffc7bb;
-  border-radius: 32rpx;
+  border-radius: 35rpx;
   background: rgba(255, 248, 237, 0.96);
 }
 
 .quote-image {
-  width: 205rpx;
-  height: 93rpx;
+  width: 220rpx;
+  height: 100rpx;
   margin-top: -4rpx;
 }
 
@@ -248,7 +248,7 @@ page {
 
 .quote-text {
   font-family: KaiTi, STKaiti, 'Microsoft YaHei', sans-serif;
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
 }
@@ -256,21 +256,21 @@ page {
 .quote-heart {
   margin-left: 4rpx;
   color: #f4868d;
-  font-size: 25rpx;
+  font-size: 27rpx;
 }
 
 .flower-bed {
   position: absolute;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom) + 8rpx);
+  bottom: 0;
   left: 0;
-  height: 92rpx;
+  height: calc(118rpx + env(safe-area-inset-bottom));
   overflow: hidden;
 }
 
 .flowers {
   position: absolute;
-  bottom: -25rpx;
+  bottom: env(safe-area-inset-bottom);
   width: 150rpx;
 }
 
@@ -289,11 +289,11 @@ page {
 }
 
 .flower-star--left {
-  bottom: 46rpx;
+  bottom: calc(46rpx + env(safe-area-inset-bottom));
   left: 184rpx;
 }
 
 .flower-star--middle {
   right: 218rpx;
-  bottom: 25rpx;
+  bottom: calc(25rpx + env(safe-area-inset-bottom));
 }

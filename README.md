@@ -44,29 +44,16 @@ xCook/
 ├── backend/                  # Go 后端
 │   ├── cmd/api/              # 服务启动入口
 │   ├── internal/             # 配置、鉴权、模型、业务、上传
+│   ├── docker-compose.yml     # 后端服务容器编排
+│   ├── deploy.sh              # 一键部署脚本
 │   └── .env.example
 ├── miniprogram/              # 微信小程序
-├── design.md                 # 技术设计文档
-└── docker-compose.yml        # MySQL / MinIO 本地依赖
+└── design.md                 # 技术设计文档
 ```
 
 ## 快速开始
 
-### 1. 启动基础服务
-
-在项目根目录运行：
-
-```bash
-docker compose up -d
-```
-
-启动后：
-
-- MySQL: `127.0.0.1:3306`
-- MinIO API: `http://127.0.0.1:9000`
-- MinIO Console: `http://127.0.0.1:9001`
-
-### 2. 配置后端
+### 1. 配置后端
 
 ```bash
 cd backend
@@ -80,7 +67,25 @@ cp .env.example .env
 - `WECHAT_APP_ID` / `WECHAT_APP_SECRET` 填小程序后台配置
 - 本地联调时可先保留 `WECHAT_ALLOW_DEBUG_AUTH=true`
 
-### 3. 运行数据库迁移并启动后端
+MySQL 和 MinIO 需独立部署，不由本项目的 Compose 启动。通过 Docker Compose
+运行后端时，如果依赖服务运行在宿主机，请将 `MYSQL_HOST` 和
+`MINIO_ENDPOINT` 中的主机名设置为 `host.docker.internal`；如果依赖服务运行
+在其他机器上，则填写其实际可访问地址。
+
+### 2. 启动后端
+
+在 `backend` 目录运行：
+
+```bash
+cd backend
+docker compose up -d --build
+```
+
+Compose 只会构建并启动后端，服务端口由 `.env` 中的 `APP_PORT` 控制，默认
+监听 `http://127.0.0.1:8080`。启动时会先自动执行内嵌的
+`golang-migrate` SQL 迁移。
+
+也可以不使用 Docker，直接在本机启动：
 
 ```bash
 cd backend
@@ -88,6 +93,24 @@ go run ./cmd/api
 ```
 
 服务启动时会先自动执行内嵌的 `golang-migrate` SQL 迁移，再监听 `http://127.0.0.1:8080`。
+
+### 3. 一键部署到服务器
+
+部署前确保本机已安装 Docker、SSH 和 SCP，服务器已安装 Docker 及 Compose
+插件，并已正确配置 `backend/.env`。服务器地址通过 `SERVER_HOST` 环境变量传入，
+不会写入仓库；SSH 用户、端口及部署目录可按需修改 `deploy.sh` 顶部配置区。然后在
+`backend` 目录执行：
+
+```bash
+cd backend
+chmod +x deploy.sh
+SERVER_HOST=<服务器地址> ./deploy.sh
+```
+
+脚本会构建 Linux 镜像、导出并上传镜像和运行配置，然后在服务器的
+`/opt/xcook-backend` 目录加载镜像并启动服务。ARM64 服务器请将脚本配置区的
+`TARGET_PLATFORM` 改为 `linux/arm64`。脚本会将 `.env` 上传到服务器并设置为
+仅所有者可读写，请妥善保管其中的密钥。
 
 ### 4. 配置小程序
 

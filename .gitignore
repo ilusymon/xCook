@@ -1,28 +1,49 @@
-# 依赖
+# Node / 微信小程序依赖
 node_modules/
 miniprogram/miniprogram_npm/
-package-lock.json
 
-# 敏感配置（含 API Token 等密钥）
-miniprogram/config/secret.config.js
-miniprogram/project.private.config.json
-backend/.env
+# Go 构建、测试与覆盖率产物
+bin/
+*.exe
+*.test
+*.out
+*.prof
+coverage/
+coverage.*
 .gocache/
 .gomodcache/
+/backend/xcook-api.tar
 
-# IDE
+# 敏感配置（保留可提交的示例文件）
+.env
+.env.*
+!.env.example
+!**/.env.example
+miniprogram/config/secret.config.js
+miniprogram/project.private.config.json
+
+# 本地开发工具与云开发调试状态
 .idea/
 .vscode/
+.cloudbase/
+.claude/
+*.iml
 *.swp
 *.swo
+*~
 
-# 系统文件
+# 日志与临时文件
+*.log
+logs/
+.cache/
+tmp/
+temp/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 操作系统文件
 .DS_Store
 Thumbs.db
-
-# 云函数依赖
-cloudfunctions/*/node_modules/
-cloudfunctions/*/package-lock.json
-
-# Claude 本地配置
-.claude/
+Desktop.ini
