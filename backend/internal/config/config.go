@@ -54,7 +54,7 @@ func Load() Config {
 
 	return Config{
 		App: AppConfig{
-			Port:        getEnv("APP_PORT", "8080"),
+			Port:        getEnv("APP_PORT", "8081"),
 			JWTSecret:   getEnv("APP_JWT_SECRET", "xcook-dev-secret"),
 			JWTTTL:      time.Duration(getEnvInt("APP_JWT_TTL_HOURS", 168)) * time.Hour,
 			ReadTimeout: 15 * time.Second,

@@ -17,6 +17,6 @@ RUN apk add --no-cache ca-certificates tzdata \
 COPY --from=builder /out/xcook-api /usr/local/bin/xcook-api
 
 USER xcook
-EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT ["/usr/local/bin/xcook-api"]

@@ -12,7 +12,7 @@ set -euo pipefail
 
 # ============ 配置区（按需修改）============
 SERVER_USER="${SERVER_USER:-root}"
-SERVER_HOST="${SERVER_HOST:-}"
+SERVER_HOST="117.72.40.150"
 SERVER_PORT="22"                              # SSH 端口
 DEPLOY_DIR="/opt/xcook-api"               # 服务器部署目录
 SERVICE="backend"                             # Compose 服务名
@@ -55,7 +55,7 @@ if [ ! -f "${ENV_FILE}" ]; then
 fi
 
 APP_PORT="$(sed -n 's/^[[:space:]]*APP_PORT[[:space:]]*=[[:space:]]*//p' "${ENV_FILE}" | tail -n 1 | tr -d '\r')"
-APP_PORT="${APP_PORT:-8080}"
+APP_PORT="${APP_PORT:-8081}"
 if ! [[ "${APP_PORT}" =~ ^[0-9]+$ ]] || [ "${APP_PORT}" -lt 1 ] || [ "${APP_PORT}" -gt 65535 ]; then
   echo "!! .env 中的 APP_PORT 不是有效端口: ${APP_PORT}"
   exit 1
