@@ -16,16 +16,16 @@
     "pages/chef/category-manage/index"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#FF6B81",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F6AEBB",
     "navigationBarTitleText": "星厨房",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#FFF5F5"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFF5D9"
   },
   "tabBar": {
-    "color": "#9B8888",
-    "selectedColor": "#FF6B81",
-    "backgroundColor": "#FFFFFF",
+    "color": "#816F69",
+    "selectedColor": "#EF8297",
+    "backgroundColor": "#FFFDF7",
     "borderStyle": "white",
     "list": [
       {

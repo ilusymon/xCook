@@ -1,43 +1,44 @@
 /* 星厨房 全局样式 — 温馨情侣主题 */
 
 page {
-  --color-primary: #FF6B81;
-  --color-primary-light: #FFB8C6;
-  --color-primary-dark: #E84660;
-  --color-secondary: #FFC048;
-  --color-bg: #FFF5F5;
-  --color-bg-card: #FFFFFF;
-  --color-text: #4A3333;
-  --color-text-secondary: #9B8888;
+  --color-primary: #EF8297;
+  --color-primary-light: #F6AEBB;
+  --color-primary-dark: #D96D82;
+  --color-secondary: #E8B453;
+  --color-bg: #FFF5D9;
+  --color-bg-card: #FFFDF7;
+  --color-text: #493B37;
+  --color-text-secondary: #816F69;
   --color-success: #5FD068;
   --color-warning: #FF9F43;
-  --color-border: #FFE4E4;
+  --color-border: #F1DDD2;
 
   /* iView Weapp 主题覆盖 */
-  --button-primary-bg-color: #FF6B81;
-  --button-primary-active-color: #E84660;
-  --tab-bar-active-color: #FF6B81;
-  --tag-primary-color: #FF6B81;
-  --switch-checked-color: #FF6B81;
+  --button-primary-bg-color: #EF8297;
+  --button-primary-active-color: #D96D82;
+  --tab-bar-active-color: #EF8297;
+  --tag-primary-color: #EF8297;
+  --switch-checked-color: #EF8297;
 
-  background-color: #FFF5F5;
-  color: #4A3333;
+  background-color: #FFF5D9;
+  color: #493B37;
   font-size: 28rpx;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 /* 通用卡片 */
 .card {
-  background: #FFFFFF;
+  background: #FFFDF7;
   border-radius: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
+  border: 2rpx solid rgba(73, 59, 55, 0.05);
+  box-shadow: 0 6rpx 18rpx rgba(111, 82, 55, 0.09);
   padding: 24rpx;
   margin: 16rpx 24rpx;
 }
 
 /* 主按钮 */
 .btn-primary {
-  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  background: #EF8297;
   color: #FFFFFF;
   border: none;
   border-radius: 40rpx;
@@ -45,19 +46,19 @@ page {
   font-size: 30rpx;
   font-weight: 600;
   text-align: center;
-  box-shadow: 0 6rpx 20rpx rgba(255, 107, 129, 0.3);
+  box-shadow: 0 6rpx 20rpx rgba(239, 130, 151, 0.28);
 }
 
 .btn-primary:active {
-  background: linear-gradient(135deg, #E84660, #FF6B81);
+  background: #D96D82;
   transform: scale(0.98);
 }
 
 /* 次要按钮 */
 .btn-secondary {
-  background: #FFFFFF;
-  color: #FF6B81;
-  border: 2rpx solid #FF6B81;
+  background: #FFFDF7;
+  color: #EF8297;
+  border: 2rpx solid #EF8297;
   border-radius: 40rpx;
   padding: 18rpx 48rpx;
   font-size: 28rpx;
@@ -84,8 +85,8 @@ page {
 }
 
 .tag-difficulty {
-  background: #FFE4E4;
-  color: #FF6B81;
+  background: #FCE6EA;
+  color: #D96D82;
 }
 
 /* 星星币显示 */
@@ -113,20 +114,20 @@ page {
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #4A3333;
+  color: #493B37;
   margin: 24rpx 0 16rpx 0;
 }
 
 /* 辅助文字 */
 .text-secondary {
   font-size: 24rpx;
-  color: #9B8888;
+  color: #816F69;
 }
 
 /* 分割线 */
 .divider {
   height: 1rpx;
-  background: #FFE4E4;
+  background: #F1DDD2;
   margin: 16rpx 0;
 }
 
@@ -148,27 +149,27 @@ page {
 
 .empty-state-text {
   font-size: 28rpx;
-  color: #9B8888;
+  color: #816F69;
 }
 
 /* 页面容器 */
 .page-container {
   min-height: 100vh;
-  background: #FFF5F5;
+  background: #FFF5D9;
   padding-bottom: 120rpx;
 }
 
 /* 输入框 */
 .input-box {
-  border: 2rpx solid #FFE4E4;
+  border: 2rpx solid #F1DDD2;
   border-radius: 16rpx;
   padding: 16rpx 20rpx;
   font-size: 28rpx;
-  background: #FFFFFF;
+  background: #FFFDF7;
 }
 
 .input-box:focus {
-  border-color: #FF6B81;
+  border-color: #EF8297;
 }
 
 /* 浮动操作按钮 */
@@ -179,8 +180,8 @@ page {
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 129, 0.4);
+  background: #EF8297;
+  box-shadow: 0 8rpx 24rpx rgba(239, 130, 151, 0.34);
   display: flex;
   align-items: center;
   justify-content: center;

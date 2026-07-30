@@ -101,10 +101,13 @@ cp secret.config.example.js secret.config.js
 编辑 `secret.config.js`：
 
 - `API_BASE_URL`: 后端地址
+- `IMAGE_BASE_URL`: 图片访问根地址，例如 `http://127.0.0.1:9000/xcook-images`
 - `POLL_INTERVAL`: 订单轮询间隔，默认 `5000`
 - `DEBUG_OPEN_ID`: 本地调试可填一个固定值；正式环境留空
 
 如果是真机调试，请把 `API_BASE_URL` 改成你电脑的局域网 IP，而不是 `127.0.0.1`。
+
+小程序的 [project.config.json](/D:/projects/laixm/xCook/miniprogram/project.config.json) 已经使用占位 `appid`，不要把真实 `appid` 写回仓库。建议只在微信开发者工具本地维护真实配置，并使用 [project.private.config.json](/D:/projects/laixm/xCook/miniprogram/project.private.config.json) 保存个人配置；该文件已被 [.gitignore](/D:/projects/laixm/xCook/.gitignore) 忽略，不会进入 Git。
 
 ### 5. 安装前端依赖
 
