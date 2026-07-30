@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
 
 type CoinLogEntry struct {
 	Type      string    `json:"type"`
@@ -9,6 +13,47 @@ type CoinLogEntry struct {
 	OrderID   uint64    `json:"orderId,omitempty"`
 	By        uint64    `json:"by,omitempty"`
 	Timestamp time.Time `json:"timestamp"`
+}
+
+const coinLogTimeLayout = "2006-01-02 15:04:05"
+
+func (entry CoinLogEntry) MarshalJSON() ([]byte, error) {
+	type coinLogEntry CoinLogEntry
+
+	return json.Marshal(struct {
+		coinLogEntry
+		Timestamp string `json:"timestamp"`
+	}{
+		coinLogEntry: coinLogEntry(entry),
+		Timestamp:    entry.Timestamp.In(time.Local).Format(coinLogTimeLayout),
+	})
+}
+
+func (entry *CoinLogEntry) UnmarshalJSON(data []byte) error {
+	type coinLogEntry CoinLogEntry
+
+	var decoded coinLogEntry
+	payload := struct {
+		*coinLogEntry
+		Timestamp string `json:"timestamp"`
+	}{
+		coinLogEntry: &decoded,
+	}
+
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	if payload.Timestamp != "" {
+		parsed, err := time.ParseInLocation(coinLogTimeLayout, payload.Timestamp, time.Local)
+		if err != nil {
+			return fmt.Errorf("parse coin log timestamp %q: %w", payload.Timestamp, err)
+		}
+		decoded.Timestamp = parsed
+	}
+
+	*entry = CoinLogEntry(decoded)
+	return nil
 }
 
 type Category struct {
