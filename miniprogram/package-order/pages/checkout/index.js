@@ -74,7 +74,7 @@ Page({
         wx.showToast({ title: '下单成功 💕', icon: 'success' })
         setTimeout(() => {
           wx.redirectTo({
-            url: `/pages/order/order-detail/index?id=${res.orderId}`
+            url: `/package-order/pages/order-detail/index?id=${res.orderId}`
           })
         }, 1000)
       } else {

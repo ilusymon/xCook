@@ -90,6 +90,6 @@ Page({
   },
 
   goCheckout() {
-    wx.navigateTo({ url: '/pages/order/checkout/index' })
+    wx.navigateTo({ url: '/package-order/pages/checkout/index' })
   }
 })

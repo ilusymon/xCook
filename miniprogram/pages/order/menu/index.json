@@ -10,5 +10,6 @@
     "dish-card": "placeholder",
     "cart-bar": "placeholder"
   },
-  "navigationBarTitleText": "菜单"
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "Couple Order"
 }

@@ -38,18 +38,18 @@ Page({
   },
 
   goDishManage() {
-    wx.navigateTo({ url: '/pages/chef/dish-manage/index' })
+    wx.navigateTo({ url: '/package-chef/pages/dish-manage/index' })
   },
 
   goAddDish() {
-    wx.navigateTo({ url: '/pages/chef/dish-edit/index' })
+    wx.navigateTo({ url: '/package-chef/pages/dish-edit/index' })
   },
 
   goOrderManage() {
-    wx.navigateTo({ url: '/pages/chef/order-manage/index' })
+    wx.navigateTo({ url: '/package-chef/pages/order-manage/index' })
   },
 
   goCategoryManage() {
-    wx.navigateTo({ url: '/pages/chef/category-manage/index' })
+    wx.navigateTo({ url: '/package-chef/pages/category-manage/index' })
   }
 })

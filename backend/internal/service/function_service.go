@@ -105,12 +105,20 @@ func (s *FunctionService) GetUserInfo(ctx context.Context, openID string) (*mode
 	return &user, nil
 }
 
-func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]any, error) {
+func (s *FunctionService) GetCategories(ctx context.Context) ([]model.Category, error) {
 	var categories []model.Category
 	if err := s.db.WithContext(ctx).
 		Where("is_active = ?", true).
 		Order("sort_order asc").
 		Find(&categories).Error; err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
+func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]any, error) {
+	categories, err := s.GetCategories(ctx)
+	if err != nil {
 		return nil, err
 	}
 

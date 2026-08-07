@@ -3,18 +3,50 @@
   "pages": [
     "pages/index/index",
     "pages/order/menu/index",
-    "pages/order/dish-detail/index",
     "pages/order/cart/index",
-    "pages/order/checkout/index",
     "pages/order/order-list/index",
-    "pages/order/order-detail/index",
-    "pages/chef/dashboard/index",
-    "pages/chef/dish-manage/index",
-    "pages/chef/dish-edit/index",
-    "pages/chef/cook-view/index",
-    "pages/chef/order-manage/index",
-    "pages/chef/category-manage/index"
+    "pages/chef/dashboard/index"
   ],
+  "subpackages": [
+    {
+      "name": "order",
+      "root": "package-order",
+      "pages": [
+        "pages/dish-detail/index",
+        "pages/checkout/index",
+        "pages/order-detail/index"
+      ]
+    },
+    {
+      "name": "chef",
+      "root": "package-chef",
+      "pages": [
+        "pages/dish-manage/index",
+        "pages/dish-edit/index",
+        "pages/cook-view/index",
+        "pages/order-manage/index",
+        "pages/category-manage/index"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/order/menu/index": {
+      "network": "all",
+      "packages": ["order"]
+    },
+    "pages/order/cart/index": {
+      "network": "all",
+      "packages": ["order"]
+    },
+    "pages/order/order-list/index": {
+      "network": "all",
+      "packages": ["order"]
+    },
+    "pages/chef/dashboard/index": {
+      "network": "all",
+      "packages": ["chef"]
+    }
+  },
   "window": {
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#F6AEBB",

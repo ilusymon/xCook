@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "option-picker": "/components/option-picker/index",
+    "option-picker": "/package-order/components/option-picker/index",
     "placeholder": "/components/placeholder/index"
   },
   "componentPlaceholder": {

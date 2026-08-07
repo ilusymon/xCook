@@ -32,6 +32,16 @@ function getMenu(role) {
 }
 
 /**
+ * 获取启用中的分类列表
+ */
+function getCategories() {
+  return api.request({
+    url: '/api/categories',
+    method: 'GET'
+  }).then(res => (res && res.categories) || [])
+}
+
+/**
  * 获取菜品详情
  */
 function getDishDetail(dishId) {
@@ -220,6 +230,7 @@ module.exports = {
   _,
   collections,
   getUserInfo,
+  getCategories,
   getMenu,
   getDishDetail,
   saveDish,

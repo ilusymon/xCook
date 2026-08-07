@@ -43,6 +43,11 @@ func (h *RestHandler) GetMenu(c *gin.Context) {
 	h.respond(c, result, err)
 }
 
+func (h *RestHandler) ListCategories(c *gin.Context) {
+	categories, err := h.functionService.GetCategories(c.Request.Context())
+	h.respond(c, gin.H{"categories": categories}, err)
+}
+
 func (h *RestHandler) GetDish(c *gin.Context) {
 	result, err := h.functionService.GetDishDetail(c.Request.Context(), c.Param("id"))
 	h.respond(c, result, err)

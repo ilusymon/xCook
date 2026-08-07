@@ -27,17 +27,17 @@ Page({
   },
 
   addDish() {
-    wx.navigateTo({ url: '/pages/chef/dish-edit/index' })
+    wx.navigateTo({ url: '/package-chef/pages/dish-edit/index' })
   },
 
   editDish(e) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: `/pages/chef/dish-edit/index?id=${id}` })
+    wx.navigateTo({ url: `/package-chef/pages/dish-edit/index?id=${id}` })
   },
 
   viewCook(e) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: `/pages/chef/cook-view/index?id=${id}` })
+    wx.navigateTo({ url: `/package-chef/pages/cook-view/index?id=${id}` })
   },
 
   toggleAvailable(e) {

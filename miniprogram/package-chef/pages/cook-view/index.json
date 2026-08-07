@@ -1,7 +1,7 @@
 {
   "usingComponents": {
-    "step-card": "/components/step-card/index",
-    "material-list": "/components/material-list/index",
+    "step-card": "/package-chef/components/step-card/index",
+    "material-list": "/package-chef/components/material-list/index",
     "placeholder": "/components/placeholder/index"
   },
   "componentPlaceholder": {

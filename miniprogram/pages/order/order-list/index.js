@@ -60,6 +60,6 @@ Page({
 
   goDetail(e) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: `/pages/order/order-detail/index?id=${id}` })
+    wx.navigateTo({ url: `/package-order/pages/order-detail/index?id=${id}` })
   }
 })
