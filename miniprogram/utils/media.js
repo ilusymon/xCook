@@ -98,6 +98,25 @@ function normalizeOrderDetailResponse(res) {
   }
 }
 
+function normalizeWishlistResponse(res) {
+  if (!res) return res
+  return {
+    ...res,
+    wishlists: Array.isArray(res.wishlists) ? res.wishlists.map(normalizeOrder) : [],
+    wishlist: normalizeOrder(res.wishlist)
+  }
+}
+
+function normalizeFoodRecordsResponse(res) {
+  if (!res) return res
+  return {
+    ...res,
+    records: Array.isArray(res.records)
+      ? res.records.map(record => ({ ...record, coverImage: resolveMediaUrl(record.coverImage) }))
+      : []
+  }
+}
+
 function isAbsoluteUrl(value) {
   return /^https?:\/\//.test(value)
 }
@@ -117,5 +136,7 @@ module.exports = {
   denormalizeDish,
   normalizeMenuResponse,
   normalizeOrdersResponse,
-  normalizeOrderDetailResponse
+  normalizeOrderDetailResponse,
+  normalizeWishlistResponse,
+  normalizeFoodRecordsResponse
 }

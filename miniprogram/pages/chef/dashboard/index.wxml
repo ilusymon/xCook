@@ -14,10 +14,10 @@
     </view>
   </view>
 
-  <!-- 新订单提醒 -->
+  <!-- 新愿望提醒 -->
   <view class="notice-bar" wx:if="{{pendingCount > 0}}" bindtap="goOrderManage">
     <text class="notice-icon">🔔</text>
-    <text class="notice-text">你有 {{pendingCount}} 个新订单待处理</text>
+    <text class="notice-text">你有 {{pendingCount}} 份愿望待处理</text>
     <text class="notice-arrow">›</text>
   </view>
 
@@ -29,7 +29,7 @@
     </view>
     <view class="stat-card">
       <text class="stat-value">{{todayCount}}</text>
-      <text class="stat-label">今日订单</text>
+      <text class="stat-label">全部愿望</text>
     </view>
     <view class="stat-card">
       <text class="stat-value">{{dishCount}}</text>
@@ -56,13 +56,19 @@
       <view class="action-icon-wrap order">
         <text class="action-icon">📦</text>
       </view>
-      <text class="action-text">订单管理</text>
+      <text class="action-text">愿望单管理</text>
     </view>
     <view class="action-item" bindtap="goCategoryManage">
       <view class="action-icon-wrap category">
         <text class="action-icon">🏷️</text>
       </view>
       <text class="action-text">分类管理</text>
+    </view>
+    <view class="action-item" bindtap="goWishlist">
+      <view class="action-icon-wrap wishlist">
+        <text class="action-icon">♡</text>
+      </view>
+      <text class="action-text">制作进度</text>
     </view>
   </view>
 </view>

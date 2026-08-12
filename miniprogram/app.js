@@ -10,8 +10,8 @@ App({
     userInfo: null,
     openid: null,
     role: 'both',
-    starCoins: 0,
-    cart: []
+    cart: [],
+    wishlistRole: 'orderer'
   },
 
   // 加载用户信息
@@ -21,7 +21,6 @@ App({
         this.globalData.userInfo = user
         this.globalData.openid = user.openid
         this.globalData.role = user.role
-        this.globalData.starCoins = user.starCoins
       }
     }).catch(err => {
       console.error('初始化用户信息失败', err)
@@ -50,7 +49,6 @@ App({
     )
     if (existIndex > -1) {
       cart[existIndex].quantity += item.quantity
-      cart[existIndex].itemTotal = (cart[existIndex].unitPrice + cart[existIndex].extraPrice) * cart[existIndex].quantity
     } else {
       item.cartItemId = this.generateId()
       cart.push(item)
@@ -68,7 +66,6 @@ App({
         cart.splice(index, 1)
       } else {
         cart[index].quantity = quantity
-        cart[index].itemTotal = (cart[index].unitPrice + cart[index].extraPrice) * quantity
       }
     }
     this.saveCart(cart)
@@ -92,15 +89,13 @@ App({
   // 获取购物车汇总
   getCartSummary() {
     const cart = this.globalData.cart
-    let totalPrice = 0
     let totalCalories = 0
     let totalCount = 0
     cart.forEach(item => {
-      totalPrice += item.itemTotal
       totalCalories += item.calories * item.quantity
       totalCount += item.quantity
     })
-    return { totalPrice, totalCalories, totalCount }
+    return { totalCalories, totalCount }
   },
 
   // 生成唯一 ID

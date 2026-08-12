@@ -13,15 +13,15 @@ Page({
   },
 
   loadStats() {
-    // 获取待处理订单数
-    cloud.getOrders('chef', 'active', 1, 1).then(res => {
+    // 获取待处理愿望数
+    cloud.getWishlist('chef', 'active', 1, 1).then(res => {
       if (res) {
         this.setData({ pendingCount: res.total || 0 })
       }
     })
 
-    // 获取今日订单数
-    cloud.getOrders('chef', '', 1, 1).then(res => {
+    // 获取愿望单总数
+    cloud.getWishlist('chef', '', 1, 1).then(res => {
       if (res) {
         this.setData({ todayCount: res.total || 0 })
       }
@@ -46,7 +46,12 @@ Page({
   },
 
   goOrderManage() {
-    wx.navigateTo({ url: '/package-chef/pages/order-manage/index' })
+    this.goWishlist()
+  },
+
+  goWishlist() {
+    app.globalData.wishlistRole = 'chef'
+    wx.switchTab({ url: '/pages/order/wishlist/index' })
   },
 
   goCategoryManage() {

@@ -11,11 +11,11 @@ Page({
   },
 
   goChef() {
-    wx.switchTab({ url: '/pages/chef/dashboard/index' })
+    wx.navigateTo({ url: '/pages/chef/dashboard/index' })
   },
 
   goOrders() {
-    wx.switchTab({ url: '/pages/order/order-list/index' })
+    wx.switchTab({ url: '/pages/order/records/index' })
   },
 
   showPending() {

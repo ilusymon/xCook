@@ -4,7 +4,9 @@
     "pages/index/index",
     "pages/order/menu/index",
     "pages/order/cart/index",
-    "pages/order/order-list/index",
+    "pages/order/wishlist/index",
+    "pages/order/records/index",
+    "pages/profile/index",
     "pages/chef/dashboard/index"
   ],
   "subpackages": [
@@ -14,7 +16,7 @@
       "pages": [
         "pages/dish-detail/index",
         "pages/checkout/index",
-        "pages/order-detail/index"
+        "pages/wishlist-detail/index"
       ]
     },
     {
@@ -24,7 +26,6 @@
         "pages/dish-manage/index",
         "pages/dish-edit/index",
         "pages/cook-view/index",
-        "pages/order-manage/index",
         "pages/category-manage/index"
       ]
     }
@@ -38,7 +39,7 @@
       "network": "all",
       "packages": ["order"]
     },
-    "pages/order/order-list/index": {
+    "pages/order/records/index": {
       "network": "all",
       "packages": ["order"]
     },
@@ -67,22 +68,22 @@
         "selectedIconPath": "images/tab-home-active.png"
       },
       {
-        "pagePath": "pages/order/cart/index",
-        "text": "购物车",
-        "iconPath": "images/tab-cart.png",
-        "selectedIconPath": "images/tab-cart-active.png"
+        "pagePath": "pages/order/wishlist/index",
+        "text": "愿望单",
+        "iconPath": "images/menu/20_nav_wishlist.png",
+        "selectedIconPath": "images/menu/20_nav_wishlist.png"
       },
       {
-        "pagePath": "pages/order/order-list/index",
-        "text": "订单",
-        "iconPath": "images/tab-order.png",
-        "selectedIconPath": "images/tab-order-active.png"
+        "pagePath": "pages/order/records/index",
+        "text": "记录",
+        "iconPath": "images/menu/18_nav_record.png",
+        "selectedIconPath": "images/menu/18_nav_record.png"
       },
       {
-        "pagePath": "pages/chef/dashboard/index",
-        "text": "厨房",
-        "iconPath": "images/tab-chef.png",
-        "selectedIconPath": "images/tab-chef-active.png"
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "images/menu/19_nav_profile.png",
+        "selectedIconPath": "images/menu/19_nav_profile.png"
       }
     ]
   },

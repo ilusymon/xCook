@@ -2,7 +2,7 @@
  * 常量定义
  */
 
-// 订单状态
+// 愿望单状态（保留 ORDER_* 导出名兼容旧页面）
 const ORDER_STATUS = {
   PLACED: 'placed',
   ACCEPTED: 'accepted',
@@ -11,16 +11,16 @@ const ORDER_STATUS = {
   CANCELLED: 'cancelled'
 }
 
-// 订单状态文本
+// 愿望单状态文本
 const ORDER_STATUS_TEXT = {
-  placed: '已下单',
-  accepted: '已接单',
+  placed: '已许愿',
+  accepted: '已接下',
   cooking: '制作中',
   done: '已完成',
   cancelled: '已取消'
 }
 
-// 订单状态颜色
+// 愿望单状态颜色
 const ORDER_STATUS_COLOR = {
   placed: '#FF9F43',
   accepted: '#54A0FF',
@@ -29,7 +29,7 @@ const ORDER_STATUS_COLOR = {
   cancelled: '#B0B0B0'
 }
 
-// 订单状态步骤序号（用于 steps 组件）
+// 愿望单状态步骤序号（用于 steps 组件）
 const ORDER_STATUS_STEP = {
   placed: 0,
   accepted: 1,

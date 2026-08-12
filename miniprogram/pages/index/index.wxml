@@ -3,7 +3,7 @@
     <view class="brand-block">
       <view class="brand-title-row">
         <text class="brand-heart">♥</text>
-        <text class="brand-title">Couple Order</text>
+        <text class="brand-title">Couple Wishlist</text>
         <text class="brand-heart">♥</text>
       </view>
       <view class="brand-subtitle-row">
@@ -33,7 +33,7 @@
         <text class="action-label">我是大厨</text>
       </button>
 
-      <button class="action-button action-button--record" hover-class="action-button--pressed" bindtap="goOrders" aria-label="记录一下，查看订单">
+      <button class="action-button action-button--record" hover-class="action-button--pressed" bindtap="goOrders" aria-label="记录一下，查看饮食记录">
         <view class="action-card">
           <image class="action-image action-image--notebook" src="/images/home/notebook.png" mode="aspectFit" />
         </view>

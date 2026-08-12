@@ -76,45 +76,92 @@ function deleteDish(dishId) {
 }
 
 /**
- * 下单
+ * 提交愿望单（完整保留原订单的菜品、数量、选项和备注能力）
  */
-function placeOrder(items, note) {
+function createWishlist(items, note) {
+  const normalizedItems = (items || []).map(item => ({
+    ...item,
+    dishId: Number(item.dishId),
+    quantity: Number(item.quantity)
+  }))
   return api.request({
-    url: '/api/orders',
+    url: '/api/wishlists',
     method: 'POST',
-    data: { items, note }
+    data: { items: normalizedItems, note }
   })
 }
 
-/**
- * 获取订单列表
- */
-function getOrders(role, status, page = 1, pageSize = 10) {
+function getWishlist(role, status, page = 1, pageSize = 10) {
   const data = { page, pageSize }
   if (role) data.role = role
   if (status !== undefined) data.status = status
   return api.request({
-    url: '/api/orders',
+    url: '/api/wishlists',
     method: 'GET',
     data
-  }).then(media.normalizeOrdersResponse)
+  }).then(media.normalizeWishlistResponse)
 }
 
-function getOrderDetail(orderId) {
+function getWishlistDetail(wishlistId, role) {
   return api.request({
-    url: `/api/orders/${orderId}`,
-    method: 'GET'
-  }).then(media.normalizeOrderDetailResponse)
+    url: `/api/wishlists/${wishlistId}`,
+    method: 'GET',
+    data: role ? { role } : undefined
+  }).then(media.normalizeWishlistResponse)
 }
 
-/**
- * 更新订单状态
- */
-function updateOrderStatus(orderId, newStatus) {
+function updateWishlistStatus(wishlistId, newStatus) {
   return api.request({
-    url: `/api/orders/${orderId}/status`,
+    url: `/api/wishlists/${wishlistId}/status`,
     method: 'PATCH',
     data: { status: newStatus }
+  })
+}
+
+function updateWishlistDishProgress(wishlistId, itemIndex, action) {
+  return api.request({
+    url: `/api/wishlists/${wishlistId}/items/${itemIndex}`,
+    method: 'PATCH',
+    data: { action }
+  })
+}
+
+// Compatibility aliases for pages that have not yet been renamed on disk.
+function placeOrder(items, note) {
+  return createWishlist(items, note)
+}
+
+function getOrders(role, status, page = 1, pageSize = 10) {
+  return getWishlist(role, status, page, pageSize).then(res => ({
+    ...res,
+    orders: res && res.wishlists ? res.wishlists : []
+  }))
+}
+
+function getOrderDetail(orderId, role) {
+  return getWishlistDetail(orderId, role).then(res => ({
+    ...res,
+    order: res && res.wishlist ? res.wishlist : null
+  }))
+}
+
+function updateOrderStatus(orderId, newStatus) {
+  return updateWishlistStatus(orderId, newStatus)
+}
+
+function getFoodRecords(type) {
+  return api.request({
+    url: '/api/food-records',
+    method: 'GET',
+    data: type ? { type } : undefined
+  }).then(media.normalizeFoodRecordsResponse)
+}
+
+function createFoodRecord(record) {
+  return api.request({
+    url: '/api/food-records',
+    method: 'POST',
+    data: record
   })
 }
 
@@ -142,17 +189,6 @@ function deleteCategory(categoryId) {
 }
 
 /**
- * 调整星星币
- */
-function adjustStarCoins(targetUserId, amount, reason) {
-  return api.request({
-    url: `/api/users/${targetUserId}/star-coins/adjust`,
-    method: 'POST',
-    data: { amount, reason }
-  })
-}
-
-/**
  * 监听订单变化（实时）
  */
 function watchOrder(orderId, onChange) {
@@ -173,6 +209,33 @@ function watchNewOrders(onChange) {
     (res) => res && res.orders ? res.orders : [],
     onChange,
     '监听新订单失败'
+  )
+}
+
+function watchWishlistDetail(wishlistId, role, onChange) {
+  return createPollWatcher(
+    () => getWishlistDetail(wishlistId, role),
+    (res) => res && res.wishlist ? res.wishlist : null,
+    onChange,
+    '监听愿望进度失败'
+  )
+}
+
+function watchWishlist(role, onChange) {
+  return createPollWatcher(
+    () => getWishlist(role, '', 1, 50),
+    (res) => res && res.wishlists ? res.wishlists : [],
+    onChange,
+    '监听愿望单失败'
+  )
+}
+
+function watchFoodRecords(type, onChange) {
+  return createPollWatcher(
+    () => getFoodRecords(type),
+    (res) => res && res.records ? res.records : [],
+    onChange,
+    '监听饮食记录失败'
   )
 }
 
@@ -235,13 +298,22 @@ module.exports = {
   getDishDetail,
   saveDish,
   deleteDish,
+  createWishlist,
   placeOrder,
   getOrders,
   getOrderDetail,
   updateOrderStatus,
+  getWishlist,
+  getWishlistDetail,
+  updateWishlistStatus,
+  updateWishlistDishProgress,
+  watchWishlist,
+  watchWishlistDetail,
+  getFoodRecords,
+  createFoodRecord,
+  watchFoodRecords,
   saveCategory,
   deleteCategory,
-  adjustStarCoins,
   watchOrder,
   watchNewOrders,
   uploadImage

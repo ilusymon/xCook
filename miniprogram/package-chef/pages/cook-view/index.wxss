@@ -1,7 +1,25 @@
 .cook-page {
+  position: relative;
   min-height: 100vh;
   background: #FFF5F5;
   padding-bottom: 140rpx;
+}
+
+.gingham-grid {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 848rpx;
+  display: flex;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.gingham-grid image {
+  flex: 0 0 212rpx;
+  width: 212rpx;
+  height: 212rpx;
 }
 
 /* 菜品头部 */
@@ -96,10 +114,81 @@
 }
 
 .nav-btn {
+  min-height: 88rpx;
   padding: 16rpx 32rpx;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
   border-radius: 32rpx;
   font-size: 28rpx;
   font-weight: 500;
+}
+
+.wishlist-mode {
+  background: #EAF8FF;
+}
+
+.wishlist-mode .dish-header,
+.wishlist-mode .section {
+  position: relative;
+  z-index: 1;
+}
+
+.wishlist-mode .dish-header {
+  width: auto;
+  height: 154rpx;
+  margin: 24rpx;
+  padding: 16rpx 22rpx;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: rgba(255, 253, 249, 0.98);
+  border-radius: 30rpx;
+  box-shadow: 0 4rpx 14rpx rgba(76, 112, 128, 0.08);
+}
+
+.wishlist-mode .dish-cover {
+  flex: 0 0 136rpx;
+  width: 136rpx;
+  height: 118rpx;
+  background: #FFF4D8;
+  border-radius: 20rpx;
+}
+
+.wishlist-mode .dish-overlay {
+  position: static;
+  flex: 1;
+  min-width: 0;
+  padding: 0 0 0 26rpx;
+  background: transparent;
+}
+
+.wishlist-mode .dish-name {
+  overflow: hidden;
+  color: #241713;
+  font-size: 29rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wishlist-mode .dish-tag {
+  color: #EF667E;
+  background: transparent;
+  padding: 0;
+  font-weight: 600;
+}
+
+.wishlist-mode .section {
+  margin: 0 24rpx 24rpx;
+  padding: 26rpx;
+  background: rgba(255, 253, 249, 0.96);
+  border-radius: 28rpx;
+}
+
+.wishlist-mode .bottom-nav {
+  z-index: 10;
+  background: rgba(255, 253, 249, 0.98);
 }
 
 .nav-btn.prev {

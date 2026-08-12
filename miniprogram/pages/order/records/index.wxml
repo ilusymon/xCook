@@ -1,0 +1,93 @@
+<view class="wishlist-page records-page">
+  <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
+    <button class="nav-home" style="top: {{navigationContentTop}}px;" bindtap="goHome" aria-label="返回首页">
+      <image src="/images/menu/home.png" mode="aspectFit" />
+    </button>
+    <text class="nav-title" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;">Couple Wishlist</text>
+  </view>
+
+  <view class="role-stage">
+    <image src="/images/menu/01_chef_girl.png" class="role-image girl" mode="aspectFit" />
+    <view class="role-pill left">我是吃货</view>
+    <text class="heart">♥</text>
+    <view class="role-pill right">我是大厨</view>
+    <image src="/images/menu/02_chef_boy.png" class="role-image boy" mode="aspectFit" />
+  </view>
+
+  <scroll-view class="wishlist-body" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="gingham-grid" aria-hidden="true">
+      <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
+    </view>
+
+    <view class="summary-card">
+      <view>
+        <text class="summary-title">我们的吃饭记录</text>
+        <text class="summary-subtitle">点单和日常饮食，都会悄悄记下来～</text>
+      </view>
+    </view>
+
+    <view class="record-filter" aria-role="tablist" aria-label="记录类型">
+      <button class="filter-item {{currentFilter === item.value ? 'active' : ''}}" wx:for="{{filters}}" wx:key="value" bindtap="changeFilter" data-value="{{item.value}}" aria-role="tab" aria-selected="{{currentFilter === item.value}}">
+        {{item.label}}
+      </button>
+    </view>
+
+    <view class="record-groups" wx:if="{{groups.length}}">
+      <view class="record-group" wx:for="{{groups}}" wx:key="key" wx:for-item="group">
+        <view class="group-heading">
+          <text>{{group.title}}</text>
+          <text>{{group.records.length}} 条</text>
+        </view>
+        <view class="record-card" wx:for="{{group.records}}" wx:key="key" wx:for-item="record">
+          <view class="record-cover-wrap">
+            <image class="record-cover" src="{{record.coverImage}}" mode="aspectFit" />
+          </view>
+          <view class="record-copy">
+            <view class="record-title-row">
+              <text class="source-tag {{record.typeClass}}">{{record.typeLabel}}</text>
+              <text class="record-title">{{record.title}}</text>
+            </view>
+            <text class="record-description">{{record.description}}</text>
+          </view>
+          <view class="record-right">
+            <text class="record-status {{record.typeClass}}">{{record.statusText}}</text>
+            <text class="record-time">{{record.timeText}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:elif="{{!loading}}">
+      <text class="empty-heart">♡</text>
+      <text>还没有这类记录</text>
+    </view>
+    <view class="loading" wx:else>记录加载中...</view>
+
+    <button class="add-record" bindtap="openForm">＋ 记录今天吃了什么</button>
+  </scroll-view>
+
+  <view class="bottom-navigation" aria-role="navigation" aria-label="底部导航">
+    <button class="bottom-nav-item {{item.key === 'record' ? 'active' : ''}}" wx:for="{{bottomNavigation}}" wx:key="key" hover-class="bottom-nav-item--pressed" bindtap="onBottomNavTap" data-key="{{item.key}}" aria-label="{{item.label}}">
+      <image src="{{item.icon}}" mode="aspectFit" style="width: {{item.width}}rpx; height: {{item.height}}rpx;" />
+      <text>{{item.label}}</text>
+    </button>
+  </view>
+
+  <view class="form-mask" wx:if="{{showForm}}" bindtap="closeForm">
+    <view class="record-form" catchtap="stopPropagation">
+      <text class="form-title">记录今天吃了什么</text>
+      <text class="field-label">标题</text>
+      <input class="form-input" value="{{draft.title}}" placeholder="例如：今天的早餐" maxlength="128" data-field="title" bindinput="updateDraft" />
+      <text class="field-label">吃了什么</text>
+      <textarea class="form-textarea" value="{{draft.description}}" placeholder="例如：煎蛋吐司、牛奶" maxlength="512" data-field="description" bindinput="updateDraft" />
+      <text class="field-label">标签</text>
+      <view class="food-tags">
+        <button class="food-tag {{draft.tag === item ? 'active' : ''}}" wx:for="{{foodTags}}" wx:key="*this" data-tag="{{item}}" bindtap="chooseTag">{{item}}</button>
+      </view>
+      <view class="form-actions">
+        <button class="form-button cancel" bindtap="closeForm">取消</button>
+        <button class="form-button save" bindtap="saveRecord">保存记录</button>
+      </view>
+    </view>
+  </view>
+</view>

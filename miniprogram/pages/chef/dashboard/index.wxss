@@ -166,6 +166,11 @@
   background: #FFF3E0;
 }
 
+.action-icon-wrap.wishlist {
+  color: #EF8297;
+  background: #FCE6EA;
+}
+
 .action-icon {
   font-size: 40rpx;
 }
