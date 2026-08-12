@@ -1,5 +1,5 @@
 <view class="menu-page">
-  <!-- 参考图顶部：系统状态栏与胶囊由小程序保留，这里只绘制页面导航和角色区 -->
+  <!-- 系统状态栏与胶囊由小程序保留；导航栏和头图上下分层。 -->
   <view class="hero-header">
     <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
       <view
@@ -28,37 +28,20 @@
         class="navigation-title"
         style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;"
       >
-        <text class="page-title">Couple Order</text>
+        <text class="page-title">Couple Wishlist</text>
       </view>
     </view>
 
-    <view class="role-stage">
-      <view class="role-pill role-pill--girl"><text>我是吃货</text></view>
-      <image class="role-person role-person--girl" src="/images/menu/01_chef_girl.png" mode="aspectFit" aria-hidden="true" />
-
-      <image class="role-heart" src="/images/menu/03_heart.png" mode="aspectFit" aria-hidden="true" />
-
-      <view class="role-pill role-pill--boy"><text>我是大厨</text></view>
-      <image class="role-person role-person--boy" src="/images/menu/02_chef_boy.png" mode="aspectFit" aria-hidden="true" />
-    </view>
+    <image class="hero-art" src="/images/menu/menu-hero.gif" mode="aspectFill" aria-hidden="true" />
   </view>
 
   <view class="menu-body">
-    <view class="gingham-grid" aria-hidden="true">
-      <image
-        class="gingham-tile"
-        wx:for="{{ginghamTiles}}"
-        wx:key="*this"
-        src="/images/menu/blue-gingham-background.png"
-        mode="scaleToFill"
-      />
-    </view>
-
-    <view class="menu-content">
-      <!-- 横向分类胶囊 -->
+    <view class="menu-content menu-content--{{layoutMode}}">
+      <!-- 默认沿用旧版左右双栏，也可切换到横向分类胶囊。 -->
       <scroll-view
         class="category-tabs"
-        scroll-x
+        scroll-x="{{layoutMode === 'tabs'}}"
+        scroll-y="{{layoutMode === 'split'}}"
         enhanced
         show-scrollbar="{{false}}"
         scroll-with-animation
@@ -66,7 +49,7 @@
         aria-role="tablist"
         aria-label="菜品分类"
       >
-        <view class="category-track" style="width: {{categoryTrackWidth}}rpx;">
+        <view class="category-track" style="width: {{layoutMode === 'tabs' ? categoryTrackWidth : 180}}rpx;">
           <button
             class="category-item {{currentCategory === index ? 'active' : ''}}"
             wx:for="{{categories}}"
@@ -79,6 +62,7 @@
             aria-role="tab"
             aria-label="{{item.name}}"
           >
+            <view class="category-active-bar" aria-hidden="true"></view>
             <image class="category-icon" src="{{item.icon}}" mode="aspectFit" aria-hidden="true" />
             <text class="category-label">{{item.name}}</text>
           </button>
@@ -103,23 +87,21 @@
             wx:for-item="section"
             id="dish-section-{{section.categoryId}}"
           >
+            <view class="dish-section-title" wx:if="{{layoutMode === 'split'}}">{{section.categoryName}}</view>
             <view class="menu-dish-card" wx:for="{{section.dishes}}" wx:key="_id" wx:for-item="dish">
               <view class="dish-art-box">
                 <image
                   class="dish-art"
                   src="{{dish.image}}"
-                  mode="aspectFit"
-                  style="width: {{dish.artWidth}}rpx; height: {{dish.artHeight}}rpx;"
+                  mode="aspectFill"
                   aria-hidden="true"
                 />
               </view>
 
-              <image class="dish-favorite" src="/images/menu/03_heart.png" mode="aspectFit" aria-hidden="true" />
-
               <view class="dish-copy">
                 <text class="dish-name">{{dish.name}}</text>
                 <text class="dish-description">{{dish.description}}</text>
-                <text class="dish-price">¥ {{dish.price}}</text>
+                <text class="dish-calories">{{dish.calories}} kcal</text>
               </view>
 
               <view class="quantity-control" aria-label="{{dish.name}}数量">
@@ -164,25 +146,88 @@
     </view>
   </view>
 
-  <!-- 选中菜品后显示结算栏。 -->
-  <view class="checkout-bar" wx:if="{{cartSummary.totalCount > 0}}">
-    <view class="checkout-art-wrap" aria-hidden="true">
-      <image class="checkout-art" src="/images/menu/15_checkout_couple.png" mode="aspectFit" />
-      <view class="checkout-badge" wx:if="{{cartSummary.totalCount > 0}}">{{cartSummary.totalCount}}</view>
+  <view
+    class="cart-panel-mask"
+    wx:if="{{cartPanelVisible}}"
+    catchtap="closeCartPanel"
+    aria-label="收起已选菜品"
+  ></view>
+
+  <view
+    class="selected-dishes-panel {{cartPanelVisible ? 'selected-dishes-panel--open' : ''}}"
+    style="height: {{cartPanelHeight}}rpx;"
+    catchtap="stopTap"
+    aria-hidden="{{!cartPanelVisible}}"
+  >
+    <view class="selected-panel-header">
+      <text class="selected-panel-title">已选菜品</text>
+      <text class="selected-panel-count">{{selectedDishes.length}} 种 · {{cartSummary.totalCalories}} kcal</text>
     </view>
 
-    <view class="checkout-summary">
-      <text class="checkout-total">¥ {{cartSummary.totalPrice}}</text>
-      <text class="checkout-discount">已优惠 <text class="checkout-discount-value">¥ {{discount}}</text></text>
-    </view>
+    <scroll-view class="selected-dishes-list" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="selected-dish-row" wx:for="{{selectedDishes}}" wx:key="_id" wx:for-item="dish">
+        <image class="selected-dish-image" src="{{dish.image}}" mode="aspectFill" aria-hidden="true" />
+
+        <view class="selected-dish-copy">
+          <text class="selected-dish-name">{{dish.name}}</text>
+          <text class="selected-dish-calories">{{dish.calories}} kcal / 份</text>
+        </view>
+
+        <view class="selected-quantity-control" aria-label="{{dish.name}}数量">
+          <button
+            class="selected-quantity-button"
+            hover-class="selected-quantity-button--pressed"
+            catchtap="onQuantityTap"
+            data-id="{{dish._id}}"
+            data-delta="-1"
+            aria-label="减少{{dish.name}}"
+          >
+            <image class="selected-quantity-icon" src="/images/menu/remove.svg" mode="aspectFit" />
+          </button>
+          <text class="selected-quantity-value">{{dish.quantity}}</text>
+          <button
+            class="selected-quantity-button selected-quantity-button--add"
+            hover-class="selected-quantity-button--pressed"
+            catchtap="onQuantityTap"
+            data-id="{{dish._id}}"
+            data-delta="1"
+            aria-label="增加{{dish.name}}"
+          >
+            <image class="selected-quantity-icon" src="/images/menu/add.svg" mode="aspectFit" />
+          </button>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 选中菜品后显示愿望栏；左侧展开已选菜品，右侧确认愿望。 -->
+  <view class="checkout-bar" wx:if="{{cartSummary.totalCount > 0}}">
+    <button
+      class="checkout-cart-trigger"
+      hover-class="checkout-cart-trigger--pressed"
+      bindtap="toggleCartPanel"
+      aria-label="{{cartPanelVisible ? '收起' : '展开'}}已选菜品"
+    >
+      <view class="checkout-art-wrap" aria-hidden="true">
+        <image class="checkout-art" src="/images/menu/15_checkout_couple.png" mode="aspectFit" />
+        <view class="checkout-badge" wx:if="{{cartSummary.totalCount > 0}}">{{cartSummary.totalCount}}</view>
+      </view>
+
+      <view class="checkout-summary">
+        <text class="checkout-total">{{cartSummary.totalCalories}} kcal</text>
+        <text class="checkout-count">共 {{cartSummary.totalCount}} 道菜</text>
+      </view>
+
+      <text class="checkout-chevron" aria-hidden="true">{{cartPanelVisible ? '⌄' : '⌃'}}</text>
+    </button>
 
     <button
       class="checkout-button"
       disabled="{{cartSummary.totalCount === 0}}"
       hover-class="checkout-button--pressed"
       bindtap="goCheckout"
-      aria-label="去结算"
-    >去结算</button>
+      aria-label="加入愿望单"
+    >确认愿望</button>
   </view>
 
   <!-- 参考图底部导航；仅菜单页隐藏系统 TabBar，离开后立即恢复。 -->

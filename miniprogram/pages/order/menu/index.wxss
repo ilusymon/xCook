@@ -13,11 +13,16 @@ page {
 
 .hero-header {
   position: relative;
-  flex: 0 0 292rpx;
+  flex: 0 0 auto;
   width: 100%;
-  height: 292rpx;
   overflow: hidden;
   background: #DFF4FF;
+}
+
+.hero-art {
+  display: block;
+  width: 100%;
+  height: 180rpx;
 }
 
 .custom-navigation {
@@ -25,30 +30,43 @@ page {
   z-index: 4;
   width: 100%;
   box-sizing: border-box;
+  background: #DFF4FF;
 }
 
 .navigation-actions {
   position: absolute;
+  z-index: 5;
   left: 36rpx;
+  width: 164rpx;
   display: flex;
   align-items: center;
-  gap: 10rpx;
+  padding: 0 8rpx;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1rpx solid rgba(83, 65, 53, 0.12);
+  border-radius: 40rpx;
+  box-sizing: border-box;
 }
 
 .navigation-icon-button {
-  width: 58rpx;
-  min-width: 58rpx;
-  height: 58rpx;
-  min-height: 58rpx;
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 100%;
+  min-height: 64rpx;
   margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1rpx solid rgba(38, 45, 50, 0.06);
-  border-radius: 50%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   box-sizing: border-box;
+}
+
+.navigation-icon-button + .navigation-icon-button {
+  border-left: 1rpx solid rgba(83, 65, 53, 0.12);
 }
 
 .navigation-icon-button::after {
@@ -66,12 +84,13 @@ page {
 }
 
 .search-icon {
-  width: 43rpx;
-  height: 43rpx;
+  width: 38rpx;
+  height: 38rpx;
 }
 
 .navigation-title {
   position: absolute;
+  z-index: 4;
   left: 50%;
   display: flex;
   align-items: center;
@@ -90,96 +109,15 @@ page {
   white-space: nowrap;
 }
 
-.role-stage {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 145rpx;
-}
-
-.role-pill {
-  position: absolute;
-  top: 58rpx;
-  height: 75rpx;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  color: #1E1714;
-  background: rgba(255, 253, 249, 0.95);
-  border: 1rpx solid rgba(126, 105, 92, 0.08);
-  border-radius: 38rpx;
-  box-shadow: 0 5rpx 14rpx rgba(94, 143, 165, 0.08);
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 26rpx;
-  font-weight: 700;
-  letter-spacing: 3rpx;
-}
-
-.role-pill--girl {
-  left: 74rpx;
-  width: 241rpx;
-  padding-left: 119rpx;
-}
-
-.role-pill--boy {
-  right: 74rpx;
-  width: 260rpx;
-  padding-left: 142rpx;
-}
-
-.role-person {
-  position: absolute;
-  z-index: 2;
-  bottom: -3rpx;
-}
-
-.role-person--girl {
-  left: 45rpx;
-  width: 144rpx;
-  height: 134rpx;
-}
-
-.role-person--boy {
-  right: 198rpx;
-  width: 133rpx;
-  height: 132rpx;
-}
-
-.role-heart {
-  position: absolute;
-  top: 78rpx;
-  left: 352rpx;
-  width: 46rpx;
-  height: 41rpx;
-}
-
 .menu-body {
   position: relative;
+  z-index: 2;
   flex: 1;
   min-height: 0;
+  margin-top: -18rpx;
   overflow: hidden;
-  border-radius: 38rpx 38rpx 0 0;
+  border-radius: 28rpx 28rpx 0 0;
   background: #EAF8FF;
-}
-
-/* 使用真实格纹图片平铺，保留参考图里的水彩纸张质感。 */
-.gingham-grid {
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  left: 0;
-  width: 848rpx;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  pointer-events: none;
-}
-
-.gingham-tile {
-  flex: 0 0 212rpx;
-  width: 212rpx;
-  height: 212rpx;
 }
 
 .menu-content {
@@ -188,6 +126,10 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.menu-content--split {
+  flex-direction: row;
 }
 
 .category-tabs {
@@ -270,6 +212,89 @@ page {
   letter-spacing: 1rpx;
 }
 
+/* 旧版交互：左侧分类独立滚动，右侧菜品滚动时联动高亮。 */
+.menu-content--split .category-tabs {
+  flex: 0 0 180rpx;
+  width: 180rpx;
+  height: 100%;
+  margin: 0;
+  background: rgba(255, 253, 249, 0.72);
+  border: 0;
+  border-right: 1rpx solid rgba(117, 104, 96, 0.08);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.menu-content--split .category-track {
+  min-height: 100%;
+  height: auto;
+  padding-top: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.menu-content--split .category-item {
+  z-index: 0;
+  flex: 0 0 104rpx;
+  width: calc(100% - 20rpx);
+  min-height: 96rpx;
+  margin: 4rpx 10rpx;
+  padding: 10rpx 0 8rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+}
+
+.menu-content--split .category-item::before,
+.menu-content--split .category-item::after {
+  display: none;
+}
+
+.category-active-bar {
+  display: none;
+}
+
+.menu-content--split .category-active-bar {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 0;
+  width: 6rpx;
+  height: 44rpx;
+  display: block;
+  background: #FF7180;
+  border-radius: 0 5rpx 5rpx 0;
+  opacity: 0;
+  transform: translateY(-50%);
+}
+
+.menu-content--split .category-item.active {
+  z-index: 1;
+  color: #FF6C78;
+  background: #EAF8FF;
+  border: 0;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(76, 112, 128, 0.08);
+}
+
+.menu-content--split .category-item.active .category-active-bar {
+  opacity: 1;
+}
+
+.menu-content--split .category-icon {
+  position: relative;
+  z-index: 2;
+  width: 45rpx;
+  height: 42rpx;
+}
+
+.menu-content--split .category-label {
+  position: relative;
+  z-index: 2;
+  font-size: 22rpx;
+}
+
 /* 菜品列表 */
 .dish-list {
   flex: 1;
@@ -278,15 +303,32 @@ page {
   box-sizing: border-box;
 }
 
+.menu-content--split .dish-list {
+  background: transparent;
+}
+
 .dish-list-inner {
   box-sizing: border-box;
   padding: 0 36rpx;
-  /* 结算栏总占位 + 24rpx 呼吸间距，并覆盖全面屏安全区。 */
-  padding-bottom: calc(232rpx + env(safe-area-inset-bottom));
+  /* 固定结算栏上方保留可滚动空间，最后一张菜品卡不会被遮挡。 */
+  padding-bottom: calc(276rpx + env(safe-area-inset-bottom));
 }
 
 .dish-section {
   width: 100%;
+}
+
+.dish-section-title {
+  padding: 12rpx 8rpx 8rpx;
+  color: #493B37;
+  font-size: 25rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.menu-content--split .dish-list-inner {
+  padding-right: 20rpx;
+  padding-left: 20rpx;
 }
 
 .section-empty {
@@ -313,23 +355,23 @@ page {
 .menu-dish-card {
   position: relative;
   width: 100%;
-  height: 140rpx;
-  margin-bottom: 7rpx;
-  padding: 14rpx 20rpx;
+  height: 154rpx;
+  margin-bottom: 14rpx;
+  padding: 16rpx 20rpx;
   display: flex;
   box-sizing: border-box;
   overflow: visible;
   color: #201613;
   background: rgba(255, 253, 249, 0.98);
   border: 1rpx solid rgba(113, 88, 74, 0.06);
-  border-radius: 32rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 112, 128, 0.07);
+  border-radius: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(76, 112, 128, 0.08);
 }
 
 .dish-art-box {
   flex: 0 0 138rpx;
   width: 138rpx;
-  height: 112rpx;
+  height: 122rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,21 +382,14 @@ page {
 
 .dish-art {
   display: block;
-}
-
-.dish-favorite {
-  position: absolute;
-  z-index: 2;
-  top: 7rpx;
-  left: 131rpx;
-  width: 36rpx;
-  height: 32rpx;
+  width: 100%;
+  height: 100%;
 }
 
 .dish-copy {
   flex: 1;
   min-width: 0;
-  height: 112rpx;
+  height: 122rpx;
   margin-left: 29rpx;
   padding-top: 9rpx;
   box-sizing: border-box;
@@ -362,7 +397,7 @@ page {
 
 .dish-name,
 .dish-description,
-.dish-price {
+.dish-calories {
   display: block;
   white-space: nowrap;
 }
@@ -392,7 +427,7 @@ page {
   text-overflow: ellipsis;
 }
 
-.dish-price {
+.dish-calories {
   margin-top: 4rpx;
   color: #FF6E79;
   font-family: Arial, 'PingFang SC', sans-serif;
@@ -485,17 +520,189 @@ page {
   color: #6F7F86;
 }
 
+/* 已选菜品从结算栏上方向上展开。 */
+.cart-panel-mask {
+  position: fixed;
+  z-index: 18;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(32, 22, 19, 0.12);
+}
+
+.selected-dishes-panel {
+  position: fixed;
+  z-index: 21;
+  right: 36rpx;
+  bottom: calc(264rpx + env(safe-area-inset-bottom));
+  left: 36rpx;
+  max-height: 432rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: rgba(255, 253, 249, 0.99);
+  border: 1rpx solid rgba(113, 88, 74, 0.10);
+  border-radius: 30rpx;
+  box-shadow: 0 -10rpx 32rpx rgba(66, 82, 90, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(28rpx);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.selected-dishes-panel--open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.selected-panel-header {
+  flex: 0 0 84rpx;
+  height: 84rpx;
+  padding: 0 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid rgba(113, 88, 74, 0.10);
+}
+
+.selected-panel-title {
+  color: #201613;
+  font-size: 27rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.selected-panel-count {
+  color: #FF6876;
+  font-family: Arial, 'PingFang SC', sans-serif;
+  font-size: 21rpx;
+}
+
+.selected-dishes-list {
+  flex: 1;
+  min-height: 0;
+}
+
+.selected-dish-row {
+  height: 116rpx;
+  margin: 0 24rpx;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid rgba(113, 88, 74, 0.08);
+}
+
+.selected-dish-row:last-child {
+  border-bottom: 0;
+}
+
+.selected-dish-image {
+  flex: 0 0 82rpx;
+  width: 82rpx;
+  height: 82rpx;
+  border-radius: 16rpx;
+}
+
+.selected-dish-copy {
+  flex: 1;
+  min-width: 0;
+  margin-left: 18rpx;
+}
+
+.selected-dish-name,
+.selected-dish-calories {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.selected-dish-name {
+  color: #201613;
+  font-size: 25rpx;
+  font-weight: 700;
+  line-height: 32rpx;
+}
+
+.selected-dish-calories {
+  margin-top: 5rpx;
+  color: #7C7B79;
+  font-family: Arial, 'PingFang SC', sans-serif;
+  font-size: 19rpx;
+  line-height: 24rpx;
+}
+
+.selected-quantity-control {
+  flex: 0 0 176rpx;
+  width: 176rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border: 1rpx solid #F0E2DA;
+  border-radius: 33rpx;
+}
+
+.selected-quantity-button {
+  width: 64rpx;
+  min-width: 64rpx;
+  height: 64rpx;
+  min-height: 64rpx;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FBFCFA;
+  border: 1rpx solid #E5E6E2;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.selected-quantity-button::after {
+  display: none;
+}
+
+.selected-quantity-button--add {
+  background: #FFFFFF;
+  border-color: #BFA99E;
+}
+
+.selected-quantity-button--pressed {
+  transform: scale(0.90);
+}
+
+.selected-quantity-icon {
+  width: 19rpx;
+  height: 19rpx;
+}
+
+.selected-quantity-value {
+  min-width: 30rpx;
+  color: #201613;
+  font-family: Arial, sans-serif;
+  font-size: 26rpx;
+  text-align: center;
+}
+
 /* 结算栏 */
 .checkout-bar {
   position: fixed;
-  z-index: 20;
+  z-index: 22;
   right: 36rpx;
-  /* 与底部导航保持 24rpx 间距。 */
-  bottom: calc(112rpx + env(safe-area-inset-bottom));
+  /* 底部导航占 116rpx，距屏幕底部 16rpx；这里再留出 24rpx。 */
+  bottom: calc(156rpx + env(safe-area-inset-bottom));
   left: 36rpx;
   height: 96rpx;
   display: flex;
   align-items: center;
+  padding: 10rpx 16rpx 10rpx 12rpx;
   box-sizing: border-box;
   color: #211713;
   background: rgba(255, 253, 249, 0.98);
@@ -504,23 +711,48 @@ page {
   box-shadow: 0 -5rpx 16rpx rgba(66, 105, 123, 0.08);
 }
 
+.checkout-cart-trigger {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 76rpx;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 33rpx 0 0 33rpx;
+  box-sizing: border-box;
+}
+
+.checkout-cart-trigger::after {
+  display: none;
+}
+
+.checkout-cart-trigger--pressed {
+  background: rgba(255, 113, 128, 0.06);
+}
+
 .checkout-art-wrap {
-  position: absolute;
-  bottom: 1rpx;
-  left: 14rpx;
-  width: 160rpx;
-  height: 114rpx;
+  position: relative;
+  flex: 0 0 112rpx;
+  width: 112rpx;
+  height: 76rpx;
 }
 
 .checkout-art {
-  width: 160rpx;
-  height: 114rpx;
+  display: block;
+  width: 112rpx;
+  height: 76rpx;
 }
 
 .checkout-badge {
   position: absolute;
-  top: -7rpx;
-  right: -1rpx;
+  top: 0;
+  right: -2rpx;
   min-width: 34rpx;
   height: 34rpx;
   padding: 0 5rpx;
@@ -537,23 +769,27 @@ page {
 }
 
 .checkout-summary {
-  position: absolute;
-  left: 205rpx;
-  top: 19rpx;
+  flex: 1;
+  min-width: 0;
+  margin-left: 12rpx;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .checkout-total {
+  max-width: 100%;
+  overflow: hidden;
   color: #FF6876;
   font-family: Arial, sans-serif;
-  font-size: 34rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  line-height: 36rpx;
+  line-height: 32rpx;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.checkout-discount {
+.checkout-count {
   margin-top: 3rpx;
   color: #716D6A;
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -563,17 +799,22 @@ page {
   white-space: nowrap;
 }
 
-.checkout-discount-value {
-  color: #FF6876;
+.checkout-chevron {
+  flex: 0 0 28rpx;
+  width: 28rpx;
+  margin-right: 8rpx;
+  color: #8B7F79;
+  font-family: Arial, sans-serif;
+  font-size: 26rpx;
+  line-height: 28rpx;
 }
 
 .checkout-button {
-  position: absolute;
-  top: 17rpx;
-  right: 28rpx;
-  width: 193rpx;
-  min-height: 62rpx;
-  height: 62rpx;
+  position: relative;
+  flex: 0 0 220rpx;
+  width: 220rpx;
+  min-height: 64rpx;
+  height: 64rpx;
   margin: 0;
   padding: 0;
   color: #FFFFFF;
@@ -584,7 +825,7 @@ page {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-size: 27rpx;
   font-weight: 600;
-  line-height: 60rpx;
+  line-height: 62rpx;
   letter-spacing: 3rpx;
   text-align: center;
   box-shadow: 0 4rpx 9rpx rgba(255, 105, 119, 0.16);
@@ -605,33 +846,36 @@ page {
   transform: scale(0.98);
 }
 
-/* 底部四栏导航 */
+/* 四周留白的悬浮导航卡片。 */
 .bottom-navigation {
   position: fixed;
   z-index: 19;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: calc(88rpx + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
+  right: 28rpx;
+  bottom: calc(16rpx + env(safe-area-inset-bottom));
+  left: 28rpx;
+  height: 116rpx;
+  padding: 2rpx 8rpx;
   display: flex;
   box-sizing: border-box;
-  background: rgba(237, 249, 255, 0.98);
-  border-top: 1rpx solid rgba(117, 151, 165, 0.14);
-  box-shadow: 0 -4rpx 13rpx rgba(75, 114, 131, 0.05);
+  background: rgba(255, 253, 249, 0.98);
+  border: 1rpx solid rgba(117, 104, 96, 0.12);
+  border-radius: 28rpx;
+  box-shadow: 0 10rpx 30rpx rgba(65, 83, 91, 0.16);
 }
 
 .bottom-nav-item {
+  position: relative;
   flex: 1;
   min-width: 0;
-  height: 88rpx;
-  min-height: 88rpx;
+  height: 112rpx;
+  min-height: 112rpx;
   margin: 0;
-  padding: 6rpx 0 4rpx;
+  padding: 10rpx 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  gap: 2rpx;
   color: #716D6A;
   background: transparent;
   border: 0;
@@ -645,9 +889,12 @@ page {
 
 .bottom-nav-item--pressed {
   opacity: 0.72;
+  transform: scale(0.97);
 }
 
 .bottom-nav-icon-wrap {
+  position: relative;
+  z-index: 1;
   width: 64rpx;
   height: 54rpx;
   display: flex;
@@ -660,6 +907,8 @@ page {
 }
 
 .bottom-nav-label {
+  position: relative;
+  z-index: 1;
   height: 27rpx;
   padding: 0 2rpx 2rpx;
   box-sizing: border-box;
@@ -672,10 +921,13 @@ page {
 }
 
 .bottom-nav-item.active {
-  color: #241713;
+  color: #493B37;
+}
+
+.bottom-nav-item.active::before {
+  display: none;
 }
 
 .bottom-nav-item.active .bottom-nav-label {
-  border-bottom: 2rpx solid #241713;
   font-weight: 600;
 }

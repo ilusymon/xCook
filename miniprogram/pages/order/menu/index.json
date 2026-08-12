@@ -2,7 +2,6 @@
   "usingComponents": {
     "dish-card": "/components/dish-card/index",
     "cart-bar": "/components/cart-bar/index",
-    "star-coin-badge": "/components/star-coin-badge/index",
     "home-btn": "/components/home-btn/index",
     "placeholder": "/components/placeholder/index"
   },
@@ -11,5 +10,5 @@
     "cart-bar": "placeholder"
   },
   "navigationStyle": "custom",
-  "navigationBarTitleText": "Couple Order"
+  "navigationBarTitleText": "Couple Wishlist"
 }

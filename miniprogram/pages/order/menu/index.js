@@ -34,7 +34,7 @@ const BOTTOM_NAVIGATION = [
   { key: 'menu', label: '菜单', icon: '/images/menu/17_nav_menu.png', iconWidth: 53, iconHeight: 50 },
   { key: 'wishlist', label: '愿望单', icon: '/images/menu/20_nav_wishlist.png', iconWidth: 52, iconHeight: 49 },
   { key: 'record', label: '记录', icon: '/images/menu/18_nav_record.png', iconWidth: 51, iconHeight: 50 },
-  { key: 'us', label: '我们', icon: '/images/menu/15_checkout_couple.png', iconWidth: 60, iconHeight: 44 }
+  { key: 'profile', label: '我的', icon: '/images/menu/19_nav_profile.png', iconWidth: 48, iconHeight: 41 }
 ]
 
 function decorateCategory(category, index) {
@@ -63,6 +63,7 @@ function decorateDish(dish, index, cart) {
 function buildDishSections(categories, dishes) {
   return categories.map(category => ({
     categoryId: category._id,
+    categoryName: category.name,
     dishes: dishes.filter(dish => dish.categoryId === category._id)
   }))
 }
@@ -70,10 +71,17 @@ function buildDishSections(categories, dishes) {
 function summarizeDishes(dishes) {
   return dishes.reduce((summary, dish) => {
     summary.totalCount += dish.quantity
-    summary.totalPrice += Number(dish.price || 0) * dish.quantity
     summary.totalCalories += Number(dish.calories || 0) * dish.quantity
     return summary
-  }, { totalCount: 0, totalPrice: 0, totalCalories: 0 })
+  }, { totalCount: 0, totalCalories: 0 })
+}
+
+function getSelectedDishes(dishes) {
+  return dishes.filter(dish => dish.quantity > 0)
+}
+
+function getCartPanelHeight(selectedDishes) {
+  return 84 + Math.min(selectedDishes.length, 3) * 116
 }
 
 Page({
@@ -82,19 +90,20 @@ Page({
     navigationHeight: 64,
     navigationContentTop: 20,
     navigationContentHeight: 44,
-    ginghamTiles: Array.from({ length: 40 }, (_, index) => index),
     categories: [],
     dishes: [],
     dishSections: [],
     bottomNavigation: BOTTOM_NAVIGATION,
+    layoutMode: 'split',
     currentCategory: 0,
     categoryTrackWidth: 0,
     categoryScrollTo: '',
     scrollToView: '',
     loading: true,
-    starCoins: 0,
-    discount: 0,
-    cartSummary: { totalCount: 0, totalPrice: 0, totalCalories: 0 }
+    selectedDishes: [],
+    cartPanelVisible: false,
+    cartPanelHeight: 84,
+    cartSummary: { totalCount: 0, totalCalories: 0 }
   },
 
   onLoad() {
@@ -125,18 +134,26 @@ Page({
     wx.reLaunch({ url: '/pages/index/index' })
   },
 
+  toggleLayout() {
+    const layoutMode = this.data.layoutMode === 'split' ? 'tabs' : 'split'
+    const category = this.data.categories[this.data.currentCategory]
+    const targetView = category ? `dish-section-${category._id}` : ''
+    this._tapping = true
+    this._sectionOffsets = null
+
+    this.setData({ layoutMode, scrollToView: '' }, () => {
+      this.setData({ scrollToView: targetView }, () => {
+        setTimeout(() => {
+          this.cacheSectionOffsets()
+          this._tapping = false
+        }, 80)
+      })
+    })
+  },
+
   onShow() {
     this.hideNativeTabBar()
-    this.setData({ starCoins: app.globalData.starCoins })
     this.loadMenuData()
-  },
-
-  onHide() {
-    this.showNativeTabBar()
-  },
-
-  onUnload() {
-    this.showNativeTabBar()
   },
 
   hideNativeTabBar() {
@@ -144,36 +161,20 @@ Page({
     wx.hideTabBar({ animation: false })
   },
 
-  showNativeTabBar(callback) {
-    if (!wx.showTabBar) {
-      if (callback) callback()
-      return
-    }
-    wx.showTabBar({
-      animation: false,
-      complete: () => {
-        if (callback) callback()
-      }
-    })
-  },
-
   onBottomNavTap(e) {
     const key = e.currentTarget.dataset.key
     if (key === 'menu') return
 
-    this.showNativeTabBar(() => {
-      if (key === 'wishlist') {
-        wx.switchTab({ url: '/pages/order/cart/index' })
-        return
-      }
-      if (key === 'record') {
-        wx.switchTab({ url: '/pages/order/order-list/index' })
-        return
-      }
-      if (key === 'us') {
-        wx.reLaunch({ url: '/pages/index/index' })
-      }
-    })
+    if (key === 'wishlist') {
+      app.globalData.wishlistRole = 'orderer'
+      wx.switchTab({ url: '/pages/order/wishlist/index' })
+      return
+    }
+    if (key === 'record') {
+      wx.switchTab({ url: '/pages/order/records/index' })
+      return
+    }
+    if (key === 'profile') wx.switchTab({ url: '/pages/profile/index' })
   },
 
   loadMenuData() {
@@ -181,11 +182,11 @@ Page({
     this._menuRequestId = requestId
     this.setData({ loading: true })
 
-    Promise.all([cloud.getCategories(), cloud.getMenu()])
-      .then(([categoryResponse, menuResponse]) => {
+    cloud.getMenu()
+      .then(menuResponse => {
         if (this._menuRequestId !== requestId) return
 
-        const categories = (categoryResponse || []).map(decorateCategory)
+        const categories = ((menuResponse && menuResponse.categories) || []).map(decorateCategory)
         const menuDishMap = (menuResponse && menuResponse.dishes) || {}
         const cart = app.globalData.cart || []
         const dishes = []
@@ -201,6 +202,7 @@ Page({
 
         const dishSections = buildDishSections(categories, dishes)
         const cartSummary = summarizeDishes(dishes)
+        const selectedDishes = getSelectedDishes(dishes)
 
         this.setData({
           categories,
@@ -211,7 +213,9 @@ Page({
           categoryScrollTo: categories[0] ? `side_${categories[0]._id}` : '',
           scrollToView: '',
           loading: false,
-          discount: cartSummary.totalPrice >= 80 ? 5 : 0,
+          selectedDishes,
+          cartPanelVisible: false,
+          cartPanelHeight: getCartPanelHeight(selectedDishes),
           cartSummary
         }, () => {
           setTimeout(() => this.cacheSectionOffsets(), 80)
@@ -263,14 +267,29 @@ Page({
     })
     const dishSections = buildDishSections(this.data.categories, dishes)
     const cartSummary = summarizeDishes(dishes)
+    const selectedDishes = getSelectedDishes(dishes)
 
     this.setData({
       dishes,
       dishSections,
-      discount: cartSummary.totalPrice >= 80 ? 5 : 0,
+      selectedDishes,
+      cartPanelVisible: selectedDishes.length > 0 && this.data.cartPanelVisible,
+      cartPanelHeight: getCartPanelHeight(selectedDishes),
       cartSummary
     })
   },
+
+  toggleCartPanel() {
+    if (this.data.cartSummary.totalCount === 0) return
+    this.setData({ cartPanelVisible: !this.data.cartPanelVisible })
+  },
+
+  closeCartPanel() {
+    if (!this.data.cartPanelVisible) return
+    this.setData({ cartPanelVisible: false })
+  },
+
+  stopTap() {},
 
   goCheckout() {
     if (this.data.cartSummary.totalCount === 0) {
@@ -288,12 +307,9 @@ Page({
           dishId: dish._id,
           dishName: dish.name,
           coverImage: dish.image,
-          unitPrice: dish.price,
           calories: dish.calories,
           quantity: dish.quantity,
-          selectedOptions: {},
-          extraPrice: 0,
-          itemTotal: dish.price * dish.quantity
+          selectedOptions: {}
         }
       })
 
@@ -316,12 +332,9 @@ Page({
         dishId: dish._id,
         dishName: dish.name,
         coverImage: dish.coverImage,
-        unitPrice: dish.price,
         calories: dish.calories,
         quantity: 1,
-        selectedOptions: {},
-        extraPrice: 0,
-        itemTotal: dish.price
+        selectedOptions: {}
       }
       app.addToCart(cartItem)
       this.refreshCart()
