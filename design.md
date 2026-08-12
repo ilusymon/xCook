@@ -2,12 +2,12 @@
 
 ## 1. 项目概述
 
-星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单制作。使用虚拟「星星币」作为支付方式，不接入真实支付。
+星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味并提交完整愿望单；另一方在「厨师端」接下愿望并逐道制作。产品只保留愿望单概念，不包含支付或虚拟币机制。
 
 ### 1.1 核心目标
 - 让情侣间的做饭点餐更有仪式感和趣味性
 - 厨师可以完整管理菜品分类、菜品、食材、步骤、视频
-- 点菜人可以方便浏览、选择口味、下单并追踪订单
+- 点菜人可以方便浏览、选择口味、提交并追踪愿望单
 - 将原云开发方案替换为可自部署的 `Go + MySQL + MinIO` 架构
 
 ---
@@ -98,8 +98,8 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 | nick_name | varchar(128) | 昵称 |
 | avatar_url | varchar(1024) | 头像 |
 | role | varchar(32) | `orderer` / `chef` / `both` |
-| star_coins | bigint | 星星币余额，默认 100 |
-| coin_log | json | 星星币变动记录 |
+| star_coins | bigint | 兼容旧数据的遗留字段，业务不再使用 |
+| coin_log | json | 兼容旧数据的遗留字段，业务不再使用 |
 | created_at | datetime | 创建时间 |
 | updated_at | datetime | 更新时间 |
 
@@ -124,7 +124,7 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 | description | text | 简短描述 |
 | cover_image | varchar(1024) | 封面图 URL（MinIO） |
 | category_id | varchar(64) | 所属分类 ID |
-| price | bigint | 星星币价格 |
+| price | bigint | 兼容旧数据的遗留字段，业务不再使用 |
 | calories | bigint | 卡路里 |
 | preparation_time | int | 制作时间（分钟） |
 | difficulty | int | 难度 |
@@ -138,16 +138,18 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 | created_at | datetime | 创建时间 |
 | updated_at | datetime | 更新时间 |
 
-### 4.4 orders 表
+### 4.4 愿望单（兼容存储表 `orders`）
+
+产品层只使用“愿望单”。数据库沿用 `orders` 表和 `order_number` 字段，避免破坏已有愿望单数据。
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | id | varchar(64) | 主键 |
-| order_number | varchar(32) | 订单号 |
-| user_id | varchar(64) | 下单人 openid |
+| order_number | varchar(32) | 愿望单编号（历史字段名） |
+| user_id | varchar(64) | 许愿人 openid |
 | status | varchar(32) | `placed` / `accepted` / `cooking` / `done` / `cancelled` |
 | items | json | 菜品明细 |
-| total_price | bigint | 总价 |
+| total_price | bigint | 兼容旧数据的遗留字段，新愿望单固定为 0 |
 | total_calories | bigint | 总热量 |
 | note | text | 备注 |
 | status_history | json | 状态流转历史 |
@@ -156,7 +158,7 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 
 ### 4.5 JSON 结构
 
-`optionGroups`、`materials`、`steps`、`items`、`coinLog`、`statusHistory` 保持与原设计一致，便于前端平滑迁移。
+`optionGroups`、`materials`、`steps`、`items`、`statusHistory` 保持与原设计一致，便于前端平滑迁移。
 
 ---
 
@@ -165,13 +167,13 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 页面信息架构与原设计保持一致，不因后端迁移而调整。
 
 ### 5.1 点菜端
-- 首页：角色选择、余额展示
+- 首页：角色选择
 - 菜单页：左分类右菜品、购物车汇总
 - 菜品详情页：封面、描述、难度、选项选择
 - 购物车页：增减、删除、汇总
-- 结算页：备注、余额校验、下单
-- 订单列表页：全部 / 进行中 / 已完成
-- 订单详情页：状态进度、明细、取消订单
+- 结算页：确认菜品、数量、口味选项和备注，提交愿望单
+- 愿望单页：统一展示全部 / 进行中 / 已完成愿望
+- 愿望单详情页：状态进度、菜品明细、备注、总热量、取消愿望
 
 ### 5.2 厨师端
 - 厨房首页：待处理数、菜品总数、快捷入口
@@ -179,7 +181,7 @@ MySQL 中保留与原业务一致的数据结构，但将数组/对象字段改�
 - 菜品管理：上下架、编辑、删除
 - 菜品编辑：图片、基本信息、选项、材料、步骤、视频
 - 烹饪指引：步骤时间线、材料勾选
-- 订单管理：接单、开始制作、完成
+- 愿望单管理：接下愿望、按菜品推进制作步骤、完成
 
 ---
 
@@ -218,8 +220,7 @@ UI 规范与原方案一致：
   "user": {
     "_id": "openid",
     "openid": "openid",
-    "role": "both",
-    "starCoins": 100
+    "role": "both"
   }
 }
 ```
@@ -229,16 +230,18 @@ UI 规范与原方案一致：
 后端按资源拆分为 RESTful 路由：
 
 - `GET /api/users/me`
-- `POST /api/users/:id/star-coins/adjust`
 - `GET /api/menu`
 - `GET /api/dishes/:id`
 - `POST /api/dishes`
 - `PUT /api/dishes/:id`
 - `DELETE /api/dishes/:id`
-- `GET /api/orders`
-- `GET /api/orders/:id`
-- `POST /api/orders`
-- `PATCH /api/orders/:id/status`
+- `GET /api/wishlists`
+- `GET /api/wishlists/:id`
+- `POST /api/wishlists`
+- `PATCH /api/wishlists/:id/status`
+- `PATCH /api/wishlists/:id/items/:itemIndex`
+
+旧 `/api/orders` 路由保留为兼容别名，不作为新页面入口。
 - `POST /api/categories`
 - `PATCH /api/categories/:id`
 - `DELETE /api/categories/:id`
@@ -266,26 +269,25 @@ UI 规范与原方案一致：
 → 调用 getUserInfo 获取/创建用户
 ```
 
-### 8.2 下单流程
+### 8.2 提交愿望流程
 
 ```text
 点菜端选菜
 → 加入本地购物车
-→ 确认下单
-→ POST /api/orders
-→ 后端重新查菜品验价
-→ 锁定用户余额并扣减星星币
-→ 创建订单
-→ 返回订单ID
-→ 订单详情页轮询获取状态
+→ 确认愿望
+→ POST /api/wishlists
+→ 后端重新校验菜品和数量
+→ 创建一份包含全部菜品、数量、口味选项和备注的愿望单
+→ 返回愿望单ID
+→ 愿望单详情页轮询获取状态
 ```
 
-### 8.3 厨师接单流程
+### 8.3 厨师接下愿望流程
 
 ```text
-厨师端进入订单页
-→ 轮询 placed 订单
-→ 点击接单
+厨师端进入愿望单页
+→ 轮询 placed 愿望单
+→ 点击接下愿望
 → updateOrderStatus(accepted)
 → 点击开始制作
 → updateOrderStatus(cooking)
@@ -309,9 +311,9 @@ UI 规范与原方案一致：
 
 ## 9. 安全与一致性设计
 
-- **服务端验价**：`placeOrder` 不信任客户端价格，后端重新查询菜品计算
-- **状态机校验**：`updateOrderStatus` 校验订单状态转换是否合法
-- **事务保证**：下单与取消订单使用数据库事务保证余额和订单一致
+- **服务端校验**：`placeOrder` 不信任客户端菜品信息，后端重新查询菜品并校验可用状态
+- **状态机校验**：愿望单整体状态和每道菜的制作步骤都在服务端校验
+- **事务保证**：提交、取消和更新制作进度使用数据库事务保证愿望单一致
 - **软删除**：菜品采用 `is_deleted` 逻辑删除
 - **JWT 鉴权**：业务接口统一通过 Bearer Token 识别用户
 - **微信身份来源**：正式环境通过 `code2session` 获取可信 openid

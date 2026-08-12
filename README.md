@@ -2,7 +2,7 @@
 
 > 属于我们的小厨房
 
-星厨房是一款面向情侣的私人点餐微信小程序。一方在「点菜端」浏览菜单、选择口味、下单；另一方在「厨师端」管理菜品、接单烹饪。使用虚拟「星星币」支付，不接入真实支付。
+星厨房是一款面向情侣的私人点餐微信小程序。一方把想吃的完整菜单加入「愿望单」，另一方在「厨师端」接下愿望并逐道制作。愿望单是唯一业务入口，不包含支付。
 
 当前版本已将原来的「微信云开发 + 云数据库 + GitCode 图床」方案，替换为：
 
@@ -15,15 +15,16 @@
 
 ### 点菜端
 - 分类浏览，快速查看想吃的菜
-- 口味/加料选项选择，支持单选、多选、加价
-- 购物车与星星币结算
-- 订单列表与订单详情状态跟踪
+- 口味/加料选项选择，支持单选、多选
+- 购物车与完整愿望单提交
+- 愿望单保留菜品数量、口味选项、备注和总热量
+- 愿望单列表、详情、取消和制作状态跟踪
 
 ### 厨师端
 - 分类管理：新增、编辑、排序、启停、删除
 - 菜品管理：新增、编辑、上下架、软删除
 - 食材、步骤、视频配置
-- 订单管理：接单、开始制作、完成
+- 愿望单管理：接下愿望、逐道制作、完成
 
 ## 技术栈
 
@@ -125,7 +126,7 @@ cp secret.config.example.js secret.config.js
 
 - `API_BASE_URL`: 后端地址
 - `IMAGE_BASE_URL`: 图片访问根地址，例如 `http://127.0.0.1:9000/xcook-images`
-- `POLL_INTERVAL`: 订单轮询间隔，默认 `5000`
+- `POLL_INTERVAL`: 愿望单轮询间隔，默认 `5000`
 - `DEBUG_OPEN_ID`: 本地调试可填一个固定值；正式环境留空
 
 如果是真机调试，请把 `API_BASE_URL` 改成你电脑的局域网 IP，而不是 `127.0.0.1`。
@@ -167,16 +168,16 @@ backend/internal/migrate/sql/
 ### 业务接口
 
 - `GET /api/users/me`
-- `POST /api/users/:id/star-coins/adjust`
 - `GET /api/menu`
 - `GET /api/dishes/:id`
 - `POST /api/dishes`
 - `PUT /api/dishes/:id`
 - `DELETE /api/dishes/:id`
-- `GET /api/orders`
-- `GET /api/orders/:id`
-- `POST /api/orders`
-- `PATCH /api/orders/:id/status`
+- `GET /api/wishlists`
+- `GET /api/wishlists/:id`
+- `POST /api/wishlists`
+- `PATCH /api/wishlists/:id/status`
+- `PATCH /api/wishlists/:id/items/:itemIndex`
 - `POST /api/categories`
 - `PATCH /api/categories/:id`
 - `DELETE /api/categories/:id`
@@ -186,6 +187,7 @@ backend/internal/migrate/sql/
 - `miniprogram/utils/cloud.js` 已改为 HTTP API 封装，页面调用方式基本不变
 - `miniprogram/utils/upload.js` 已改为上传到后端，再由后端写入 MinIO
 - 原来的 `watch` 实时监听已替换为前端轮询
+- 数据库继续使用历史 `orders` 表保存愿望单，旧 `/api/orders` 接口仅作兼容
 
 ## 注意事项
 
