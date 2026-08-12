@@ -15,18 +15,18 @@ type RestHandler struct {
 	functionService *service.FunctionService
 }
 
-type createOrderRequest struct {
-	Items any    `json:"items"`
-	Note  string `json:"note"`
-}
-
 type updateOrderStatusRequest struct {
 	Status string `json:"status"`
 }
 
-type adjustStarCoinsRequest struct {
-	Amount int64  `json:"amount"`
-	Reason string `json:"reason"`
+type updateWishlistDishProgressRequest struct {
+	Action string `json:"action"`
+}
+
+type createFoodRecordRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Tag         string `json:"tag"`
 }
 
 func NewRestHandler(functionService *service.FunctionService) *RestHandler {
@@ -109,6 +109,7 @@ func (h *RestHandler) ListOrders(c *gin.Context) {
 func (h *RestHandler) GetOrder(c *gin.Context) {
 	result, err := h.functionService.GetOrders(c.Request.Context(), middleware.OpenIDFromContext(c), service.GetOrdersInput{
 		OrderID: parseUintParam(c.Param("id")),
+		Role:    c.Query("role"),
 	})
 	h.respond(c, result, err)
 }
@@ -124,6 +125,80 @@ func (h *RestHandler) UpdateOrderStatus(c *gin.Context) {
 		middleware.OpenIDFromContext(c),
 		c.Param("id"),
 		request.Status,
+	)
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) ListWishlists(c *gin.Context) {
+	page, _ := strconv.Atoi(withDefault(c.Query("page"), "1"))
+	pageSize, _ := strconv.Atoi(withDefault(c.Query("pageSize"), "10"))
+	result, err := h.functionService.ListWishlists(c.Request.Context(), middleware.OpenIDFromContext(c), service.GetOrdersInput{
+		Role:     c.Query("role"),
+		Status:   c.Query("status"),
+		Page:     page,
+		PageSize: pageSize,
+	})
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) GetWishlist(c *gin.Context) {
+	result, err := h.functionService.GetWishlist(c.Request.Context(), middleware.OpenIDFromContext(c), c.Param("id"), c.Query("role"))
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) CreateWishlist(c *gin.Context) {
+	payload, ok := h.bindMap(c)
+	if !ok {
+		return
+	}
+	items, _ := payload["items"]
+	note, _ := payload["note"].(string)
+	result, err := h.functionService.CreateWishlistFromAny(c.Request.Context(), middleware.OpenIDFromContext(c), items, note)
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) UpdateWishlistStatus(c *gin.Context) {
+	var request updateOrderStatusRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "请求体格式错误"})
+		return
+	}
+	result, err := h.functionService.UpdateOrderStatus(c.Request.Context(), middleware.OpenIDFromContext(c), c.Param("id"), request.Status)
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) UpdateWishlistDishProgress(c *gin.Context) {
+	var request updateWishlistDishProgressRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "请求体格式错误"})
+		return
+	}
+	itemIndex, err := strconv.Atoi(c.Param("itemIndex"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "菜品序号错误"})
+		return
+	}
+	result, err := h.functionService.UpdateWishlistDishProgress(c.Request.Context(), middleware.OpenIDFromContext(c), c.Param("id"), itemIndex, request.Action)
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) ListFoodRecords(c *gin.Context) {
+	result, err := h.functionService.ListFoodRecords(c.Request.Context(), middleware.OpenIDFromContext(c), c.Query("type"))
+	h.respond(c, result, err)
+}
+
+func (h *RestHandler) CreateFoodRecord(c *gin.Context) {
+	var request createFoodRecordRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "请求体格式错误"})
+		return
+	}
+	result, err := h.functionService.CreateFoodRecord(
+		c.Request.Context(),
+		middleware.OpenIDFromContext(c),
+		request.Title,
+		request.Description,
+		request.Tag,
 	)
 	h.respond(c, result, err)
 }
@@ -149,22 +224,6 @@ func (h *RestHandler) UpdateCategory(c *gin.Context) {
 
 func (h *RestHandler) DeleteCategory(c *gin.Context) {
 	result, err := h.functionService.SaveCategory(c.Request.Context(), "delete", nil, parseUintParam(c.Param("id")))
-	h.respond(c, result, err)
-}
-
-func (h *RestHandler) AdjustStarCoins(c *gin.Context) {
-	var request adjustStarCoinsRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "请求体格式错误"})
-		return
-	}
-	result, err := h.functionService.AdjustStarCoins(
-		c.Request.Context(),
-		middleware.OpenIDFromContext(c),
-		parseUintParam(c.Param("id")),
-		request.Amount,
-		request.Reason,
-	)
 	h.respond(c, result, err)
 }
 

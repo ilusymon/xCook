@@ -123,6 +123,8 @@ type OrderItem struct {
 	ExtraPrice      int64               `json:"extraPrice"`
 	ItemTotal       int64               `json:"itemTotal"`
 	Calories        int64               `json:"calories"`
+	Status          string              `json:"status,omitempty"`
+	CurrentStep     int                 `json:"currentStep,omitempty"`
 }
 
 type StatusHistoryEntry struct {
@@ -145,14 +147,26 @@ type Order struct {
 	UpdatedAt     time.Time            `json:"updatedAt"`
 }
 
+type DailyFoodRecord struct {
+	ID          uint64    `gorm:"primaryKey;autoIncrement" json:"_id"`
+	UserID      uint64    `gorm:"index;not null" json:"userId"`
+	Title       string    `gorm:"size:128;not null" json:"title"`
+	Description string    `gorm:"size:512;not null" json:"description"`
+	Tag         string    `gorm:"size:32;not null" json:"tag"`
+	OccurredAt  time.Time `gorm:"index;not null" json:"occurredAt"`
+	CreatedAt   time.Time `json:"createdAt"`
+}
+
 type User struct {
-	ID        uint64         `gorm:"primaryKey;autoIncrement" json:"_id"`
-	OpenID    string         `gorm:"size:64;uniqueIndex;not null" json:"openid"`
-	NickName  string         `gorm:"size:128" json:"nickName"`
-	AvatarURL string         `gorm:"size:1024" json:"avatarUrl"`
-	Role      string         `gorm:"size:32;not null;default:both" json:"role"`
-	StarCoins int64          `gorm:"not null;default:100" json:"starCoins"`
-	CoinLog   []CoinLogEntry `gorm:"type:json;serializer:json" json:"coinLog"`
+	ID        uint64 `gorm:"primaryKey;autoIncrement" json:"_id"`
+	OpenID    string `gorm:"size:64;uniqueIndex;not null" json:"openid"`
+	NickName  string `gorm:"size:128" json:"nickName"`
+	AvatarURL string `gorm:"size:1024" json:"avatarUrl"`
+	Role      string `gorm:"size:32;not null;default:both" json:"role"`
+	// Legacy columns are retained for compatibility with deployed databases.
+	// The application no longer exposes or mutates a virtual-currency balance.
+	StarCoins int64          `gorm:"not null" json:"-"`
+	CoinLog   []CoinLogEntry `gorm:"type:json;serializer:json" json:"-"`
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 }
@@ -171,4 +185,8 @@ func (Dish) TableName() string {
 
 func (Order) TableName() string {
 	return "orders"
+}
+
+func (DailyFoodRecord) TableName() string {
+	return "daily_food_records"
 }

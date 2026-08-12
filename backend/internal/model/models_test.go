@@ -48,3 +48,23 @@ func TestCoinLogEntryMarshalJSONUsesMySQLDatetime(t *testing.T) {
 		t.Fatalf("timestamp = %q", payload["timestamp"])
 	}
 }
+
+func TestUserJSONOmitsLegacyCoinFields(t *testing.T) {
+	data, err := json.Marshal(User{
+		StarCoins: 100,
+		CoinLog:   []CoinLogEntry{{Type: "credit", Amount: 100}},
+	})
+	if err != nil {
+		t.Fatalf("Marshal() error = %v", err)
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(data, &payload); err != nil {
+		t.Fatalf("Unmarshal() error = %v", err)
+	}
+	for _, key := range []string{"starCoins", "coinLog"} {
+		if _, exists := payload[key]; exists {
+			t.Fatalf("legacy field %q is exposed in user JSON", key)
+		}
+	}
+}

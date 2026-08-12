@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
+	"sort"
 	"strings"
 	"time"
 
@@ -56,16 +57,29 @@ type saveCategoryInput struct {
 	CategoryID uint64         `json:"categoryId"`
 }
 
-type adjustStarCoinsInput struct {
-	TargetUserID uint64 `json:"targetUserId"`
-	Amount       int64  `json:"amount"`
-	Reason       string `json:"reason"`
+type foodRecordView struct {
+	ID          string    `json:"_id"`
+	Type        string    `json:"type"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	CoverImage  string    `json:"coverImage"`
+	Tag         string    `json:"tag"`
+	Status      string    `json:"status"`
+	Calories    int64     `json:"calories"`
+	OccurredAt  time.Time `json:"occurredAt"`
 }
 
 var validTransitions = map[string][]string{
 	"placed":   {"accepted", "cancelled"},
 	"accepted": {"cooking", "cancelled"},
 	"cooking":  {"done"},
+}
+
+var dailyFoodTags = map[string]bool{
+	"早餐": true,
+	"午餐": true,
+	"晚餐": true,
+	"加餐": true,
 }
 
 func NewFunctionService(db *gorm.DB) *FunctionService {
@@ -90,10 +104,7 @@ func (s *FunctionService) GetUserInfo(ctx context.Context, openID string) (*mode
 	user = model.User{
 		OpenID:    openID,
 		Role:      "both",
-		StarCoins: 100,
-		CoinLog: []model.CoinLogEntry{
-			{Type: "credit", Amount: 100, Reason: "初始赠送", Timestamp: now},
-		},
+		CoinLog:   []model.CoinLogEntry{},
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -256,8 +267,7 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 	var response map[string]any
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var user model.User
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where("open_id = ?", openID).
+		if err := tx.Where("open_id = ?", openID).
 			First(&user).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return notFound("用户不存在")
@@ -265,7 +275,6 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 			return err
 		}
 
-		totalPrice := int64(0)
 		totalCalories := int64(0)
 		verifiedItems := make([]model.OrderItem, 0, len(items))
 
@@ -284,26 +293,21 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 				return badRequest(fmt.Sprintf("菜品「%s」已下架", item.DishName))
 			}
 
-			extraPrice := calculateExtraPrice(dish.OptionGroups, item.SelectedOptions)
-			itemTotal := (dish.Price + extraPrice) * int64(item.Quantity)
-			totalPrice += itemTotal
 			totalCalories += dish.Calories * int64(item.Quantity)
 
 			verifiedItems = append(verifiedItems, model.OrderItem{
 				DishID:          dish.ID,
 				DishName:        dish.Name,
 				CoverImage:      dish.CoverImage,
-				UnitPrice:       dish.Price,
+				UnitPrice:       0,
 				Quantity:        item.Quantity,
 				SelectedOptions: item.SelectedOptions,
-				ExtraPrice:      extraPrice,
-				ItemTotal:       itemTotal,
+				ExtraPrice:      0,
+				ItemTotal:       0,
 				Calories:        dish.Calories,
+				Status:          "pending",
+				CurrentStep:     0,
 			})
-		}
-
-		if user.StarCoins < totalPrice {
-			return badRequest("星星币不足")
 		}
 
 		now := time.Now()
@@ -312,7 +316,7 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 			UserID:        user.ID,
 			Status:        "placed",
 			Items:         verifiedItems,
-			TotalPrice:    totalPrice,
+			TotalPrice:    0,
 			TotalCalories: totalCalories,
 			Note:          strings.TrimSpace(note),
 			StatusHistory: []model.StatusHistoryEntry{
@@ -322,28 +326,15 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 			UpdatedAt: now,
 		}
 
-		user.StarCoins -= totalPrice
-		user.CoinLog = append(user.CoinLog, model.CoinLogEntry{
-			Type:      "debit",
-			Amount:    totalPrice,
-			Reason:    fmt.Sprintf("订单 %s", order.OrderNumber),
-			OrderID:   order.ID,
-			Timestamp: now,
-		})
-		user.UpdatedAt = now
-
 		if err := tx.Create(&order).Error; err != nil {
 			return err
 		}
-		if err := tx.Save(&user).Error; err != nil {
-			return err
-		}
-
 		response = map[string]any{
 			"success":        true,
 			"orderId":        order.ID,
 			"orderNumber":    order.OrderNumber,
-			"remainingCoins": user.StarCoins,
+			"wishlistId":     order.ID,
+			"wishlistNumber": order.OrderNumber,
 		}
 		return nil
 	})
@@ -355,28 +346,66 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 }
 
 func (s *FunctionService) PlaceOrderFromAny(ctx context.Context, openID string, items any, note string) (map[string]any, error) {
-	body, err := json.Marshal(items)
+	parsed, err := parseOrderItems(items)
 	if err != nil {
-		return nil, badRequest("订单参数错误")
-	}
-
-	var parsed []model.OrderItem
-	if err := json.Unmarshal(body, &parsed); err != nil {
 		return nil, badRequest("订单参数错误")
 	}
 
 	return s.PlaceOrder(ctx, openID, parsed, note)
 }
 
+func parseOrderItems(items any) ([]model.OrderItem, error) {
+	body, err := json.Marshal(items)
+	if err != nil {
+		return nil, err
+	}
+
+	var rawItems []map[string]any
+	if err := json.Unmarshal(body, &rawItems); err != nil {
+		return nil, err
+	}
+	for _, item := range rawItems {
+		item["dishId"] = uintValue(item["dishId"])
+	}
+
+	body, err = json.Marshal(rawItems)
+	if err != nil {
+		return nil, err
+	}
+	var parsed []model.OrderItem
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return nil, err
+	}
+	for _, item := range parsed {
+		if item.DishID == 0 || item.Quantity <= 0 {
+			return nil, fmt.Errorf("invalid order item")
+		}
+	}
+	return parsed, nil
+}
+
 func (s *FunctionService) GetOrders(ctx context.Context, openID string, input getOrdersInput) (map[string]any, error) {
 	if input.OrderID != 0 {
+		user, err := s.mustGetUserByOpenID(ctx, openID)
+		if err != nil {
+			return nil, err
+		}
+		query := s.db.WithContext(ctx).Where("id = ?", input.OrderID)
+		if input.Role == "chef" {
+			if user.Role != "chef" && user.Role != "both" {
+				return nil, unauthorized("无厨师权限")
+			}
+		} else {
+			query = query.Where("user_id = ?", user.ID)
+		}
 		var order model.Order
-		if err := s.db.WithContext(ctx).First(&order, "id = ?", input.OrderID).Error; err != nil {
+		if err := query.First(&order).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return map[string]any{"order": nil}, nil
 			}
 			return nil, err
 		}
+		normalizeWishlistOrder(&order)
 		return map[string]any{"order": order}, nil
 	}
 
@@ -390,7 +419,15 @@ func (s *FunctionService) GetOrders(ctx context.Context, openID string, input ge
 	}
 
 	query := s.db.WithContext(ctx).Model(&model.Order{})
-	if input.Role != "chef" {
+	if input.Role == "chef" {
+		user, err := s.mustGetUserByOpenID(ctx, openID)
+		if err != nil {
+			return nil, err
+		}
+		if user.Role != "chef" && user.Role != "both" {
+			return nil, unauthorized("无厨师权限")
+		}
+	} else {
 		user, err := s.mustGetUserByOpenID(ctx, openID)
 		if err != nil {
 			return nil, err
@@ -422,12 +459,83 @@ func (s *FunctionService) GetOrders(ctx context.Context, openID string, input ge
 	if err := query.Order("created_at desc").Offset(skip).Limit(pageSize).Find(&orders).Error; err != nil {
 		return nil, err
 	}
+	for index := range orders {
+		normalizeWishlistOrder(&orders[index])
+	}
 
 	return map[string]any{
 		"orders":  orders,
 		"total":   total,
 		"hasMore": int64(skip+len(orders)) < total,
 	}, nil
+}
+
+// CreateWishlistFromAny creates the complete cooking request that the UI calls a
+// wishlist. Orders remain the storage model so existing installations keep all
+// historical data and do not need a destructive table rename.
+func (s *FunctionService) CreateWishlistFromAny(ctx context.Context, openID string, items any, note string) (map[string]any, error) {
+	return s.PlaceOrderFromAny(ctx, openID, items, note)
+}
+
+func (s *FunctionService) ListWishlists(ctx context.Context, openID string, input getOrdersInput) (map[string]any, error) {
+	result, err := s.GetOrders(ctx, openID, input)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{
+		"wishlists": result["orders"],
+		"total":     result["total"],
+		"hasMore":   result["hasMore"],
+	}, nil
+}
+
+func (s *FunctionService) GetWishlist(ctx context.Context, openID, wishlistID, role string) (map[string]any, error) {
+	id := uintValue(wishlistID)
+	if id == 0 {
+		return nil, badRequest("缺少愿望单ID")
+	}
+
+	user, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
+		return nil, err
+	}
+	if role == "chef" && user.Role != "chef" && user.Role != "both" {
+		return nil, unauthorized("无厨师权限")
+	}
+
+	query := s.db.WithContext(ctx).Where("id = ?", id)
+	if role != "chef" {
+		query = query.Where("user_id = ?", user.ID)
+	}
+	var wishlist model.Order
+	if err := query.First(&wishlist).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, notFound("愿望单不存在")
+		}
+		return nil, err
+	}
+	normalizeWishlistOrder(&wishlist)
+	return map[string]any{"wishlist": wishlist}, nil
+}
+
+func normalizeWishlistOrder(wishlist *model.Order) {
+	for index := range wishlist.Items {
+		if wishlist.Items[index].Status != "" {
+			continue
+		}
+		switch wishlist.Status {
+		case "placed":
+			wishlist.Items[index].Status = "pending"
+		case "accepted":
+			wishlist.Items[index].Status = "accepted"
+		case "cooking":
+			wishlist.Items[index].Status = "cooking"
+		case "done":
+			wishlist.Items[index].Status = "done"
+		case "cancelled":
+			wishlist.Items[index].Status = "cancelled"
+		}
+	}
 }
 
 func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID, newStatus string) (map[string]any, error) {
@@ -446,7 +554,7 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
 			First(&order, "id = ?", id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
-				return badRequest("订单不存在")
+				return badRequest("愿望单不存在")
 			}
 			return err
 		}
@@ -455,9 +563,30 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 		if !contains(allowed, newStatus) {
 			return badRequest(fmt.Sprintf("不能从 %s 转为 %s", order.Status, newStatus))
 		}
+		if newStatus == "cancelled" {
+			if order.UserID != currentUser.ID {
+				return unauthorized("只能取消自己的愿望单")
+			}
+		} else if currentUser.Role != "chef" && currentUser.Role != "both" {
+			return unauthorized("无厨师权限")
+		}
 
 		now := time.Now()
 		order.Status = newStatus
+		for index := range order.Items {
+			switch newStatus {
+			case "accepted":
+				if order.Items[index].Status == "" || order.Items[index].Status == "pending" {
+					order.Items[index].Status = "accepted"
+				}
+			case "cooking":
+				if order.Items[index].Status == "" || order.Items[index].Status == "accepted" {
+					order.Items[index].Status = "cooking"
+				}
+			case "done", "cancelled":
+				order.Items[index].Status = newStatus
+			}
+		}
 		order.StatusHistory = append(order.StatusHistory, model.StatusHistoryEntry{
 			Status:    newStatus,
 			Timestamp: now,
@@ -469,28 +598,6 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 			return err
 		}
 
-		if newStatus == "cancelled" {
-			var user model.User
-			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-				First(&user, "id = ?", order.UserID).Error; err != nil {
-				return err
-			}
-
-			user.StarCoins += order.TotalPrice
-			user.CoinLog = append(user.CoinLog, model.CoinLogEntry{
-				Type:      "credit",
-				Amount:    order.TotalPrice,
-				Reason:    fmt.Sprintf("订单 %s 取消退回", order.OrderNumber),
-				OrderID:   order.ID,
-				Timestamp: now,
-			})
-			user.UpdatedAt = now
-
-			if err := tx.Save(&user).Error; err != nil {
-				return err
-			}
-		}
-
 		return nil
 	})
 	if err != nil {
@@ -500,51 +607,202 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 	return map[string]any{"success": true}, nil
 }
 
-func (s *FunctionService) AdjustStarCoins(ctx context.Context, openID string, targetUserID uint64, amount int64, reason string) (map[string]any, error) {
-	if targetUserID == 0 || amount == 0 {
-		return nil, badRequest("参数不完整")
+func (s *FunctionService) UpdateWishlistDishProgress(ctx context.Context, openID, wishlistID string, itemIndex int, action string) (map[string]any, error) {
+	user, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Role != "chef" && user.Role != "both" {
+		return nil, unauthorized("无厨师权限")
 	}
 
-	currentUser, err := s.mustGetUserByOpenID(ctx, openID)
+	id := uintValue(wishlistID)
+	if id == 0 || itemIndex < 0 {
+		return nil, badRequest("愿望单菜品参数错误")
+	}
+
+	var updated model.Order
+	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var wishlist model.Order
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&wishlist, "id = ?", id).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return notFound("愿望单不存在")
+			}
+			return err
+		}
+		if itemIndex >= len(wishlist.Items) {
+			return badRequest("愿望单菜品不存在")
+		}
+		if wishlist.Status == "placed" {
+			return badRequest("请先接下愿望单")
+		}
+		if wishlist.Status == "cancelled" || wishlist.Status == "done" {
+			return badRequest("当前愿望单不能更新制作进度")
+		}
+
+		var dish model.Dish
+		if err := tx.First(&dish, "id = ?", wishlist.Items[itemIndex].DishID).Error; err != nil {
+			return err
+		}
+
+		normalizeWishlistOrder(&wishlist)
+		if err := advanceWishlistOrderItem(&wishlist.Items[itemIndex], len(dish.Steps), action); err != nil {
+			return err
+		}
+
+		previousStatus := wishlist.Status
+		wishlist.Status = deriveWishlistStatus(wishlist.Items)
+		now := time.Now()
+		if wishlist.Status != previousStatus {
+			wishlist.StatusHistory = append(wishlist.StatusHistory, model.StatusHistoryEntry{
+				Status: wishlist.Status, Timestamp: now, By: user.ID,
+			})
+		}
+		wishlist.UpdatedAt = now
+		if err := tx.Save(&wishlist).Error; err != nil {
+			return err
+		}
+		updated = wishlist
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{"success": true, "wishlist": updated}, nil
+}
+
+func advanceWishlistOrderItem(item *model.OrderItem, stepCount int, action string) error {
+	switch action {
+	case "start":
+		if item.Status != "accepted" {
+			return badRequest("当前菜品不能开始制作")
+		}
+		item.Status = "cooking"
+		return nil
+	case "next":
+		if item.Status != "cooking" {
+			return badRequest("当前菜品不能更新制作进度")
+		}
+		if stepCount == 0 || item.CurrentStep >= stepCount-1 {
+			item.Status = "done"
+			return nil
+		}
+		item.CurrentStep++
+		return nil
+	default:
+		return badRequest("未知操作")
+	}
+}
+
+func deriveWishlistStatus(items []model.OrderItem) string {
+	allDone := len(items) > 0
+	hasCooking := false
+	for _, item := range items {
+		if item.Status != "done" {
+			allDone = false
+		}
+		if item.Status == "cooking" || item.Status == "done" {
+			hasCooking = true
+		}
+	}
+	if allDone {
+		return "done"
+	}
+	if hasCooking {
+		return "cooking"
+	}
+	return "accepted"
+}
+
+func (s *FunctionService) ListFoodRecords(ctx context.Context, openID, recordType string) (map[string]any, error) {
+	if recordType != "" && recordType != "order" && recordType != "daily" {
+		return nil, badRequest("记录类型错误")
+	}
+	user, err := s.mustGetUserByOpenID(ctx, openID)
 	if err != nil {
 		return nil, err
 	}
 
-	var user model.User
-	if err := s.db.WithContext(ctx).First(&user, "id = ?", targetUserID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, notFound("用户不存在")
+	records := make([]foodRecordView, 0)
+	if recordType == "" || recordType == "order" {
+		var wishlists []model.Order
+		if err := s.db.WithContext(ctx).
+			Where("user_id = ? AND status = ?", user.ID, "done").
+			Find(&wishlists).Error; err != nil {
+			return nil, err
 		}
-		return nil, err
+		for _, wishlist := range wishlists {
+			for index, item := range wishlist.Items {
+				records = append(records, foodRecordView{
+					ID:          fmt.Sprintf("wishlist-%d-%d", wishlist.ID, index),
+					Type:        "order",
+					Title:       item.DishName,
+					Description: wishlist.Note,
+					CoverImage:  item.CoverImage,
+					Tag:         "愿望单",
+					Status:      "done",
+					Calories:    item.Calories * int64(item.Quantity),
+					OccurredAt:  wishlist.UpdatedAt,
+				})
+			}
+		}
 	}
 
-	entryType := "debit"
-	if amount > 0 {
-		entryType = "credit"
-	}
-	if reason == "" {
-		if amount > 0 {
-			reason = "伴侣赠送"
-		} else {
-			reason = "扣除"
+	if recordType == "" || recordType == "daily" {
+		var daily []model.DailyFoodRecord
+		if err := s.db.WithContext(ctx).
+			Where("user_id = ?", user.ID).
+			Find(&daily).Error; err != nil {
+			return nil, err
+		}
+		for _, record := range daily {
+			records = append(records, foodRecordView{
+				ID:          fmt.Sprintf("daily-%d", record.ID),
+				Type:        "daily",
+				Title:       record.Title,
+				Description: record.Description,
+				Tag:         record.Tag,
+				Status:      "recorded",
+				OccurredAt:  record.OccurredAt,
+			})
 		}
 	}
 
-	user.StarCoins += amount
-	user.CoinLog = append(user.CoinLog, model.CoinLogEntry{
-		Type:      entryType,
-		Amount:    abs(amount),
-		Reason:    reason,
-		By:        currentUser.ID,
-		Timestamp: time.Now(),
+	sort.Slice(records, func(i, j int) bool {
+		return records[i].OccurredAt.After(records[j].OccurredAt)
 	})
-	user.UpdatedAt = time.Now()
+	return map[string]any{"records": records}, nil
+}
 
-	if err := s.db.WithContext(ctx).Save(&user).Error; err != nil {
+func (s *FunctionService) CreateFoodRecord(ctx context.Context, openID, title, description, tag string) (map[string]any, error) {
+	user, err := s.mustGetUserByOpenID(ctx, openID)
+	if err != nil {
 		return nil, err
 	}
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return nil, badRequest("请填写记录标题")
+	}
+	if len([]rune(title)) > 128 || len([]rune(description)) > 512 {
+		return nil, badRequest("记录内容过长")
+	}
+	if !dailyFoodTags[tag] {
+		return nil, badRequest("饮食标签错误")
+	}
 
-	return map[string]any{"success": true}, nil
+	now := time.Now()
+	record := model.DailyFoodRecord{
+		UserID:      user.ID,
+		Title:       title,
+		Description: strings.TrimSpace(description),
+		Tag:         tag,
+		OccurredAt:  now,
+		CreatedAt:   now,
+	}
+	if err := s.db.WithContext(ctx).Create(&record).Error; err != nil {
+		return nil, err
+	}
+	return map[string]any{"success": true, "recordId": record.ID}, nil
 }
 
 func (s *FunctionService) SaveCategory(ctx context.Context, action string, category map[string]any, categoryID uint64) (map[string]any, error) {
@@ -713,22 +971,6 @@ func applyCategoryPatch(dst *model.Category, input map[string]any) error {
 	return nil
 }
 
-func calculateExtraPrice(groups []model.OptionGroup, selected map[string][]string) int64 {
-	var extraPrice int64
-	for _, group := range groups {
-		values := selected[group.GroupName]
-		if len(values) == 0 {
-			continue
-		}
-		for _, option := range group.Options {
-			if contains(values, option.Value) || contains(values, option.Label) {
-				extraPrice += option.ExtraPrice
-			}
-		}
-	}
-	return extraPrice
-}
-
 func contains(values []string, target string) bool {
 	for _, value := range values {
 		if value == target {
@@ -736,13 +978,6 @@ func contains(values []string, target string) bool {
 		}
 	}
 	return false
-}
-
-func abs(value int64) int64 {
-	if value < 0 {
-		return -value
-	}
-	return value
 }
 
 func defaultString(value, fallback string) string {

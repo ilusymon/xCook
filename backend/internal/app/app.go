@@ -57,7 +57,6 @@ func New() (*App, error) {
 
 	api := router.Group("/api", middleware.AuthRequired(tokenManager))
 	api.GET("/users/me", restHandler.GetCurrentUser)
-	api.POST("/users/:id/star-coins/adjust", restHandler.AdjustStarCoins)
 	api.GET("/categories", restHandler.ListCategories)
 	api.GET("/menu", restHandler.GetMenu)
 	api.GET("/dishes/:id", restHandler.GetDish)
@@ -68,6 +67,20 @@ func New() (*App, error) {
 	api.GET("/orders/:id", restHandler.GetOrder)
 	api.POST("/orders", restHandler.CreateOrder)
 	api.PATCH("/orders/:id/status", restHandler.UpdateOrderStatus)
+	// The wishlist is the product-facing name for a complete cooking request.
+	// Legacy order routes stay available so existing clients and data remain valid.
+	api.GET("/wishlists", restHandler.ListWishlists)
+	api.GET("/wishlists/:id", restHandler.GetWishlist)
+	api.POST("/wishlists", restHandler.CreateWishlist)
+	api.PATCH("/wishlists/:id/status", restHandler.UpdateWishlistStatus)
+	api.PATCH("/wishlists/:id/items/:itemIndex", restHandler.UpdateWishlistDishProgress)
+	api.GET("/wishlist", restHandler.ListWishlists)
+	api.GET("/wishlist/:id", restHandler.GetWishlist)
+	api.POST("/wishlist", restHandler.CreateWishlist)
+	api.PATCH("/wishlist/:id/status", restHandler.UpdateWishlistStatus)
+	api.PATCH("/wishlist/:id/items/:itemIndex", restHandler.UpdateWishlistDishProgress)
+	api.GET("/food-records", restHandler.ListFoodRecords)
+	api.POST("/food-records", restHandler.CreateFoodRecord)
 	api.POST("/categories", restHandler.CreateCategory)
 	api.PATCH("/categories/:id", restHandler.UpdateCategory)
 	api.DELETE("/categories/:id", restHandler.DeleteCategory)
