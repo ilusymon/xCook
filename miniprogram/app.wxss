@@ -79,35 +79,9 @@ page {
   color: #FF9F43;
 }
 
-.tag-coin {
-  background: #FFF8E6;
-  color: #FFC048;
-}
-
 .tag-difficulty {
   background: #FCE6EA;
   color: #D96D82;
-}
-
-/* 星星币显示 */
-.star-coin {
-  display: inline-flex;
-  align-items: center;
-  color: #FFC048;
-  font-weight: 600;
-}
-
-.star-coin-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 6rpx;
-}
-
-/* 价格文字 */
-.price {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #FFC048;
 }
 
 /* 区域标题 */

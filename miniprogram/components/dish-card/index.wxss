@@ -85,20 +85,6 @@
   justify-content: space-between;
 }
 
-.dish-price {
-  display: flex;
-  align-items: center;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 6rpx;
-}
-
 .dish-time {
   display: flex;
   align-items: center;

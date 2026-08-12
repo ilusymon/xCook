@@ -5,10 +5,6 @@
       <view class="cart-badge" wx:if="{{totalCount > 0}}">{{totalCount}}</view>
     </view>
     <view class="cart-info">
-      <view class="cart-price">
-        <image class="coin-icon" src="/images/star-coin.png" />
-        <text>{{totalPrice}}</text>
-      </view>
       <text class="cart-calories">{{totalCalories}}kcal</text>
     </view>
   </view>

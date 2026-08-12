@@ -33,10 +33,7 @@
       </view>
       <view class="order-footer">
         <text class="order-time">{{item.createdAtText}}</text>
-        <view class="order-total">
-          <image class="coin-icon" src="/images/star-coin.png" />
-          <text>{{item.totalPrice}}</text>
-        </view>
+        <text class="order-calories">{{item.totalCalories}}kcal</text>
       </view>
     </view>
   </view>

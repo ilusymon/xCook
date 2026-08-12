@@ -8,7 +8,6 @@
         <view class="dish-info">
           <text class="dish-name">{{dish.name}}</text>
           <view class="dish-meta">
-            <text class="dish-price">⭐ {{dish.price}}</text>
             <text class="dish-cal">{{dish.calories}}kcal</text>
           </view>
         </view>

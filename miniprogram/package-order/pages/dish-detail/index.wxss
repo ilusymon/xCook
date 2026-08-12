@@ -79,29 +79,6 @@
   color: #FF6B81;
 }
 
-.price-row {
-  display: flex;
-  align-items: center;
-}
-
-.coin-icon {
-  width: 36rpx;
-  height: 36rpx;
-  margin-right: 8rpx;
-}
-
-.price-value {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.price-unit {
-  font-size: 24rpx;
-  color: #C89030;
-  margin-left: 6rpx;
-}
-
 .section-card {
   background: #FFFFFF;
   border-radius: 24rpx;
@@ -176,20 +153,6 @@
 .total-label {
   font-size: 22rpx;
   color: #9B8888;
-}
-
-.total-price {
-  display: flex;
-  align-items: center;
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon-sm {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
 }
 
 .total-cal {

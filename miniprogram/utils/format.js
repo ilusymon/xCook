@@ -3,13 +3,6 @@
  */
 
 /**
- * 格式化星星币价格
- */
-function formatPrice(price) {
-  return Number(price).toFixed(0)
-}
-
-/**
  * 格式化卡路里
  */
 function formatCalories(cal) {
@@ -86,7 +79,6 @@ function formatRelativeTime(date) {
 }
 
 module.exports = {
-  formatPrice,
   formatCalories,
   formatDate,
   formatFullDate,

@@ -94,18 +94,9 @@
   color: #B0B0B0;
 }
 
-.order-total {
-  display: flex;
-  align-items: center;
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon {
-  width: 26rpx;
-  height: 26rpx;
-  margin-right: 6rpx;
+.order-calories {
+  color: #FF9F43;
+  font-size: 22rpx;
 }
 
 /* 空状态 */

@@ -23,11 +23,7 @@
       <textarea class="form-textarea" placeholder="简短描述" value="{{dish.description}}" bindinput="onInput" data-field="description" maxlength="100" />
     </view>
     <view class="form-row">
-      <view class="form-item half">
-        <text class="form-label">价格（星星币）</text>
-        <input class="form-input" type="number" placeholder="0" value="{{dish.price}}" bindinput="onInputNumber" data-field="price" />
-      </view>
-      <view class="form-item half">
+      <view class="form-item">
         <text class="form-label">卡路里(kcal)</text>
         <input class="form-input" type="number" placeholder="0" value="{{dish.calories}}" bindinput="onInputNumber" data-field="calories" />
       </view>
@@ -114,19 +110,6 @@
               data-oidx="{{oidx}}"
               data-field="label"
             />
-            <view class="tree-child-price-wrap">
-              <text class="tree-child-price-label">加价</text>
-              <input
-                class="tree-child-price"
-                type="digit"
-                placeholder="0"
-                value="{{opt.extraPrice}}"
-                bindinput="onOptionPriceInput"
-                data-gidx="{{idx}}"
-                data-oidx="{{oidx}}"
-              />
-              <text class="tree-child-price-unit">币</text>
-            </view>
           </view>
           <view class="tree-child-del" bindtap="removeOption" data-gidx="{{idx}}" data-oidx="{{oidx}}">✕</view>
         </view>

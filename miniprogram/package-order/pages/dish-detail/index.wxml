@@ -16,11 +16,6 @@
       <view class="info-tag difficulty" wx:if="{{dish.difficulty}}">{{difficultyText}}</view>
     </view>
 
-    <view class="price-row">
-      <image class="coin-icon" src="/images/star-coin.png" />
-      <text class="price-value">{{dish.price}}</text>
-      <text class="price-unit">星星币</text>
-    </view>
   </view>
 
   <!-- 选项选择 -->
@@ -29,7 +24,6 @@
     <option-picker
       id="optionPicker"
       optionGroups="{{dish.optionGroups}}"
-      bind:change="onOptionChange"
     />
   </view>
 
@@ -46,11 +40,7 @@
   <!-- 底部操作栏 -->
   <view class="bottom-bar">
     <view class="total-info">
-      <text class="total-label">合计</text>
-      <view class="total-price">
-        <image class="coin-icon-sm" src="/images/star-coin.png" />
-        <text>{{totalPrice}}</text>
-      </view>
+      <text class="total-label">营养参考</text>
       <text class="total-cal">{{totalCalories}}kcal</text>
     </view>
     <view class="add-cart-btn" bindtap="addToCart">加入购物车</view>

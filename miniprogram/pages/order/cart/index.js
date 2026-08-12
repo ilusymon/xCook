@@ -3,15 +3,12 @@ const app = getApp()
 Page({
   data: {
     cart: [],
-    starCoins: 0,
     totalCount: 0,
-    totalPrice: 0,
     totalCalories: 0
   },
 
   onShow() {
     this.refreshCart()
-    this.setData({ starCoins: app.globalData.starCoins })
   },
 
   refreshCart() {
@@ -33,7 +30,6 @@ Page({
     this.setData({
       cart,
       totalCount: summary.totalCount,
-      totalPrice: summary.totalPrice,
       totalCalories: summary.totalCalories
     })
   },

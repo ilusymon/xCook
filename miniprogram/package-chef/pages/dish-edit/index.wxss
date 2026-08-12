@@ -334,32 +334,6 @@
   min-width: 0;
 }
 
-.tree-child-price-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4rpx;
-  flex-shrink: 0;
-}
-
-.tree-child-price-label {
-  font-size: 20rpx;
-  color: #B0B0B0;
-}
-
-.tree-child-price {
-  width: 80rpx;
-  font-size: 24rpx;
-  color: #FFC048;
-  font-weight: 600;
-  text-align: center;
-  border-bottom: 2rpx solid #FFE4E4;
-}
-
-.tree-child-price-unit {
-  font-size: 20rpx;
-  color: #B0B0B0;
-}
-
 .tree-child-del {
   font-size: 22rpx;
   color: #C0B0B0;

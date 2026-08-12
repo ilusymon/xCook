@@ -44,10 +44,6 @@
       </view>
       <view class="item-right">
         <text class="item-qty">x{{item.quantity}}</text>
-        <view class="item-price">
-          <image class="coin-icon" src="/images/star-coin.png" />
-          <text>{{item.itemTotal}}</text>
-        </view>
       </view>
     </view>
   </view>
@@ -58,16 +54,9 @@
     <text class="note-text">{{order.note}}</text>
   </view>
 
-  <!-- 合计 -->
+  <!-- 营养信息 -->
   <view class="section-card total-card">
     <view class="total-row">
-      <text>总计</text>
-      <view class="total-price">
-        <image class="coin-icon-lg" src="/images/star-coin.png" />
-        <text>{{order.totalPrice}}</text>
-      </view>
-    </view>
-    <view class="total-row sub">
       <text>总热量</text>
       <text class="cal-text">{{order.totalCalories}}kcal</text>
     </view>

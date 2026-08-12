@@ -60,18 +60,11 @@
   color: #FFFFFF;
 }
 
-.option-item.selected .option-label,
-.option-item.selected .option-extra {
+.option-item.selected .option-label {
   color: #FFFFFF;
 }
 
 .option-label {
   font-size: 26rpx;
   color: #4A3333;
-}
-
-.option-extra {
-  font-size: 22rpx;
-  color: #FFC048;
-  margin-left: 8rpx;
 }

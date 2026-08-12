@@ -24,7 +24,6 @@ Component({
         selections[group] = [value]
       }
       this.setData({ selections })
-      this.emitChange()
     },
 
     onMultiSelect(e) {
@@ -43,22 +42,6 @@ Component({
         selections[group] = [...selections[group], value]
       }
       this.setData({ selections })
-      this.emitChange()
-    },
-
-    emitChange() {
-      const selections = this.data.selections
-      // 计算加价
-      let extraPrice = 0
-      this.data.optionGroups.forEach(group => {
-        const selected = selections[group.groupName] || []
-        group.options.forEach(opt => {
-          if (selected.includes(opt.value)) {
-            extraPrice += opt.extraPrice || 0
-          }
-        })
-      })
-      this.triggerEvent('change', { selections, extraPrice })
     },
 
     // 验证必选项是否已选

@@ -1,4 +1,3 @@
-const app = getApp()
 const cloud = require('../../../utils/cloud')
 const { formatFullDate } = require('../../../utils/format')
 const { ORDER_STATUS_STEP } = require('../../../utils/constants')
@@ -64,7 +63,7 @@ Page({
   cancelOrder() {
     wx.showModal({
       title: '取消订单',
-      content: '取消后星星币将退回，确定取消吗？',
+      content: '确定取消这份订单吗？',
       confirmColor: '#FF6B81',
       success: (res) => {
         if (res.confirm) {
@@ -72,7 +71,6 @@ Page({
           cloud.updateOrderStatus(this.data.order._id, 'cancelled').then(res => {
             wx.hideLoading()
             if (res && res.success) {
-              app.globalData.starCoins += this.data.order.totalPrice
               wx.showToast({ title: '已取消', icon: 'success' })
             }
           }).catch(() => {

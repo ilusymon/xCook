@@ -58,20 +58,6 @@
   flex-direction: column;
 }
 
-.cart-price {
-  display: flex;
-  align-items: center;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
-}
-
 .cart-calories {
   font-size: 22rpx;
   color: #9B8888;

@@ -40,10 +40,7 @@
 
       <!-- 操作按钮 -->
       <view class="order-actions">
-        <view class="total-info">
-          <image class="coin-icon" src="/images/star-coin.png" />
-          <text class="total-price">{{item.totalPrice}}</text>
-        </view>
+        <text class="total-info">{{item.totalCalories}}kcal</text>
         <view class="action-buttons">
           <view
             class="action-btn accept"

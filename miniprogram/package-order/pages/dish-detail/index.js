@@ -6,8 +6,6 @@ Page({
   data: {
     dish: {},
     quantity: 1,
-    extraPrice: 0,
-    totalPrice: 0,
     totalCalories: 0,
     difficultyText: '',
     heroLoaded: false
@@ -36,11 +34,6 @@ Page({
     })
   },
 
-  onOptionChange(e) {
-    this.setData({ extraPrice: e.detail.extraPrice || 0 })
-    this.calcTotal()
-  },
-
   increaseQty() {
     this.setData({ quantity: this.data.quantity + 1 })
     this.calcTotal()
@@ -54,10 +47,9 @@ Page({
   },
 
   calcTotal() {
-    const { dish, quantity, extraPrice } = this.data
-    const totalPrice = (dish.price + extraPrice) * quantity
+    const { dish, quantity } = this.data
     const totalCalories = dish.calories * quantity
-    this.setData({ totalPrice, totalCalories })
+    this.setData({ totalCalories })
   },
 
   onHeroLoad() {
@@ -65,7 +57,7 @@ Page({
   },
 
   addToCart() {
-    const { dish, quantity, extraPrice } = this.data
+    const { dish, quantity } = this.data
     const picker = this.selectComponent('#optionPicker')
 
     // 验证必选项
@@ -83,12 +75,9 @@ Page({
       dishId: dish._id,
       dishName: dish.name,
       coverImage: dish.coverImage,
-      unitPrice: dish.price,
       calories: dish.calories,
       quantity,
-      selectedOptions,
-      extraPrice,
-      itemTotal: (dish.price + extraPrice) * quantity
+      selectedOptions
     }
 
     app.addToCart(cartItem)

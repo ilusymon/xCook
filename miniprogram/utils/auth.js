@@ -35,13 +35,6 @@ function getOpenid() {
 }
 
 /**
- * 获取星星币余额
- */
-function getStarCoins() {
-  return app.globalData.starCoins || 0
-}
-
-/**
  * 刷新用户信息
  */
 function refreshUserInfo() {
@@ -53,6 +46,5 @@ module.exports = {
   isChef,
   isOrderer,
   getOpenid,
-  getStarCoins,
   refreshUserInfo
 }

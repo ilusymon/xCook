@@ -9,7 +9,6 @@ Page({
       name: '',
       description: '',
       coverImage: '',
-      price: '',
       calories: '',
       preparationTime: '',
       difficulty: 1,
@@ -104,7 +103,7 @@ Page({
       type: 'single',
       required: false,
       expanded: true,
-      options: [{ label: '', value: '', extraPrice: 0 }]
+      options: [{ label: '', value: '' }]
     })
     this.setData({ 'dish.optionGroups': groups })
   },
@@ -141,7 +140,7 @@ Page({
   addOption(e) {
     const idx = e.currentTarget.dataset.idx
     const options = this.data.dish.optionGroups[idx].options
-    options.push({ label: '', value: '', extraPrice: 0 })
+    options.push({ label: '', value: '' })
     this.setData({ [`dish.optionGroups[${idx}].options`]: options })
   },
 
@@ -159,11 +158,6 @@ Page({
     if (field === 'label') {
       this.setData({ [`dish.optionGroups[${gidx}].options[${oidx}].value`]: e.detail.value })
     }
-  },
-
-  onOptionPriceInput(e) {
-    const { gidx, oidx } = e.currentTarget.dataset
-    this.setData({ [`dish.optionGroups[${gidx}].options[${oidx}].extraPrice`]: Number(e.detail.value) || 0 })
   },
 
   // === 材料管理 ===
@@ -243,16 +237,17 @@ Page({
     if (dish.optionGroups) {
       dish.optionGroups = dish.optionGroups.map(group => {
         const { expanded, ...rest } = group
-        return rest
+        return {
+          ...rest,
+          options: (rest.options || []).map(option => ({ label: option.label, value: option.value }))
+        }
       })
     }
+    delete dish.price
 
     // 验证
     if (!dish.name) {
       wx.showToast({ title: '请输入菜品名称', icon: 'none' }); return
-    }
-    if (!dish.price && dish.price !== 0) {
-      wx.showToast({ title: '请设置价格', icon: 'none' }); return
     }
     if (!dish.categoryId && this.data.categories.length > 0) {
       dish.categoryId = this.data.categories[this.data.categoryIndex]._id

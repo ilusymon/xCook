@@ -18,6 +18,10 @@
   color: #4A3333;
 }
 
+.top-bar-spacer {
+  width: 72rpx;
+}
+
 .cart-list {
   padding: 16rpx 24rpx;
 }
@@ -75,18 +79,9 @@
   margin-top: 8rpx;
 }
 
-.item-price {
-  display: flex;
-  align-items: center;
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
+.item-calories {
+  color: #FF9F43;
+  font-size: 23rpx;
 }
 
 .qty-control {
@@ -187,20 +182,6 @@
 .checkout-cal {
   font-size: 22rpx;
   color: #FF9F43;
-}
-
-.checkout-price {
-  display: flex;
-  align-items: center;
-  font-size: 34rpx;
-  font-weight: bold;
-  color: #FFC048;
-}
-
-.coin-icon-sm {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
 }
 
 .clear-btn {
