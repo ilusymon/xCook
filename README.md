@@ -157,6 +157,7 @@ backend/internal/migrate/sql/
 - 启动服务时自动执行 `Up()`
 - 使用版本化 SQL，而不是 `GORM AutoMigrate`
 - 默认分类也通过 migration seed 初始化
+- 历史迁移已合并到 `000001_init_schema`；重新初始化时需同时重置业务表和 `schema_migrations` 迁移记录
 - 新增表结构时，继续追加新的 `*.up.sql` / `*.down.sql`
 
 ## 主要接口

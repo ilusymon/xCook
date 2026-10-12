@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS daily_food_records;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS dishes;
 DROP TABLE IF EXISTS categories;

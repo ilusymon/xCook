@@ -5,54 +5,19 @@
 const api = require('./api')
 const media = require('./media')
 
-// ─── 工具函数 ────────────────────────────────────────────
-
-/**
- * 压缩图片
- * @param {string} filePath - 临时文件路径
- * @param {number} quality - 压缩质量 0-100，默认 80
- * @returns {Promise<string>} 压缩后的临时文件路径
- */
-function compressImage(filePath, quality = 80) {
-  return new Promise((resolve, reject) => {
-    wx.compressImage({
-      src: filePath,
-      quality,
-      success: (res) => {
-        console.log('[Upload] 图片压缩完成:', res.tempFilePath)
-        resolve(res.tempFilePath)
-      },
-      fail: (err) => {
-        console.warn('[Upload] 图片压缩失败，使用原图:', err)
-        resolve(filePath)
-      }
-    })
-  })
-}
-
 // ─── 上传 ────────────────────────────────────────────────
 
 /**
- * 上传图片到后端，后端负责写入 MinIO
+ * 上传原图到后端，由后端压缩并保存两份图片
  * @param {string} filePath - 本地图片路径
- * @param {Object} options - 可选配置
- * @param {number} options.quality - 压缩质量 0-100，默认 80
- * @param {boolean} options.compress - 是否压缩，默认 true
- * @returns {Promise<string>} 上传后的图片访问地址
+ * @returns {Promise<string>} 压缩图访问地址
  */
-async function uploadImage(filePath, options = {}) {
-  const { quality = 80, compress = true } = options
-
+async function uploadImage(filePath) {
   if (isRemoteUrl(filePath)) {
     return filePath
   }
 
-  let uploadPath = filePath
-  if (compress) {
-    uploadPath = await compressImage(filePath, quality)
-  }
-
-  const res = await api.uploadFile(uploadPath)
+  const res = await api.uploadFile(filePath)
   if (!res || !res.path) {
     throw new Error('上传失败，未返回图片地址')
   }
@@ -65,16 +30,16 @@ async function uploadImage(filePath, options = {}) {
 /**
  * 批量上传图片（串行，避免弱网下并发上传失败）
  * @param {Array<{filePath: string, index: number}>} items - 待上传项
- * @param {Object} options - 上传选项
+ * @param {Object} _options - 已废弃参数，保留进度回调的位置
  * @param {Function} onProgress - 进度回调 (current, total)
  * @returns {Promise<Array<{index: number, url: string}>>} 上传结果
  */
-async function batchUpload(items, options = {}, onProgress) {
+async function batchUpload(items, _options = {}, onProgress) {
   const results = []
   for (let i = 0; i < items.length; i++) {
     const item = items[i]
     if (onProgress) onProgress(i + 1, items.length)
-    const url = await uploadImage(item.filePath, options)
+    const url = await uploadImage(item.filePath)
     results.push({ index: item.index, url })
   }
   return results
@@ -113,7 +78,6 @@ function hasToken() {
 module.exports = {
   uploadImage,
   batchUpload,
-  compressImage,
   isRemoteUrl,
   hasToken
 }

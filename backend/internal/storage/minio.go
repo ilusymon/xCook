@@ -75,6 +75,11 @@ func (s *MinioService) UploadImage(ctx context.Context, file multipart.File, hea
 		contentType = detectContentType(content, header.Filename)
 	}
 
+	compressedContent, compressedType, compressedFilename, err := compressImage(content, header.Filename)
+	if err != nil {
+		return nil, err
+	}
+
 	originalPath := s.generateObjectName("originals", header.Filename)
 	if _, err := s.client.PutObject(ctx, s.bucket, originalPath, bytes.NewReader(content), int64(len(content)), minio.PutObjectOptions{
 		ContentType: contentType,
@@ -82,7 +87,6 @@ func (s *MinioService) UploadImage(ctx context.Context, file multipart.File, hea
 		return nil, err
 	}
 
-	compressedContent, compressedType, compressedFilename := compressImage(content, header.Filename)
 	compressedPath := s.generateObjectName("images", compressedFilename)
 	if _, err := s.client.PutObject(ctx, s.bucket, compressedPath, bytes.NewReader(compressedContent), int64(len(compressedContent)), minio.PutObjectOptions{
 		ContentType: compressedType,
@@ -168,17 +172,17 @@ func httpDetectContentType(content []byte) string {
 	return strings.SplitN(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(http.DetectContentType(content), "\r", ""), "\n", "")), ";", 2)[0]
 }
 
-func compressImage(content []byte, filename string) ([]byte, string, string) {
+func compressImage(content []byte, filename string) ([]byte, string, string, error) {
 	src, _, err := image.Decode(bytes.NewReader(content))
 	if err != nil {
-		return content, detectContentType(content, filename), filename
+		return nil, "", "", fmt.Errorf("无法压缩图片，请上传有效的 JPEG、PNG 或 GIF 图片: %w", err)
 	}
 
 	bounds := src.Bounds()
 	width := bounds.Dx()
 	height := bounds.Dy()
 	if width <= 0 || height <= 0 {
-		return content, detectContentType(content, filename), filename
+		return nil, "", "", fmt.Errorf("图片尺寸无效")
 	}
 
 	resized := src
@@ -188,14 +192,14 @@ func compressImage(content []byte, filename string) ([]byte, string, string) {
 
 	buffer := bytes.NewBuffer(nil)
 	if err := jpeg.Encode(buffer, resized, &jpeg.Options{Quality: compressedJPEGQuality}); err != nil {
-		return content, detectContentType(content, filename), filename
+		return nil, "", "", fmt.Errorf("压缩图片失败: %w", err)
 	}
 
 	base := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
 	if base == "" {
 		base = "image"
 	}
-	return buffer.Bytes(), "image/jpeg", base + ".jpg"
+	return buffer.Bytes(), "image/jpeg", base + ".jpg", nil
 }
 
 func scaleSize(width int) int {

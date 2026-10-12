@@ -11,6 +11,14 @@ CREATE TABLE IF NOT EXISTS users (
   INDEX idx_users_open_id (open_id)
 );
 
+UPDATE users
+SET coin_log = CASE
+  WHEN JSON_TYPE(coin_log) = 'OBJECT' AND JSON_LENGTH(coin_log) > 0
+    THEN JSON_ARRAY(coin_log)
+  ELSE JSON_ARRAY()
+END
+WHERE JSON_TYPE(coin_log) <> 'ARRAY';
+
 CREATE TABLE IF NOT EXISTS categories (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(64) NOT NULL,
@@ -71,3 +79,17 @@ CREATE TABLE IF NOT EXISTS orders (
   INDEX idx_orders_status (status),
   INDEX idx_orders_created_at (created_at)
 );
+
+CREATE TABLE IF NOT EXISTS daily_food_records (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  description VARCHAR(512) NOT NULL DEFAULT '',
+  tag VARCHAR(32) NOT NULL,
+  occurred_at DATETIME(3) NOT NULL,
+  created_at DATETIME(3) NOT NULL,
+  INDEX idx_daily_food_records_user_id (user_id),
+  INDEX idx_daily_food_records_occurred_at (occurred_at)
+);
+
+DROP TABLE IF EXISTS wishlist_items;

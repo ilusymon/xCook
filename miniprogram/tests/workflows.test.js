@@ -49,6 +49,27 @@ function load(file, { app, modules = {}, wx: wxOverrides = {}, timers = [] } = {
 
 const event = dataset => ({ currentTarget: { dataset } })
 
+test('image upload sends the original file and uses the compressed image for display', async () => {
+  const uploaded = []
+  const upload = load('utils/upload.js', { modules: {
+    './api': { uploadFile: async filePath => {
+      uploaded.push(filePath)
+      return { path: 'images/photo.jpg', originalPath: 'originals/photo.png' }
+    } },
+    './media': { resolveMediaUrl: path => `https://images.example/${path}` }
+  }, wx: { compressImage: () => assert.fail('original must not be compressed before upload') } })
+  assert.equal(await upload.uploadImage('wxfile://photo.png'), 'https://images.example/images/photo.jpg')
+  assert.deepEqual(uploaded, ['wxfile://photo.png'])
+  assert.equal(await upload.uploadImage('https://images.example/images/saved.jpg'), 'https://images.example/images/saved.jpg')
+  assert.equal(uploaded.length, 1)
+
+  const selected = []
+  const editor = load('package-chef/pages/dish-edit/index.js', { wx: { chooseMedia: options => selected.push(options) } })
+  editor.chooseCover()
+  editor.chooseStepImage(event({ idx: 0 }))
+  assert.deepEqual(selected.map(options => Array.from(options.sizeType)), [['original'], ['original']])
+})
+
 test('all registered pages have balanced templates, callable events and valid routes', () => {
   for (const page of pages) {
     const instance = load(`${page}.js`)

@@ -116,6 +116,7 @@ Page({
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
+      sizeType: ['original'],
       sourceType: ['album', 'camera'],
       success: (res) => {
         const filePath = res.tempFiles[0].tempFilePath
@@ -234,6 +235,7 @@ Page({
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
+      sizeType: ['original'],
       success: (res) => {
         this.setData({ [`dish.steps[${idx}].image`]: res.tempFiles[0].tempFilePath })
       }

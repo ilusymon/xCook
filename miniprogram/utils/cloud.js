@@ -254,11 +254,10 @@ function watchFoodRecords(type, onChange, onError) {
  * 上传图片到后端
  * @param {string} filePath - 本地图片路径
  * @param {string} _cloudPath - 已废弃参数，保留兼容
- * @param {Object} options - 上传选项（quality, compress）
  */
-function uploadImage(filePath, _cloudPath, options) {
+function uploadImage(filePath, _cloudPath) {
   const upload = require('./upload')
-  return upload.uploadImage(filePath, options)
+  return upload.uploadImage(filePath)
 }
 
 function createPollWatcher(fetcher, formatter, onChange, errorLabel, onError) {
