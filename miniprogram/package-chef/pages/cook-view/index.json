@@ -2,7 +2,8 @@
   "usingComponents": {
     "step-card": "/package-chef/components/step-card/index",
     "material-list": "/package-chef/components/material-list/index",
-    "placeholder": "/components/placeholder/index"
+    "placeholder": "/components/placeholder/index",
+    "dish-art": "/components/dish-art/index"
   },
   "componentPlaceholder": {
     "step-card": "placeholder",

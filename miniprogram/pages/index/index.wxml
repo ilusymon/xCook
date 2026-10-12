@@ -1,68 +1,13 @@
-<view class="home-page theme-{{homeTheme}}">
-  <view class="home-canvas">
-    <view class="brand-block">
-      <view class="brand-title-row">
-        <text class="brand-heart">♥</text>
-        <text class="brand-title">Couple Wishlist</text>
-        <text class="brand-heart">♥</text>
-      </view>
-      <view class="brand-subtitle-row">
-        <text class="brand-star">✦</text>
-        <text class="brand-subtitle">情侣点餐</text>
-        <text class="brand-star">✦</text>
-      </view>
-      <text class="brand-wave" aria-hidden="true">～～～～</text>
+<view class="home-page">
+  <storybook-header title="把日子，煮成喜欢。" subtitle="星厨房 · 今天也要好好吃饭" scene="menu" bind:hometap="goOrder" />
+  <view class="home-body">
+    <text class="home-note">一起点菜，一起做饭，记住每一顿小幸福。</text>
+    <button class="home-primary" bindtap="goOrder"><view class="primary-art"><kitchen-art kind="categories" /></view><view><text>今天想吃什么？</text><text class="primary-detail">去菜单选一道喜欢的</text></view><text class="arrow">›</text></button>
+    <view class="home-grid">
+      <button class="home-item" bindtap="goChef"><view class="item-art"><kitchen-art kind="add" /></view><text>我是大厨</text><text class="item-detail">让小厨房热闹起来</text></button>
+      <button class="home-item" bindtap="goWishlist"><view class="item-art"><kitchen-art kind="wishes" /></view><text>我们的愿望</text><text class="item-detail">每一份都值得回应</text></button>
     </view>
-
-    <view class="hero-scene" aria-label="情侣一起做饭和用餐的插画">
-      <image class="hero-main" src="/images/home/hero-couple.png" mode="aspectFit" aria-hidden="true" />
-    </view>
-
-    <view class="action-row" aria-role="navigation" aria-label="首页快捷入口">
-      <button class="action-button action-button--order" hover-class="action-button--pressed" bindtap="goOrder" aria-label="我是吃货，进入点餐">
-        <view class="action-card">
-          <image class="action-image action-image--person" src="/images/home/girl.png" mode="aspectFit" />
-        </view>
-        <text class="action-label">我是吃货</text>
-      </button>
-
-      <button class="action-button action-button--chef" hover-class="action-button--pressed" bindtap="goChef" aria-label="我是大厨，进入厨房">
-        <view class="action-card">
-          <image class="action-image action-image--person" src="/images/home/chef.png" mode="aspectFit" />
-        </view>
-        <text class="action-label">我是大厨</text>
-      </button>
-
-      <button class="action-button action-button--record" hover-class="action-button--pressed" bindtap="goOrders" aria-label="记录一下，查看饮食记录">
-        <view class="action-card">
-          <image class="action-image action-image--notebook" src="/images/home/notebook.png" mode="aspectFit" />
-        </view>
-        <text class="action-label">记录一下</text>
-      </button>
-
-      <button class="action-button action-button--relation" hover-class="action-button--pressed" bindtap="showPending" aria-label="绑定关系，待开发">
-        <view class="action-card">
-          <image class="action-image action-image--hearts" src="/images/home/hearts.png" mode="aspectFit" />
-        </view>
-        <text class="action-label">绑定关系</text>
-      </button>
-    </view>
-
-    <view class="quote-card">
-      <view class="quote-card-inner">
-        <image class="quote-image" src="/images/home/heart-bow.png" mode="aspectFit" aria-hidden="true" />
-        <view class="quote-line">
-          <text class="quote-text">和喜欢的人一起，吃遍世界的美味吧～</text>
-          <text class="quote-heart">♥</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="flower-bed" aria-hidden="true">
-      <image class="flowers flowers--left" src="/images/home/flowers-left.png" mode="widthFix" />
-      <text class="flower-star flower-star--left">✦</text>
-      <text class="flower-star flower-star--middle">✧</text>
-      <image class="flowers flowers--right" src="/images/home/flowers-right.png" mode="widthFix" />
-    </view>
+    <button class="home-record" bindtap="goOrders"><image src="/images/cartoon/record.svg" mode="aspectFit" /><text>翻翻我们的吃饭手账</text><text>›</text></button>
+    <text class="home-footer">♡ 今天的喜欢，就是明天回味的美味。</text>
   </view>
 </view>

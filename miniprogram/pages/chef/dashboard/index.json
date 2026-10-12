@@ -1,6 +1,10 @@
 {
   "usingComponents": {
-    "home-btn": "/components/home-btn/index"
+    "storybook-header": "/components/storybook-header/index",
+    "dish-art": "/components/dish-art/index",
+    "kitchen-art": "/components/kitchen-art/index",
+    "bottom-navigation": "/components/bottom-navigation/index"
   },
-  "navigationBarTitleText": "厨房"
+  "navigationBarTitleText": "厨房",
+  "navigationStyle": "custom"
 }

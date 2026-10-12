@@ -12,6 +12,7 @@
       <view class="tab-badge" wx:if="{{item.count > 0}}">{{item.count}}</view>
     </view>
   </view>
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadOrders">重新加载</button></view>
 
   <!-- 订单列表 -->
   <view class="orders" wx:if="{{orders.length > 0}}">
@@ -26,9 +27,10 @@
 
       <!-- 菜品列表 -->
       <view class="order-dishes">
-        <view class="dish-row" wx:for="{{item.items}}" wx:for-item="dish" wx:key="dishId">
+        <view class="dish-row" wx:for="{{item.items}}" wx:for-item="dish" wx:key="itemIndex">
           <text class="dish-name">{{dish.dishName}}</text>
           <text class="dish-qty">x{{dish.quantity}}</text>
+          <text class="dish-options" wx:if="{{dish.optionTags.length}}">{{dish.optionTags}}</text>
         </view>
       </view>
 
@@ -42,32 +44,28 @@
       <view class="order-actions">
         <text class="total-info">{{item.totalCalories}}kcal</text>
         <view class="action-buttons">
-          <view
-            class="action-btn accept"
+          <button
+            class="action-btn accept cartoon-button cartoon-button--compact"
             wx:if="{{item.status === 'placed'}}"
             bindtap="acceptOrder"
-            data-id="{{item._id}}"
-          >接单</view>
-          <view
+            data-index="{{index}}"
+            disabled="{{busy}}"
+           hover-class="cartoon-button--pressed">接下愿望</button>
+          <button
             class="action-btn cooking"
-            wx:if="{{item.status === 'accepted'}}"
-            bindtap="startCooking"
-            data-id="{{item._id}}"
-          >开始制作</view>
-          <view
-            class="action-btn done"
-            wx:if="{{item.status === 'cooking'}}"
-            bindtap="markDone"
-            data-id="{{item._id}}"
-          >完成</view>
+            bindtap="openOrder"
+            data-index="{{index}}"
+          >{{item.status === 'accepted' || item.status === 'cooking' ? '逐道制作' : '查看详情'}}</button>
         </view>
       </view>
     </view>
   </view>
 
   <!-- 空状态 -->
-  <view class="empty-state" wx:else>
+  <view class="state-panel" wx:elif="{{loading}}">愿望单加载中...</view>
+  <view class="empty-state" wx:elif="{{!error}}">
     <text class="empty-emoji">📦</text>
-    <text class="empty-text">暂无订单</text>
+    <text class="empty-text">暂无愿望</text>
   </view>
+  <button class="load-more" wx:if="{{hasMore}}" bindtap="loadMore" disabled="{{loading}}">{{loading ? '加载中...' : '加载更多愿望'}}</button>
 </view>

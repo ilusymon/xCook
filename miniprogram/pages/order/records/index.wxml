@@ -1,37 +1,13 @@
 <view class="wishlist-page records-page">
-  <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
-    <button class="nav-home" style="top: {{navigationContentTop}}px;" bindtap="goHome" aria-label="返回首页">
-      <image src="/images/menu/home.png" mode="aspectFit" />
-    </button>
-    <text class="nav-title" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;">Couple Wishlist</text>
-  </view>
-
-  <view class="role-stage">
-    <image src="/images/menu/01_chef_girl.png" class="role-image girl" mode="aspectFit" />
-    <view class="role-pill left">我是吃货</view>
-    <text class="heart">♥</text>
-    <view class="role-pill right">我是大厨</view>
-    <image src="/images/menu/02_chef_boy.png" class="role-image boy" mode="aspectFit" />
-  </view>
-
-  <scroll-view class="wishlist-body" scroll-y enhanced show-scrollbar="{{false}}">
-    <view class="gingham-grid" aria-hidden="true">
-      <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
-    </view>
-
-    <view class="summary-card">
-      <view>
-        <text class="summary-title">我们的吃饭记录</text>
-        <text class="summary-subtitle">点单和日常饮食，都会悄悄记下来～</text>
-      </view>
-    </view>
-
+  <storybook-header title="我们的吃饭手账" subtitle="每一顿小幸福，都悄悄记下来。" scene="wishlist" compact bind:hometap="goHome" />
+  <view class="records-body">
     <view class="record-filter" aria-role="tablist" aria-label="记录类型">
       <button class="filter-item {{currentFilter === item.value ? 'active' : ''}}" wx:for="{{filters}}" wx:key="value" bindtap="changeFilter" data-value="{{item.value}}" aria-role="tab" aria-selected="{{currentFilter === item.value}}">
         {{item.label}}
       </button>
     </view>
 
+    <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadRecords">重新加载</button></view>
     <view class="record-groups" wx:if="{{groups.length}}">
       <view class="record-group" wx:for="{{groups}}" wx:key="key" wx:for-item="group">
         <view class="group-heading">
@@ -40,7 +16,7 @@
         </view>
         <view class="record-card" wx:for="{{group.records}}" wx:key="key" wx:for-item="record">
           <view class="record-cover-wrap">
-            <image class="record-cover" src="{{record.coverImage}}" mode="aspectFit" />
+            <dish-art cover-image="{{record.coverImage}}" dish-name="{{record.title}}" />
           </view>
           <view class="record-copy">
             <view class="record-title-row">
@@ -57,21 +33,16 @@
       </view>
     </view>
 
-    <view class="empty-state" wx:elif="{{!loading}}">
+    <view class="empty-state" wx:elif="{{!loading && !error}}">
       <text class="empty-heart">♡</text>
       <text>还没有这类记录</text>
     </view>
-    <view class="loading" wx:else>记录加载中...</view>
+    <view class="loading" wx:elif="{{loading}}">记录加载中...</view>
 
-    <button class="add-record" bindtap="openForm">＋ 记录今天吃了什么</button>
-  </scroll-view>
-
-  <view class="bottom-navigation" aria-role="navigation" aria-label="底部导航">
-    <button class="bottom-nav-item {{item.key === 'record' ? 'active' : ''}}" wx:for="{{bottomNavigation}}" wx:key="key" hover-class="bottom-nav-item--pressed" bindtap="onBottomNavTap" data-key="{{item.key}}" aria-label="{{item.label}}">
-      <image src="{{item.icon}}" mode="aspectFit" style="width: {{item.width}}rpx; height: {{item.height}}rpx;" />
-      <text>{{item.label}}</text>
-    </button>
+    <button class="add-record cartoon-button" bindtap="openForm" hover-class="cartoon-button--pressed">＋ 记录今天吃了什么</button>
   </view>
+
+  <bottom-navigation active="record" />
 
   <view class="form-mask" wx:if="{{showForm}}" bindtap="closeForm">
     <view class="record-form" catchtap="stopPropagation">
@@ -85,8 +56,8 @@
         <button class="food-tag {{draft.tag === item ? 'active' : ''}}" wx:for="{{foodTags}}" wx:key="*this" data-tag="{{item}}" bindtap="chooseTag">{{item}}</button>
       </view>
       <view class="form-actions">
-        <button class="form-button cancel" bindtap="closeForm">取消</button>
-        <button class="form-button save" bindtap="saveRecord">保存记录</button>
+        <button class="btn-secondary" bindtap="closeForm">取消</button>
+        <button class="btn-primary cartoon-button cartoon-button--compact" bindtap="saveRecord" loading="{{saving}}" disabled="{{saving}}" hover-class="cartoon-button--pressed">保存记录</button>
       </view>
     </view>
   </view>

@@ -1,5 +1,9 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "storybook-header": "/components/storybook-header/index",
+    "dish-art": "/components/dish-art/index",
+    "kitchen-art": "/components/kitchen-art/index"
+  },
   "navigationStyle": "custom",
   "backgroundColor": "#DFF3FF",
   "backgroundTextStyle": "dark"

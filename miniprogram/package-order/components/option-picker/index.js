@@ -7,7 +7,15 @@ Component({
   },
 
   data: {
-    selections: {} // { groupName: [selectedValues] }
+    selections: {},
+    groups: []
+  },
+
+  observers: {
+    optionGroups() {
+      this.setData({ selections: {} })
+      this.updateGroups()
+    }
   },
 
   methods: {
@@ -24,6 +32,7 @@ Component({
         selections[group] = [value]
       }
       this.setData({ selections })
+      this.updateGroups()
     },
 
     onMultiSelect(e) {
@@ -42,6 +51,18 @@ Component({
         selections[group] = [...selections[group], value]
       }
       this.setData({ selections })
+      this.updateGroups()
+    },
+
+    updateGroups() {
+      const selections = this.data.selections
+      this.setData({ groups: this.data.optionGroups.map(group => ({
+        ...group,
+        options: (group.options || []).map(option => ({
+          ...option,
+          selected: (selections[group.groupName] || []).includes(option.value)
+        }))
+      })) })
     },
 
     // 验证必选项是否已选
@@ -65,6 +86,7 @@ Component({
     // 重置选择
     reset() {
       this.setData({ selections: {} })
+      this.updateGroups()
     }
   }
 })

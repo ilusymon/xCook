@@ -26,7 +26,9 @@ Page({
     editName: '',
     editIcon: '',
     showIconPicker: false,
-    loading: false
+    loading: false,
+    error: '',
+    saving: false
   },
 
   onShow() {
@@ -34,8 +36,8 @@ Page({
   },
 
   loadCategories() {
-    this.setData({ loading: true })
-    cloud.getMenu('chef').then(res => {
+    this.setData({ loading: true, error: '' })
+    return cloud.getMenu('chef').then(res => {
       if (res && res.categories) {
         const categories = res.categories.map(c => ({
           ...c,
@@ -43,20 +45,21 @@ Page({
         }))
         this.setData({ categories, loading: false })
       }
-    })
+    }).catch(err => this.setData({ loading: false, error: err.message || '分类加载失败' }))
   },
 
   // 添加分类
   addCategory() {
+    if (this.data.saving) return
+    this.setData({ saving: true })
     cloud.saveCategory({ name: '新分类', icon: 'default' }).then(res => {
       if (res && res.success) {
-        this.loadCategories()
-        // 自动进入编辑
-        setTimeout(() => {
+        return this.loadCategories().then(() => {
           this.setData({ editingId: res.id, editName: '新分类', editIcon: 'default' })
-        }, 500)
+        })
       }
-    })
+    }).catch(err => wx.showToast({ title: err.message || '添加失败', icon: 'none' }))
+      .finally(() => this.setData({ saving: false }))
   },
 
   // 进入编辑
@@ -88,28 +91,36 @@ Page({
 
   // 保存编辑
   saveEdit() {
+    if (this.data.saving) return
     const { editingId, editName, editIcon } = this.data
     if (!editName.trim()) {
       wx.showToast({ title: '名称不能为空', icon: 'none' })
       return
     }
+    this.setData({ saving: true })
     cloud.saveCategory({ _id: editingId, name: editName.trim(), icon: editIcon }).then(res => {
       if (res && res.success) {
         wx.showToast({ title: '已保存', icon: 'success' })
         this.cancelEdit()
         this.loadCategories()
       }
-    })
+    }).catch(err => wx.showToast({ title: err.message || '保存失败', icon: 'none' }))
+      .finally(() => this.setData({ saving: false }))
   },
 
   // 切换启用状态
   toggleActive(e) {
-    const { id, active } = e.currentTarget.dataset
-    cloud.saveCategory({ _id: id, isActive: !active }).then(res => {
+    if (this.data.saving) return
+    const { id } = e.currentTarget.dataset
+    this.setData({ saving: true })
+    cloud.saveCategory({ _id: id, isActive: e.detail.value }).then(res => {
       if (res && res.success) {
         this.loadCategories()
       }
-    })
+    }).catch(err => {
+      wx.showToast({ title: err.message || '更新失败', icon: 'none' })
+      this.loadCategories()
+    }).finally(() => this.setData({ saving: false }))
   },
 
   // 上移
@@ -123,6 +134,8 @@ Page({
   },
 
   swapSort(index, direction) {
+    if (this.data.saving) return
+    index = Number(index)
     const { categories } = this.data
     const targetIndex = index + direction
     if (targetIndex < 0 || targetIndex >= categories.length) return
@@ -131,16 +144,18 @@ Page({
     const b = categories[targetIndex]
 
     // 交换 sortOrder
-    Promise.all([
-      cloud.saveCategory({ _id: a._id, sortOrder: b.sortOrder }),
-      cloud.saveCategory({ _id: b._id, sortOrder: a.sortOrder })
-    ]).then(() => {
+    this.setData({ saving: true })
+    cloud.saveCategory({ _id: a._id, swapWith: b._id }).then(() => {
       this.loadCategories()
-    })
+    }).catch(err => {
+      wx.showToast({ title: err.message || '排序失败，请重试', icon: 'none' })
+      this.loadCategories()
+    }).finally(() => this.setData({ saving: false }))
   },
 
   // 删除分类
   deleteCategory(e) {
+    if (this.data.saving) return
     const { id, name } = e.currentTarget.dataset
     wx.showModal({
       title: '删除分类',
@@ -148,6 +163,7 @@ Page({
       confirmColor: '#FF6B81',
       success: (res) => {
         if (res.confirm) {
+          this.setData({ saving: true })
           cloud.deleteCategory(id).then(res => {
             if (res && res.success) {
               wx.showToast({ title: '已删除', icon: 'success' })
@@ -155,7 +171,8 @@ Page({
             } else {
               wx.showToast({ title: res.message || '删除失败', icon: 'none' })
             }
-          })
+          }).catch(err => wx.showToast({ title: err.message || '删除失败', icon: 'none' }))
+            .finally(() => this.setData({ saving: false }))
         }
       }
     })

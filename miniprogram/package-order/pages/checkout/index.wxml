@@ -1,22 +1,29 @@
 <view class="checkout-page">
+  <view class="empty-state" wx:if="{{!cart.length}}"><text>还没有选菜</text><button class="btn-primary cartoon-button cartoon-button--compact" bindtap="goMenu" hover-class="cartoon-button--pressed">去选菜</button></view>
+  <block wx:else>
   <!-- 愿望摘要 -->
   <view class="section-card">
-    <text class="section-title">愿望确认</text>
+    <view class="section-header"><text class="section-title">愿望确认</text><button class="text-button" bindtap="editCart">修改菜品</button></view>
     <view class="order-items">
       <view class="order-item" wx:for="{{cart}}" wx:key="cartItemId">
+        <view class="item-cover"><dish-art cover-image="{{item.coverImage}}" dish-name="{{item.dishName}}" /></view>
+        <view class="item-copy">
         <text class="item-name">{{item.dishName}} x{{item.quantity}}</text>
+        <text class="item-options" wx:for="{{item.optionTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        <text class="item-options">{{item.calories * item.quantity}} kcal</text>
+        </view>
       </view>
     </view>
     <view class="divider"></view>
     <view class="summary-row">
-      <text>共 {{totalCount}} 道菜</text>
+      <text>共 {{totalCount}} 份</text>
       <text class="cal-text">{{totalCalories}}kcal</text>
     </view>
   </view>
 
   <!-- 备注 -->
   <view class="section-card">
-    <text class="section-title">想对厨师说...</text>
+    <text class="section-title">给大厨的话</text>
     <textarea
       class="note-input"
       placeholder="口味偏好、特殊要求等"
@@ -28,8 +35,9 @@
 
   <!-- 提交愿望按钮 -->
   <view class="pay-btn-wrap">
-    <view class="pay-btn" bindtap="placeOrder">
+    <button class="pay-btn cartoon-button" bindtap="placeOrder" loading="{{submitting}}" disabled="{{submitting}}" hover-class="cartoon-button--pressed">
       <text>加入愿望单</text>
-    </view>
+    </button>
   </view>
+  </block>
 </view>

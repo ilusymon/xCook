@@ -1,54 +1,42 @@
-page { height: 100vh; overflow: hidden; }
-
-.wishlist-page { height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: #DFF4FF; color: #241713; }
-.custom-navigation { position: relative; flex: none; box-sizing: border-box; }
-.nav-home { position: absolute; left: 36rpx; width: 58rpx; min-height: 58rpx; padding: 6rpx; background: rgba(255,255,255,.85); border: 0; border-radius: 50%; }
-.nav-home::after { display: none; }
-.nav-home image { width: 42rpx; height: 39rpx; }
-.nav-title { position: absolute; left: 50%; display: flex; align-items: center; transform: translateX(-50%); font: 700 34rpx Georgia, serif; white-space: nowrap; }
-.role-stage { position: relative; flex: 0 0 136rpx; }
-.role-pill { position: absolute; top: 50rpx; height: 68rpx; display: flex; align-items: center; box-sizing: border-box; background: rgba(255,253,249,.95); border-radius: 36rpx; font-size: 24rpx; font-weight: 700; letter-spacing: 2rpx; }
-.role-pill.left { left: 74rpx; width: 238rpx; padding-left: 116rpx; }
-.role-pill.right { right: 74rpx; width: 252rpx; padding-left: 136rpx; }
-.role-image { position: absolute; z-index: 2; bottom: 0; }
-.role-image.girl { left: 45rpx; width: 144rpx; height: 134rpx; }
-.role-image.boy { right: 196rpx; width: 133rpx; height: 132rpx; }
-.heart { position: absolute; top: 68rpx; left: 355rpx; color: #FF7180; font-size: 34rpx; }
-
-.wishlist-body { position: relative; flex: 1; min-height: 0; box-sizing: border-box; background: #EAF8FF; border-radius: 38rpx 38rpx 0 0; }
-.gingham-grid { position: absolute; z-index: 0; top: 0; left: 0; width: 848rpx; display: flex; flex-wrap: wrap; pointer-events: none; }
-.gingham-grid image { flex: 0 0 212rpx; width: 212rpx; height: 212rpx; }
-.summary-card, .wish-list, .empty-state, .loading, .add-wish { position: relative; z-index: 1; }
-.summary-card { margin: 28rpx 36rpx 18rpx; padding: 22rpx 26rpx; display: flex; align-items: center; justify-content: space-between; background: rgba(255,253,249,.98); border-radius: 28rpx; box-shadow: 0 4rpx 12rpx rgba(76,112,128,.08); }
-.summary-title { display: block; font-size: 34rpx; font-weight: 800; }
-.summary-subtitle { display: block; margin-top: 6rpx; color: #8B8581; font-size: 20rpx; }
-.count-pill { min-width: 90rpx; height: 54rpx; padding: 0 18rpx; display: flex; gap: 12rpx; align-items: center; justify-content: center; box-sizing: border-box; color: #EF8297; background: #FFF4F5; border: 1rpx solid #F4CFD5; border-radius: 28rpx; font-size: 25rpx; }
-.wish-list { padding: 0 36rpx; }
-.wish-card { position: relative; height: 154rpx; margin-bottom: 16rpx; padding: 16rpx 20rpx; display: flex; align-items: center; box-sizing: border-box; background: rgba(255,253,249,.98); border-radius: 30rpx; box-shadow: 0 4rpx 12rpx rgba(76,112,128,.08); }
-.dish-cover-wrap { width: 136rpx; height: 118rpx; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #FFF4D8; border-radius: 20rpx; }
-.dish-cover { width: 122rpx; height: 102rpx; }
-.card-heart { position: absolute; top: 10rpx; left: 149rpx; color: #EE7E91; font-size: 32rpx; }
-.wish-copy { flex: 1; min-width: 0; margin-left: 28rpx; }
-.dish-name { display: block; max-width: 320rpx; overflow: hidden; font-size: 27rpx; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.dish-status { display: block; margin-top: 10rpx; color: #E9A243; font-size: 21rpx; font-weight: 600; }
-.dish-status.accepted, .dish-status.cooking { color: #EF667E; }
-.dish-status.done { color: #51BF62; }
-.dish-status.cancelled { color: #99908B; }
-.dish-remaining { display: block; margin-top: 4rpx; color: #99908B; font-size: 19rpx; }
-.wish-action { width: 142rpx; min-height: 88rpx; padding: 0; color: #6D4616; background: #F2BD5F; border: 1rpx solid #71552D; border-radius: 44rpx; font-size: 21rpx; line-height: 86rpx; }
-.wish-action::after { display: none; }
-.wish-action.cooking, .wish-action.accepted { color: #fff; background: #FF7180; border-color: #50302C; }
-.wish-action.done, .wish-action[disabled] { color: #fff; background: #5CCB67; border-color: #398F45; opacity: 1; }
-.wish-action.cancelled, .wish-action.cancelled[disabled] { color: #7C7774; background: #E8E5E3; border-color: #B8B1AD; }
-.empty-state, .loading { padding: 120rpx 40rpx 40rpx; color: #7C8588; text-align: center; }
-.empty-heart { display: block; margin-bottom: 10rpx; color: #EF8297; font-size: 80rpx; }
-.add-wish { width: 390rpx; min-height: 64rpx; margin: 28rpx auto 164rpx; color: #EF667E; background: rgba(255,253,249,.96); border: 1rpx solid #EFA2AF; border-radius: 34rpx; font-size: 24rpx; line-height: 62rpx; }
-.add-wish::after { display: none; }
-.bottom-navigation { position: fixed; z-index: 20; right: 28rpx; bottom: calc(16rpx + env(safe-area-inset-bottom)); left: 28rpx; height: 116rpx; padding: 2rpx 8rpx; display: flex; box-sizing: border-box; background: rgba(255,253,249,.98); border: 1rpx solid rgba(117,104,96,.12); border-radius: 28rpx; box-shadow: 0 10rpx 30rpx rgba(65,83,91,.16); }
-.bottom-nav-item { position: relative; flex: 1; min-width: 0; min-height: 112rpx; margin: 0; padding: 10rpx 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rpx; color: #716D6A; background: transparent; border: 0; border-radius: 0; box-sizing: border-box; font-size: 19rpx; }
-.bottom-nav-item::after { display: none; }
-.bottom-nav-item > image, .bottom-nav-item > text { position: relative; z-index: 1; }
-.bottom-nav-item--pressed { opacity: .72; transform: scale(.97); }
-.bottom-nav-item.active { color: #493B37; }
-.bottom-nav-item.active::before { display: none; }
-.bottom-nav-item.active > text { font-weight: 600; white-space: nowrap; }
+.wishlist-page { min-height: 100vh; padding-bottom: calc(150rpx + env(safe-area-inset-bottom)); background: var(--color-bg); }
+.list-caption { display: flex; justify-content: space-between; align-items: center; margin: 0 32rpx 18rpx; color: var(--color-text-secondary); font-size: 22rpx; }
+.wish-entry { margin: 28rpx 30rpx 38rpx; }
+.wish-paper { position: relative; padding: 30rpx 32rpx 32rpx; }
+.paper-skin { position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
+.paper-skin image { position: absolute; left: 0; width: 100%; }
+.paper-top { top: 0; height: 64rpx; }
+.paper-middle { top: 62rpx; height: calc(100% - 108rpx); }
+.paper-bottom { bottom: 0; height: 48rpx; }
+.paper-content { position: relative; z-index: 1; }
+.paper-clip { position: absolute; z-index: 3; width: 48rpx; height: 86rpx; top: -20rpx; left: 48rpx; transform: rotate(-5deg); pointer-events: none; }
+.paper-leaf { position: absolute; z-index: 2; width: 36rpx; height: 58rpx; pointer-events: none; }
+.paper-leaf-left { left: 14rpx; top: 88rpx; transform: rotate(-14deg); }
+.paper-leaf-right { right: 16rpx; top: 20rpx; transform: rotate(8deg); }
+.paper-title { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12rpx; padding-left: 52rpx; padding-right: 8rpx; font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 42rpx; line-height: 1.3; }
+.heart { color: #FF8D73; font-size: 32rpx; }
+.wish-status { flex-shrink: 0; padding: 7rpx 18rpx; border: 1rpx solid #E9BB69; border-radius: 18rpx 22rpx 20rpx 16rpx; background: linear-gradient(180deg, #FFE5A5, #FFDC88); font-family: sans-serif; font-size: 22rpx; line-height: 1.4; }
+.wish-status.accepted, .wish-status.done { color: #536D35; border-color: #A3C46A; background: linear-gradient(180deg, #E0EEC8, #BDDB91); }
+.wish-status.cooking { color: #42677B; border-color: #9BC2D3; background: linear-gradient(180deg, #E2EFF6, #BCDDEB); }
+.wish-status.cancelled { color: #8A7466; border-color: #D5C3AF; background: #EEE2D5; }
+.paper-dishes { margin-top: 20rpx; }
+.paper-dish { display: flex; align-items: center; gap: 14rpx; padding: 6rpx 0; }
+.paper-art { flex-shrink: 0; width: 120rpx; height: 104rpx; overflow: hidden; border-radius: 16rpx; }
+.paper-dish-copy { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 12rpx; }
+.paper-dish-title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10rpx; }
+.paper-dish-name { font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 32rpx; line-height: 1.4; }
+.paper-quantity { flex-shrink: 0; white-space: nowrap; font-size: 26rpx; }
+.dish-options { flex-shrink: 0; max-width: 180rpx; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8rpx; }
+.dish-options text { max-width: 100%; padding: 5rpx 14rpx; box-sizing: border-box; border-radius: 16rpx 12rpx 18rpx 14rpx; background: #FFDCC4; color: #894C35; font-size: 20rpx; line-height: 1.4; word-break: break-all; }
+.paper-total { display: block; margin: 14rpx 18rpx 0; padding-top: 18rpx; border-top: 2rpx dashed #BFA284; text-align: center; font-size: 28rpx; line-height: 1.4; }
+.wish-note { position: relative; margin-top: 24rpx; padding: 16rpx 38rpx 18rpx 74rpx; border-radius: 24rpx 20rpx 28rpx 18rpx; background: linear-gradient(110deg, #FFDDCC, #FFD8C7 65%, #FFE0D3); }
+.note-pencil { position: absolute; top: -12rpx; left: -6rpx; width: 74rpx; height: 90rpx; }
+.note-title { display: block; margin-bottom: 8rpx; font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 30rpx; line-height: 1.4; }
+.note-copy { display: block; font-size: 26rpx; line-height: 1.65; word-break: break-all; }
+.note-heart { position: absolute; bottom: 12rpx; right: 16rpx; color: #F67F64; font-size: 26rpx; }
+.heart-progress { position: relative; display: flex; margin: 16rpx 12rpx 18rpx; }
+.heart-progress::before { content: ''; position: absolute; top: 24rpx; left: 12%; right: 12%; border-top: 2rpx dashed #B89A80; }
+.progress-stop { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; font-size: 26rpx; }
+.progress-heart { width: 46rpx; height: 46rpx; padding: 0 8rpx; background: var(--color-bg); }
+.wish-action { min-height: 104rpx; margin: 20rpx 24rpx 0; padding: 0 28rpx; font-size: 40rpx; line-height: 104rpx; }
+.wish-meta { display: block; margin-top: 18rpx; text-align: center; color: var(--color-text-secondary); font-size: 20rpx; }
+.empty-art { width: 180rpx; height: 180rpx; }

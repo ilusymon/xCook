@@ -1,0 +1,12 @@
+<view class="storybook-header">
+  <view class="brand-navigation" style="height: {{navigationHeight}}px;">
+    <button class="brand" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;" bindtap="goHome" aria-label="星厨房，返回首页">
+      <image src="/images/cartoon/star.svg" mode="aspectFit" /><text>星厨房</text>
+    </button>
+    <button wx:if="{{showSearch}}" class="search" style="top: {{navigationContentTop}}px; right: {{navigationRight}}px; height: {{navigationContentHeight}}px;" bindtap="search" aria-label="搜索菜品"><image src="/images/cartoon/search.svg" mode="aspectFit" /></button>
+  </view>
+  <view class="scene {{compact ? 'compact' : ''}}">
+    <image class="scene-image" src="/images/cartoon/{{scene}}-hero.jpg" mode="aspectFill" aria-hidden="true" />
+    <view class="scene-copy"><text class="title">{{title}}</text><text class="subtitle">{{subtitle}}</text></view>
+  </view>
+</view>

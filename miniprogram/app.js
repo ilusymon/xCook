@@ -11,7 +11,8 @@ App({
     openid: null,
     role: 'both',
     cart: [],
-    wishlistRole: 'orderer'
+    wishlistRole: 'orderer',
+    searchMenu: false
   },
 
   // 加载用户信息
@@ -30,7 +31,9 @@ App({
   // 加载购物车
   loadCart() {
     const cart = wx.getStorageSync('cart') || []
-    this.globalData.cart = cart
+    this.globalData.cart = Array.isArray(cart) ? cart.filter(item =>
+      item && item.dishId && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 99
+    ) : []
   },
 
   // 保存购物车
@@ -42,11 +45,17 @@ App({
   // 添加到购物车
   addToCart(item) {
     const cart = this.globalData.cart
+    if (!item.dishId || !Number.isInteger(item.quantity) || item.quantity < 1) {
+      throw new Error('菜品或数量无效，请重新选择')
+    }
     // 检查是否存在相同菜品 + 相同选项的项
     const existIndex = cart.findIndex(c =>
-      c.dishId === item.dishId &&
-      JSON.stringify(c.selectedOptions) === JSON.stringify(item.selectedOptions)
+      String(c.dishId) === String(item.dishId) &&
+      this.optionKey(c.selectedOptions) === this.optionKey(item.selectedOptions)
     )
+    if (item.quantity + (existIndex > -1 ? cart[existIndex].quantity : 0) > 99) {
+      throw new Error('每种口味最多选择99份')
+    }
     if (existIndex > -1) {
       cart[existIndex].quantity += item.quantity
     } else {
@@ -59,6 +68,7 @@ App({
 
   // 更新购物车项数量
   updateCartItemQuantity(cartItemId, quantity) {
+    if (!Number.isInteger(quantity) || quantity > 99) return this.globalData.cart
     const cart = this.globalData.cart
     const index = cart.findIndex(c => c.cartItemId === cartItemId)
     if (index > -1) {
@@ -92,10 +102,15 @@ App({
     let totalCalories = 0
     let totalCount = 0
     cart.forEach(item => {
-      totalCalories += item.calories * item.quantity
+      totalCalories += Number(item.calories || 0) * item.quantity
       totalCount += item.quantity
     })
     return { totalCalories, totalCount }
+  },
+
+  optionKey(options = {}) {
+    options = options || {}
+    return JSON.stringify(Object.keys(options).sort().map(key => [key, [...options[key]].sort()]))
   },
 
   // 生成唯一 ID

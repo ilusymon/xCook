@@ -1,4 +1,5 @@
 const app = getApp()
+const { formatCartItem } = require('../../../utils/format')
 
 Page({
   data: {
@@ -12,19 +13,7 @@ Page({
   },
 
   refreshCart() {
-    const cart = app.globalData.cart.map(item => {
-      // 将 selectedOptions 转为标签数组用于显示
-      const optionTags = []
-      if (item.selectedOptions) {
-        Object.keys(item.selectedOptions).forEach(group => {
-          const vals = item.selectedOptions[group]
-          if (Array.isArray(vals)) {
-            vals.forEach(v => optionTags.push(v))
-          }
-        })
-      }
-      return { ...item, optionTags }
-    })
+    const cart = app.globalData.cart.map(formatCartItem)
 
     const summary = app.getCartSummary()
     this.setData({
@@ -86,6 +75,11 @@ Page({
   },
 
   goCheckout() {
+    if (!this.data.cart.length) return
     wx.navigateTo({ url: '/package-order/pages/checkout/index' })
+  },
+
+  goMenu() {
+    wx.switchTab({ url: '/pages/order/menu/index' })
   }
 })

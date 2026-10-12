@@ -1,0 +1,1 @@
+<view class="art"><image src="/images/cartoon/tools-atlas.jpg" style="left: {{left}}%; top: {{top}}%;" mode="scaleToFill" aria-hidden="true" /></view>

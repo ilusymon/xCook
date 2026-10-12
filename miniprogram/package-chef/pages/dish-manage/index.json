@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "dish-art": "/components/dish-art/index"
+  },
   "navigationBarTitleText": "菜品管理"
 }

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>星厨房 · 私人厨房手账</title>
+  <style>
+    :root { color-scheme: light; --paper:#f7f5ef; --cream:#fffdf7; --ink:#29352d; --muted:#787d70; --red:#b94732; --olive:#66744d; --line:#deded2; --pale:#ecefe1; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#eeede6; font-family:"PingFang SC","Microsoft YaHei",sans-serif; }
+    button, input, textarea { font:inherit; }
+    button { color:inherit; cursor:pointer; }
+    button:disabled { cursor:default; opacity:.45; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline:3px solid #d29d53; outline-offset:3px; }
+    button { -webkit-tap-highlight-color:transparent; }
+    .board { max-width:1120px; margin:auto; min-height:100vh; padding:48px 64px; display:grid; grid-template-columns:1fr 390px; gap:90px; align-items:center; }
+    .direction { padding-bottom:36px; }
+    .eyebrow { display:block; font:600 11px/1.5 Georgia,serif; letter-spacing:3px; text-transform:uppercase; }
+    .direction h1 { font:500 58px/1.2 "Songti SC","SimSun",serif; letter-spacing:-2px; margin:26px 0; }
+    .direction p { max-width:340px; font-size:15px; line-height:1.9; color:var(--muted); }
+    .swatches { display:flex; gap:12px; margin:32px 0; }
+    .swatches span { width:30px; height:30px; border-radius:50%; border:1px solid #0000000b; }
+    .design-switch { display:flex; flex-wrap:wrap; gap:8px; padding-top:26px; border-top:1px solid #d4d4c7; }
+    .design-switch button { padding:11px 19px; background:transparent; border:1px solid #c6caba; border-radius:3px; font-size:13px; }
+    .design-switch button.selected { color:var(--cream); background:var(--ink); border-color:var(--ink); }
+    .preview-label { margin-top:18px; font-size:11px; letter-spacing:1px; color:var(--muted); }
+    .phone { position:relative; width:390px; height:790px; overflow:hidden; background:var(--paper); border:7px solid #29302a; border-radius:40px; box-shadow:0 30px 65px #303d2229; }
+    .status { height:38px; display:flex; justify-content:space-between; align-items:center; padding:9px 22px 0; font-size:11px; font-weight:600; }
+    .status .signals { display:flex; gap:7px; align-items:center; }
+    .battery { width:20px; height:10px; border:1px solid currentColor; border-radius:2px; position:relative; }
+    .battery::after { content:""; position:absolute; inset:2px; background:currentColor; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 22px; }
+    .brand { font-family:"Songti SC","SimSun",serif; font-size:22px; font-weight:700; letter-spacing:2px; }
+    .brand em { font-style:normal; color:var(--red); padding-right:6px; }
+    .capsule { width:75px; height:28px; border:1px solid #29352d25; border-radius:20px; display:flex; justify-content:center; align-items:center; gap:14px; font-size:14px; }
+    .capsule i { width:11px; height:11px; border:2px solid currentColor; border-radius:50%; }
+    .screen { height:calc(100% - 38px - 56px - 73px); overflow:auto; scrollbar-width:none; padding-bottom:100px; }
+    .screen::-webkit-scrollbar { display:none; }
+    .page { padding:12px 22px 28px; }
+    .page-heading { font-family:"Songti SC","SimSun",serif; font-size:35px; font-weight:700; line-height:1.25; letter-spacing:-1px; margin:9px 0 8px; }
+    .heading-row { display:flex; justify-content:space-between; align-items:end; }
+    .sub { font-size:12px; line-height:1.7; color:var(--muted); margin:0; }
+    .stamp { display:flex; align-items:center; justify-content:center; width:43px; height:43px; border:1px solid #b9473248; border-radius:50%; color:var(--red); font-family:serif; font-size:11px; transform:rotate(12deg); }
+    .categories { display:flex; gap:21px; margin:22px 0 18px; border-bottom:1px solid var(--line); }
+    .categories button { position:relative; padding:0 0 12px; background:none; border:0; font-size:12px; color:var(--muted); white-space:nowrap; }
+    .categories button.active { color:var(--red); font-weight:600; }
+    .categories button.active::after { content:""; position:absolute; bottom:-1px; left:0; right:0; height:2px; background:var(--red); }
+    .food-hero { position:relative; height:216px; border-radius:5px; overflow:hidden; background:#e4d7c0; }
+    .food-hero img { width:100%; height:100%; object-fit:cover; object-position:58% 53%; }
+    .food-hero .label { position:absolute; top:14px; left:14px; padding:7px 10px; background:var(--cream); font-size:10px; letter-spacing:1px; }
+    .food-hero .serial { position:absolute; bottom:13px; right:14px; color:white; font:italic 31px Georgia,serif; text-shadow:0 2px 12px #4c30245c; }
+    .featured-copy { padding:17px 0 22px; border-bottom:1px solid var(--line); }
+    .food-title { font:700 23px/1.3 "Songti SC","SimSun",serif; margin:0 0 6px; }
+    .food-meta { display:flex; align-items:center; gap:9px; font-size:10px; color:var(--muted); margin-top:12px; }
+    .food-meta span+span::before { content:"·"; margin-right:9px; }
+    .buy-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+    .food-note { font-size:11px; color:var(--olive); }
+    .add-button { width:40px; height:40px; padding:0; border:0; border-radius:50%; color:var(--cream); background:var(--red); font-size:23px; line-height:1; }
+    .quantity { display:flex; align-items:center; gap:12px; font-size:12px; }
+    .quantity .minus { width:32px; height:32px; background:none; border:1px solid var(--line); border-radius:50%; font-size:18px; }
+    .section-heading { display:flex; align-items:baseline; justify-content:space-between; margin:24px 0 8px; }
+    .section-heading h2 { margin:0; font:700 20px/1.4 "Songti SC","SimSun",serif; }
+    .section-heading span { color:var(--muted); font:11px Georgia,serif; letter-spacing:1px; }
+    .recipe-row { display:flex; align-items:center; gap:14px; padding:18px 0; border-bottom:1px solid var(--line); }
+    .recipe-no { align-self:start; color:var(--olive); font:italic 22px Georgia,serif; padding-top:1px; }
+    .recipe-copy { flex:1; min-width:0; }
+    .recipe-copy h3 { font-size:14px; margin:0 0 7px; font-weight:600; }
+    .recipe-copy p { font-size:11px; color:var(--muted); margin:0; }
+    .recipe-row .add-button { width:34px; height:34px; font-size:20px; }
+    .nav { position:absolute; right:0; left:0; bottom:0; z-index:20; height:73px; padding:9px 15px 14px; display:flex; background:var(--cream); border-top:1px solid var(--line); }
+    .nav button { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; border:0; background:none; font-size:10px; color:var(--muted); }
+    .nav button.active { color:var(--red); }
+    .icon { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.65; stroke-linecap:round; stroke-linejoin:round; }
+    .cart { position:absolute; z-index:21; bottom:88px; right:17px; left:17px; height:59px; padding:10px 13px; background:var(--ink); color:var(--cream); border-radius:5px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 18px #29352d1c; }
+    .cart strong { display:block; font-size:13px; font-weight:500; }
+    .cart span { font-size:10px; color:#e1e3d2; display:block; margin-top:4px; }
+    .cart button { min-height:37px; padding:0 14px; border:0; background:var(--cream); color:var(--ink); font-size:12px; border-radius:3px; }
+    .sheet { background:var(--cream); margin:22px 0 0; padding:21px 20px; position:relative; box-shadow:0 8px 18px #29352d08; }
+    .sheet::after { content:""; position:absolute; left:0; right:0; bottom:-6px; height:8px; background:radial-gradient(circle at 6px 8px,transparent 6px,var(--cream) 6.5px); background-size:12px 8px; }
+    .sheet-heading { display:flex; justify-content:space-between; gap:12px; padding-bottom:18px; border-bottom:1px dashed #bdc1b1; }
+    .sheet-heading strong { font:700 23px "Songti SC","SimSun",serif; }
+    .sheet-heading p { margin:7px 0 0; font-size:10px; color:var(--muted); }
+    .state { align-self:start; padding:6px 8px; color:var(--olive); background:var(--pale); font-size:10px; white-space:nowrap; }
+    .sheet-item { display:flex; justify-content:space-between; gap:15px; margin:20px 0; font-size:13px; }
+    .sheet-item p { color:var(--muted); font-size:11px; margin:7px 0 0; }
+    .sheet-total { padding-top:16px; border-top:1px dashed #bdc1b1; display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+    .note { margin:21px 0 0; padding:14px; background:#f1f0e5; font-size:11px; color:var(--olive); line-height:1.8; }
+    .timeline { margin:25px 0 0; display:flex; }
+    .timeline .point { flex:1; position:relative; color:var(--muted); font-size:10px; padding-top:19px; }
+    .timeline .point::before { content:""; position:absolute; top:2px; left:0; width:8px; height:8px; border:1px solid #c6cbba; border-radius:50%; background:var(--paper); z-index:1; }
+    .timeline .point:not(:last-child)::after { content:""; height:1px; position:absolute; top:6px; left:8px; right:0; background:#c6cbba; }
+    .timeline .point.complete { color:var(--olive); }
+    .timeline .point.complete::before { background:var(--olive); border-color:var(--olive); }
+    .wide-button { width:100%; min-height:45px; margin-top:25px; padding:12px; border:0; border-radius:3px; background:var(--red); color:var(--cream); font-size:13px; }
+    .text-button { background:none; border:0; font-size:12px; color:var(--red); min-height:40px; padding:0; text-align:left; }
+    .kitchen-banner { margin-top:24px; padding:23px 21px; background:var(--ink); color:var(--cream); border-radius:4px; position:relative; overflow:hidden; }
+    .kitchen-banner .kicker { font:10px Georgia,serif; letter-spacing:2px; color:#b8c8a7; }
+    .kitchen-banner strong { display:block; font:500 31px/1.2 "Songti SC","SimSun",serif; margin:14px 0 11px; }
+    .kitchen-banner p { font-size:11px; color:#dce1ce; margin:0; }
+    .kitchen-banner::after { content:"✳"; position:absolute; right:18px; top:31px; color:#a2ac854a; font-size:93px; font-weight:400; }
+    .task { padding:21px 0; border-bottom:1px solid var(--line); }
+    .task-top { display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--muted); }
+    .task h3 { font:700 23px/1.4 "Songti SC","SimSun",serif; margin:11px 0 9px; }
+    .task p { margin:0; font-size:11px; color:var(--muted); line-height:1.8; }
+    .task-action { width:100%; margin-top:17px; min-height:42px; border:1px solid #a9b599; border-radius:3px; color:var(--olive); background:transparent; font-size:12px; }
+    .quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-top:15px; }
+    .quick-grid button { background:#eceee3; border:0; padding:17px 15px; text-align:left; border-radius:3px; min-height:89px; }
+    .quick-grid .icon { width:21px; height:21px; color:var(--olive); margin-bottom:12px; }
+    .quick-grid strong { display:block; font-size:12px; font-weight:500; }
+    .record { display:flex; gap:16px; margin-top:24px; }
+    .record-date { width:43px; flex:none; text-align:center; }
+    .record-date strong { font:italic 31px/1 Georgia,serif; display:block; }
+    .record-date span { font-size:9px; color:var(--muted); }
+    .record-content { padding-bottom:24px; border-bottom:1px solid var(--line); flex:1; }
+    .record-content h3 { font:700 18px "Songti SC","SimSun",serif; margin:0 0 9px; }
+    .record-content p { font-size:11px; margin:0; color:var(--muted); line-height:1.8; }
+    .record-content img { width:100%; height:132px; object-fit:cover; margin-top:13px; border-radius:3px; }
+    .profile-name { font:700 35px "Songti SC","SimSun",serif; margin:18px 0 10px; }
+    .profile-row { width:100%; display:flex; align-items:center; justify-content:space-between; padding:19px 0; border:0; border-bottom:1px solid var(--line); background:none; font-size:13px; }
+    .avatar { display:grid; place-items:center; width:58px; height:58px; margin-top:20px; background:#e2e7d1; color:var(--olive); border-radius:50%; font:25px "Songti SC",serif; }
+    dialog { position:fixed; left:var(--modal-left,50%); top:var(--modal-top,50%); transform:translate(-50%,-50%); margin:0; border:0; border-radius:8px; padding:25px; width:calc(100% - 40px); max-width:344px; background:var(--cream); color:var(--ink); box-shadow:0 20px 70px #0003; }
+    dialog::backdrop { background:#29352d70; }
+    dialog h2 { margin:0 0 9px; font:700 26px/1.4 "Songti SC",serif; }
+    dialog p { color:var(--muted); font-size:12px; line-height:1.7; }
+    .flavors { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0; }
+    .flavors button { border:1px solid #c6caba; border-radius:3px; padding:11px 15px; background:none; font-size:12px; }
+    .flavors button.active { color:var(--cream); background:var(--olive); border-color:var(--olive); }
+    .dialog-actions { display:flex; gap:10px; margin-top:20px; }
+    .dialog-actions button { min-height:43px; flex:1; border:1px solid var(--line); background:transparent; border-radius:3px; font-size:12px; }
+    .dialog-actions .primary { background:var(--red); border-color:var(--red); color:var(--cream); }
+    .note-input { width:100%; height:82px; resize:vertical; padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:3px; font-size:13px; }
+    .toast { position:absolute; z-index:30; left:24px; right:24px; bottom:163px; padding:13px 16px; border-radius:4px; background:var(--ink); color:var(--cream); text-align:center; font-size:12px; box-shadow:0 5px 15px #0002; }
+    [hidden] { display:none!important; }
+    @media (max-width:850px) { .board { grid-template-columns:1fr; gap:26px; padding:24px 12px; justify-items:center; } .direction { width:390px; max-width:100%; padding:0 15px; } .direction h1 { font-size:32px; margin:15px 0; } .direction h1 br { display:none; } .direction p,.swatches { display:none; } .design-switch { padding-top:0; border:0; } .preview-label { margin:12px 0 0; } }
+    @media (max-width:410px) { .board { padding:14px 8px; } .phone { width:100%; max-width:390px; border-width:4px; border-radius:27px; } .categories { gap:18px; } .page,.topbar { padding-left:18px; padding-right:18px; } .direction { padding:0 10px; } .direction h1 { font-size:28px; } .food-hero { height:190px; } .stamp { flex:none; } }
+    @media (prefers-reduced-motion:no-preference) { .page { animation:enter .18s ease-out; } @keyframes enter { from { opacity:.6; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } } }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0"><defs>
+    <symbol id="menu-icon" viewBox="0 0 24 24"><path d="M4 4h6v7H4zm10 0h6v7h-6zM4 15h6v5H4zm10 0h6v5h-6z"/></symbol>
+    <symbol id="heart-icon" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></symbol>
+    <symbol id="book-icon" viewBox="0 0 24 24"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm0 14h16M8 7h8M8 11h5"/></symbol>
+    <symbol id="user-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol>
+    <symbol id="chef-icon" viewBox="0 0 24 24"><path d="M6 14a4 4 0 0 1-1-8 5 5 0 0 1 9-2 4 4 0 0 1 4 10v6H6zm0 3h12M9 10v4m6-4v4"/></symbol>
+    <symbol id="list-icon" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M3 6h1m-1 6h1m-1 6h1"/></symbol>
+  </defs></svg>
+  <main class="board">
+    <aside class="direction">
+      <span class="eyebrow">XCOOK / DESIGN STUDY</span>
+      <h1>好好吃饭，<br>认真生活。</h1>
+      <p>把厨房做成一本有温度的生活手账。食物、大标题、细线和留白，构成每一页的节奏。</p>
+      <div class="swatches" aria-label="设计配色"><span style="background:#fffdf7"></span><span style="background:#b94732"></span><span style="background:#29352d"></span><span style="background:#66744d"></span></div>
+      <div class="design-switch" aria-label="页面预览">
+        <button class="selected" data-screen="menu">菜单</button><button data-screen="wishlist">愿望单</button><button data-screen="kitchen">厨房</button>
+      </div>
+      <div class="preview-label">私人厨房手账 · 交互设计预览 · 示例数据</div>
+    </aside>
+    <section class="phone" aria-label="星厨房交互预览">
+      <div class="status"><span>19:08</span><span class="signals"><span>▮▮▮</span><span>⌁</span><span class="battery"></span></span></div>
+      <header class="topbar"><span class="brand"><em>✳</em>星厨房</span><span class="capsule" aria-hidden="true"><span>•••</span><i></i></span></header>
+      <div class="screen" id="screen"></div>
+      <div class="cart" id="cart" hidden><div><strong id="cart-count"></strong><span id="cart-calories"></span></div><button data-action="checkout">确认愿望 →</button></div>
+      <nav class="nav" aria-label="主导航">
+        <button data-screen="menu" class="active"><svg class="icon"><use href="#menu-icon"/></svg>菜单</button>
+        <button data-screen="wishlist"><svg class="icon"><use href="#heart-icon"/></svg>愿望单</button>
+        <button data-screen="records"><svg class="icon"><use href="#book-icon"/></svg>记录</button>
+        <button data-screen="profile"><svg class="icon"><use href="#user-icon"/></svg>我的</button>
+      </nav>
+      <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+    </section>
+  </main>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+  <script>
+    (() => {
+      const dishes = [
+        { id:'beef', name:'番茄炖牛腩', calories:486, category:'家常菜', description:'小火慢炖的软糯，配一碗米饭刚刚好。', time:45 },
+        { id:'egg', name:'葱香厚蛋烧', calories:210, category:'家常菜', description:'柔软的蛋卷，藏着一口葱香。', time:15 },
+        { id:'soup', name:'玉米排骨汤', calories:325, category:'汤与主食', description:'清甜又暖胃的一碗家常汤。', time:60 },
+        { id:'rice', name:'一碗香米饭', calories:230, category:'汤与主食', description:'陪每一道拿手菜，好好开饭。', time:20 },
+        { id:'tea', name:'桂花乌龙', calories:12, category:'甜点饮品', description:'让晚饭的尾声留一点花香。', time:5 }
+      ];
+      const state = { screen:'menu', category:'全部', cart:[], flavor:'不辣', dailyRecords:[], wish:{ number:'XC-10012', status:'accepted', items:[{ id:'beef', quantity:1, flavor:'微辣' },{ id:'egg', quantity:1, flavor:'原味' }], note:'想配米饭，今晚慢慢吃。' }, nickname:'厨房伙伴' };
+      const labels = { placed:'等待大厨接下', accepted:'大厨已接下', cooking:'正在制作', done:'可以开饭啦' };
+      const screen = document.getElementById('screen'), dialog = document.getElementById('dialog');
+      let toastTimer;
+      const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      const dish = id => dishes.find(item => item.id === id);
+      function qty(id) { return state.cart.filter(item => item.id === id).reduce((total,item)=>total+item.quantity,0); }
+      function add(id, flavor='原味') {
+        const existing = state.cart.find(item=>item.id===id && item.flavor===flavor);
+        if (existing) existing.quantity++; else state.cart.push({id, flavor, quantity:1});
+        render();
+      }
+      function quantityControl(item) {
+        const value = qty(item.id);
+        return `<div class="quantity">${value ? `<button class="minus" data-action="minus" data-id="${item.id}" aria-label="减少${item.name}">−</button><span>${value}</span>` : ''}<button class="add-button" data-action="add" data-id="${item.id}" aria-label="添加${item.name}">+</button></div>`;
+      }
+      function heading(title, kicker, sub) { return `<span class="eyebrow">${kicker}</span><div class="heading-row"><h1 class="page-heading">${title}</h1><span class="stamp">好好<br>吃饭</span></div><p class="sub">${sub}</p>`; }
+      function menu() {
+        const filtered = dishes.filter(item=>state.category==='全部'||item.category===state.category);
+        const beef = filtered.find(item=>item.id==='beef');
+        return `<div class="page">${heading('今晚，<br>想吃点什么？','A TABLE FOR TWO','喜欢的菜，和喜欢的人一起吃。')}<div class="categories" aria-label="菜品分类">${['全部','家常菜','汤与主食','甜点饮品'].map(category=>`<button class="${state.category===category?'active':''}" data-category="${category}" aria-pressed="${state.category===category}">${category}</button>`).join('')}</div>${beef ? `<div class="food-hero"><img src="tomato-beef.png" alt="自然光下的番茄炖牛腩与米饭"><span class="label">大厨的拿手菜</span><span class="serial">01.</span></div><div class="featured-copy"><h2 class="food-title">${beef.name}</h2><p class="sub">${beef.description}</p><div class="food-meta"><span>${beef.calories} kcal</span><span>${beef.time} 分钟</span><span>家常慢炖</span></div><div class="buy-row"><span class="food-note">给今天留一口热乎的</span>${quantityControl(beef)}</div></div>`:''}<div class="section-heading"><h2>${state.category==='全部'?'今天的家常菜单':state.category}</h2><span>MADE WITH LOVE</span></div>${filtered.filter(item=>item.id!=='beef').map((item,index)=>`<div class="recipe-row"><span class="recipe-no">${String(index+2).padStart(2,'0')}.</span><div class="recipe-copy"><h3>${item.name}</h3><p>${item.calories} kcal · ${item.time} 分钟</p></div>${quantityControl(item)}</div>`).join('')}</div>`;
+      }
+      function wishSheet() {
+        const wish=state.wish;
+        return `<div class="sheet"><div class="sheet-heading"><div><strong>今晚的愿望</strong><p>${wish.number} · 19:08</p></div><span class="state">${labels[wish.status]}</span></div>${wish.items.map(item=>`<div class="sheet-item"><div>${dish(item.id).name}<p>${item.flavor}</p></div><span>× ${item.quantity}</span></div>`).join('')}<div class="sheet-total"><span>共 ${wish.items.reduce((sum,item)=>sum+item.quantity,0)} 份菜</span><span>${wish.items.reduce((sum,item)=>sum+dish(item.id).calories*item.quantity,0)} kcal</span></div><div class="note">给大厨的话<br>${escape(wish.note||'今天也要好好吃饭。')}</div></div>`;
+      }
+      function wishlist() {
+        const step=['placed','accepted','cooking','done'].indexOf(state.wish.status);
+        return `<div class="page">${heading('留一点期待，<br>给晚饭。','OUR LITTLE WISHLIST','每一份愿望，都在等一次认真回应。')}${wishSheet()}<div class="timeline" aria-label="愿望制作进度">${['已许愿','已接下','制作中','已完成'].map((text,index)=>`<span class="point ${index<=step?'complete':''}">${text}</span>`).join('')}</div><button class="wide-button" data-screen="kitchen">${state.wish.status==='done'?'看看厨房 →':'去厨房看看进度 →'}</button><button class="text-button" data-screen="menu">再去菜单逛逛</button></div>`;
+      }
+      function kitchen() {
+        const completed=state.wish.status==='done';
+        return `<div class="page">${heading('为喜欢的人，<br>做顿饭。','IN OUR KITCHEN','先看看愿望，再慢慢准备今晚的晚餐。')}<div class="kitchen-banner"><span class="kicker">TONIGHT’S PLAN</span><strong>${completed?'准备开饭吧。':'有一份晚饭，等你回应。'}</strong><p>${completed?'愿望已经完成，记录会留下今天的味道。':'备好食材，剩下的交给你的拿手好菜。'}</p></div><div class="section-heading"><h2>${completed?'今日已完成':'今晚的待办'}</h2><span>01 REQUEST</span></div><div class="task"><div class="task-top"><span>${state.wish.number}</span><span class="state">${labels[state.wish.status]}</span></div><h3>${state.wish.items.map(item=>dish(item.id).name).join(' · ')}</h3><p>${state.wish.items.map(item=>dish(item.id).name+' × '+item.quantity).join(' · ')}</p><button class="task-action" data-action="cook" ${completed?'disabled':''}>${state.wish.status==='placed'?'接下愿望':state.wish.status==='accepted'?'开始制作 →':state.wish.status==='cooking'?'确认菜品已做好 ✓':'晚饭已完成 ✓'}</button></div><div class="section-heading"><h2>打理小厨房</h2></div><div class="quick-grid"><button data-action="manage-dishes"><svg class="icon"><use href="#chef-icon"/></svg><strong>我的拿手菜 →</strong></button><button data-action="manage-categories"><svg class="icon"><use href="#list-icon"/></svg><strong>整理菜单 →</strong></button></div></div>`;
+      }
+      function records() {
+        return `<div class="page">${heading('把好好吃饭，<br>记下来。','A TASTE OF OUR DAYS','记住一道菜，也记住普通日子的温度。')}<div class="record"><div class="record-date"><strong>12</strong><span>OCT / 2026</span></div><div class="record-content"><h3>${state.wish.status==='done'?'愿望完成，一起开饭。':'今天的晚饭，留一点期待。'}</h3><p>${state.wish.items.map(item=>dish(item.id).name).join('、')}<br>${state.wish.status==='done'?'已完成愿望 · '+state.wish.items.length+' 道菜':'等待完成愿望后留下记录'}</p><img src="tomato-beef.png" alt="番茄牛腩与米饭"></div></div><div class="record"><div class="record-date"><strong>11</strong><span>OCT / 2026</span></div><div class="record-content"><h3>简单的早餐，也很满足。</h3><p>日常记录 · 煎蛋吐司和热牛奶</p></div></div>${state.dailyRecords.map(value=>`<div class="record"><div class="record-date"><strong>12</strong><span>OCT / 2026</span></div><div class="record-content"><h3>${escape(value)}</h3><p>日常记录 · 今天</p></div></div>`).join('')}<button class="text-button" data-action="daily-record">＋ 记录今天吃了什么</button></div>`;
+      }
+      function profile() {
+        return `<div class="page"><span class="eyebrow">WELCOME TO OUR TABLE</span><div class="avatar">厨</div><h1 class="profile-name">${escape(state.nickname)}</h1><p class="sub">今天也为自己，留一顿认真吃的饭。</p><button class="text-button" data-action="nickname">修改昵称 →</button><div class="kitchen-banner"><span class="kicker">OUR SHARED KITCHEN</span><strong>一间厨房，很多好日子。</strong><p>这里有愿望，有拿手菜，也有日常的烟火气。</p></div><button class="profile-row" data-screen="kitchen"><span>进入厨房</span><span>→</span></button><button class="profile-row" data-action="manage-dishes"><span>拿手菜管理</span><span>→</span></button><button class="profile-row" data-screen="records"><span>我的吃饭记录</span><span>→</span></button></div>`;
+      }
+      function render() {
+        screen.innerHTML=({menu,wishlist,kitchen,records,profile})[state.screen]();
+        document.querySelectorAll('[data-screen]').forEach(button=>{
+          const selected=button.dataset.screen===state.screen;
+          if(button.closest('.nav')) {button.classList.toggle('active',selected);button.setAttribute('aria-current',selected?'page':'false');}
+          if(button.closest('.design-switch')) {button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));}
+        });
+        const count=state.cart.reduce((sum,item)=>sum+item.quantity,0);
+        document.getElementById('cart').hidden=state.screen!=='menu'||!count;
+        document.getElementById('cart-count').textContent=`已选 ${count} 份，今晚一起吃`;
+        document.getElementById('cart-calories').textContent=state.cart.reduce((sum,item)=>sum+dish(item.id).calories*item.quantity,0)+' kcal · 口味可以慢慢选';
+      }
+      function toast(message) {
+        const node=document.getElementById('toast');node.textContent=message;node.hidden=false;
+        clearTimeout(toastTimer);toastTimer=setTimeout(()=>{node.hidden=true},2300);
+      }
+      function openDialog(html) {
+        const bounds=document.querySelector('.phone').getBoundingClientRect();
+        dialog.style.setProperty('--modal-left',bounds.left+bounds.width/2+'px');
+        dialog.style.setProperty('--modal-top',bounds.top+bounds.height/2+'px');
+        document.getElementById('dialog-content').innerHTML=html;
+        if(!dialog.open) dialog.showModal();
+      }
+      function flavorDialog() {
+        openDialog(`<h2 id="dialog-title">番茄炖牛腩</h2><p>按照今晚的心情，选一点喜欢的口味。</p><div class="flavors">${['不辣','微辣','中辣'].map(flavor=>`<button data-flavor="${flavor}" class="${state.flavor===flavor?'active':''}" aria-pressed="${state.flavor===flavor}">${flavor}</button>`).join('')}</div><div class="dialog-actions"><button data-action="close">再想想</button><button class="primary" data-action="confirm-flavor">加入今晚的愿望</button></div>`);
+      }
+      document.addEventListener('click',event=>{
+        const button=event.target.closest('button');if(!button||button.disabled)return;
+        if(button.dataset.screen) {state.screen=button.dataset.screen;render();screen.scrollTop=0;return;}
+        if(button.dataset.category) {state.category=button.dataset.category;render();return;}
+        if(button.dataset.flavor) {state.flavor=button.dataset.flavor;flavorDialog();return;}
+        const action=button.dataset.action;
+        if(action==='add') {if(button.dataset.id==='beef')flavorDialog();else add(button.dataset.id);}
+        if(action==='minus') {const item=[...state.cart].reverse().find(item=>item.id===button.dataset.id);if(item){item.quantity--;state.cart=state.cart.filter(item=>item.quantity>0);render();}}
+        if(action==='confirm-flavor') {add('beef',state.flavor);dialog.close();toast('已经加入，今晚好好吃饭。');}
+        if(action==='close')dialog.close();
+        if(action==='checkout') {
+          openDialog(`<h2 id="dialog-title">今晚，就吃这些。</h2><p>${state.cart.map(item=>escape(dish(item.id).name+' · '+item.flavor+' × '+item.quantity)).join('<br>')}</p><label for="wish-note" class="sub">给大厨的话</label><textarea class="note-input" id="wish-note" maxlength="200" placeholder="口味偏好、特别想吃的……"></textarea><div class="dialog-actions"><button data-action="close">继续选菜</button><button class="primary" data-action="submit">送出这份愿望</button></div>`);
+        }
+        if(action==='submit') {if(!state.cart.length)return;state.wish={number:'XC-10013',status:'placed',items:state.cart.map(item=>({...item})),note:document.getElementById('wish-note').value};state.cart=[];state.screen='wishlist';dialog.close();render();screen.scrollTop=0;toast('愿望已送出，留一点期待。');}
+        if(action==='cook') {state.wish.status={placed:'accepted',accepted:'cooking',cooking:'done'}[state.wish.status]||state.wish.status;render();toast(labels[state.wish.status]);}
+        if(action==='manage-dishes'||action==='manage-categories') {openDialog(`<h2 id="dialog-title">${action==='manage-dishes'?'我的拿手菜':'整理菜单'}</h2><p>${(action==='manage-dishes'?dishes.map(item=>item.name):['家常菜','汤与主食','甜点饮品']).join('<br>')}</p><div class="dialog-actions"><button data-action="close">返回厨房</button></div>`);}
+        if(action==='daily-record') {openDialog('<h2 id="dialog-title">记录今天吃了什么</h2><label for="daily-note" class="sub">给这顿饭留一句话</label><textarea class="note-input" id="daily-note" maxlength="200" placeholder="今天吃了什么，有什么小小的满足？"></textarea><div class="dialog-actions"><button data-action="close">取消</button><button class="primary" data-action="save-record">记下来</button></div>');}
+        if(action==='save-record') {const value=document.getElementById('daily-note').value.trim();if(!value)return;state.dailyRecords.push(value);dialog.close();render();toast('这段日常已经记下来了。');}
+        if(action==='nickname') {openDialog(`<h2 id="dialog-title">给自己取个昵称</h2><label for="nickname-input" class="sub">厨房昵称</label><input id="nickname-input" class="note-input" style="height:44px" maxlength="32" value="${escape(state.nickname)}"><div class="dialog-actions"><button data-action="close">取消</button><button class="primary" data-action="save-nickname">保存</button></div>`);}
+        if(action==='save-nickname') {const value=document.getElementById('nickname-input').value.trim();if(!value)return;state.nickname=value;dialog.close();render();toast('昵称已经更新。');}
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

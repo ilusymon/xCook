@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/rand/v2"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -127,9 +130,116 @@ func (s *FunctionService) GetCategories(ctx context.Context) ([]model.Category, 
 	return categories, nil
 }
 
-func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]any, error) {
-	categories, err := s.GetCategories(ctx)
+func (s *FunctionService) UpdateUserInfo(ctx context.Context, openID, nickName string) (*model.User, error) {
+	nickName = strings.TrimSpace(nickName)
+	if nickName == "" || utf8.RuneCountInString(nickName) > 32 {
+		return nil, badRequest("昵称须为1至32字")
+	}
+	user, err := s.mustGetUserByOpenID(ctx, openID)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.db.WithContext(ctx).Model(user).Updates(map[string]any{"nick_name": nickName}).Error; err != nil {
+		return nil, err
+	}
+	user.NickName = nickName
+	return user, nil
+}
+
+func (s *FunctionService) validateDishCategory(ctx context.Context, dish *model.Dish) error {
+	if err := validateDish(dish); err != nil {
+		return err
+	}
+	var count int64
+	if err := s.db.WithContext(ctx).Model(&model.Category{}).Where("id = ?", dish.CategoryID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count == 0 {
+		return badRequest("分类不存在，请重新选择")
+	}
+	return nil
+}
+
+func validateDish(dish *model.Dish) error {
+	if strings.TrimSpace(dish.Name) == "" || utf8.RuneCountInString(dish.Name) > 128 || dish.CategoryID == 0 {
+		return badRequest("请填写菜品名称并选择分类")
+	}
+	if dish.Calories < 0 || dish.Calories > 100000 || dish.PreparationTime < 0 || dish.PreparationTime > 10080 || dish.Difficulty < 1 || dish.Difficulty > 3 {
+		return badRequest("热量、制作时间或难度超出范围")
+	}
+	groupNames := make(map[string]bool)
+	for _, group := range dish.OptionGroups {
+		if strings.TrimSpace(group.GroupName) == "" || groupNames[group.GroupName] || !contains([]string{"single", "multi"}, group.Type) || len(group.Options) == 0 {
+			return badRequest("口味组须有唯一名称、有效类型和至少一个选项")
+		}
+		groupNames[group.GroupName] = true
+		values := make(map[string]bool)
+		for _, option := range group.Options {
+			if strings.TrimSpace(option.Label) == "" || strings.TrimSpace(option.Value) == "" || values[option.Value] {
+				return badRequest("口味选项不能为空或重复")
+			}
+			values[option.Value] = true
+		}
+	}
+	for _, material := range dish.Materials {
+		if strings.TrimSpace(material.Name) == "" {
+			return badRequest("请填写食材名称")
+		}
+	}
+	for _, step := range dish.Steps {
+		if strings.TrimSpace(step.Description) == "" || step.Duration < 0 {
+			return badRequest("请填写步骤说明和有效时长")
+		}
+	}
+	return nil
+}
+
+func validateSelectedOptions(groups []model.OptionGroup, selections map[string][]string) error {
+	for name := range selections {
+		found := false
+		for _, group := range groups {
+			if group.GroupName == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return badRequest("口味选项已变更，请重新选菜")
+		}
+	}
+	for _, group := range groups {
+		values := selections[group.GroupName]
+		if group.Required && len(values) == 0 {
+			return badRequest(fmt.Sprintf("请选择%s", group.GroupName))
+		}
+		if group.Type == "single" && len(values) > 1 {
+			return badRequest(fmt.Sprintf("%s只能单选", group.GroupName))
+		}
+		seen := make(map[string]bool)
+		for _, value := range values {
+			valid := false
+			for _, option := range group.Options {
+				if option.Value == value {
+					valid = true
+					break
+				}
+			}
+			if !valid || seen[value] {
+				return badRequest("口味选项无效，请重新选择")
+			}
+			seen[value] = true
+		}
+	}
+	return nil
+}
+
+func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]any, error) {
+	var categories []model.Category
+	categoryQuery := s.db.WithContext(ctx).Order("sort_order asc, id asc")
+	if role != "chef" {
+		categoryQuery = categoryQuery.Where("is_active = ?", true)
+	}
+	if err := categoryQuery.Find(&categories).Error; err != nil {
 		return nil, err
 	}
 
@@ -139,7 +249,7 @@ func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]
 	}
 
 	var dishes []model.Dish
-	if err := query.Order("created_at desc").Limit(100).Find(&dishes).Error; err != nil {
+	if err := query.Order("created_at desc").Find(&dishes).Error; err != nil {
 		return nil, err
 	}
 
@@ -163,13 +273,13 @@ func (s *FunctionService) GetMenu(ctx context.Context, role string) (map[string]
 func (s *FunctionService) GetDishDetail(ctx context.Context, dishID string) (*model.Dish, error) {
 	id := uintValue(dishID)
 	if id == 0 {
-		return nil, nil
+		return nil, badRequest("菜品ID无效")
 	}
 
 	var dish model.Dish
 	if err := s.db.WithContext(ctx).First(&dish, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return nil, notFound("菜品不存在")
 		}
 		return nil, err
 	}
@@ -180,6 +290,9 @@ func (s *FunctionService) GetDishDetail(ctx context.Context, dishID string) (*mo
 func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map[string]any) (map[string]any, error) {
 	now := time.Now()
 	dishID := uintValue(input["_id"])
+	if _, updating := input["_id"]; updating && dishID == 0 {
+		return nil, badRequest("菜品ID无效")
+	}
 	if dishID > 0 {
 		var dish model.Dish
 		if err := s.db.WithContext(ctx).First(&dish, "id = ?", dishID).Error; err != nil {
@@ -192,11 +305,8 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 		if err := applyDishPatch(&dish, input); err != nil {
 			return nil, badRequest("菜品参数错误")
 		}
-		if strings.TrimSpace(dish.Name) == "" {
-			return nil, badRequest("缺少菜品名称")
-		}
-		if dish.CategoryID == 0 {
-			return nil, badRequest("缺少分类")
+		if err := s.validateDishCategory(ctx, &dish); err != nil {
+			return nil, err
 		}
 		dish.UpdatedAt = now
 		if err := s.db.WithContext(ctx).Save(&dish).Error; err != nil {
@@ -221,17 +331,14 @@ func (s *FunctionService) SaveDish(ctx context.Context, openID string, input map
 	if err := applyDishPatch(&dish, input); err != nil {
 		return nil, badRequest("菜品参数错误")
 	}
-	if strings.TrimSpace(dish.Name) == "" {
-		return nil, badRequest("缺少菜品名称")
-	}
-	if dish.CategoryID == 0 {
-		return nil, badRequest("缺少分类")
-	}
 	if dish.Difficulty == 0 {
 		dish.Difficulty = 1
 	}
 	if _, ok := input["isAvailable"]; !ok {
 		dish.IsAvailable = true
+	}
+	if err := s.validateDishCategory(ctx, &dish); err != nil {
+		return nil, err
 	}
 
 	if err := s.db.WithContext(ctx).Create(&dish).Error; err != nil {
@@ -263,6 +370,14 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 	if len(items) == 0 {
 		return nil, badRequest("购物车为空")
 	}
+	if len(items) > 100 || utf8.RuneCountInString(note) > 200 {
+		return nil, badRequest("菜品最多100项，备注最多200字")
+	}
+	for _, item := range items {
+		if item.DishID == 0 || item.Quantity < 1 || item.Quantity > 99 {
+			return nil, badRequest("每项菜品数量须为1至99份")
+		}
+	}
 
 	var response map[string]any
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -290,7 +405,17 @@ func (s *FunctionService) PlaceOrder(ctx context.Context, openID string, items [
 			}
 
 			if dish.IsDeleted || !dish.IsAvailable {
-				return badRequest(fmt.Sprintf("菜品「%s」已下架", item.DishName))
+				return badRequest(fmt.Sprintf("菜品「%s」已下架", dish.Name))
+			}
+			var category model.Category
+			if err := tx.First(&category, "id = ? AND is_active = ?", dish.CategoryID, true).Error; err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return badRequest(fmt.Sprintf("菜品「%s」所在分类已停用", dish.Name))
+				}
+				return err
+			}
+			if err := validateSelectedOptions(dish.OptionGroups, item.SelectedOptions); err != nil {
+				return err
 			}
 
 			totalCalories += dish.Calories * int64(item.Quantity)
@@ -490,8 +615,7 @@ func (s *FunctionService) ListWishlists(ctx context.Context, openID string, inpu
 }
 
 func (s *FunctionService) GetWishlist(ctx context.Context, openID, wishlistID, role string) (map[string]any, error) {
-	id := uintValue(wishlistID)
-	if id == 0 {
+	if strings.TrimSpace(wishlistID) == "" {
 		return nil, badRequest("缺少愿望单ID")
 	}
 
@@ -503,7 +627,7 @@ func (s *FunctionService) GetWishlist(ctx context.Context, openID, wishlistID, r
 		return nil, unauthorized("无厨师权限")
 	}
 
-	query := s.db.WithContext(ctx).Where("id = ?", id)
+	query := orderQueryByIdentifier(s.db.WithContext(ctx), wishlistID)
 	if role != "chef" {
 		query = query.Where("user_id = ?", user.ID)
 	}
@@ -539,8 +663,7 @@ func normalizeWishlistOrder(wishlist *model.Order) {
 }
 
 func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID, newStatus string) (map[string]any, error) {
-	id := uintValue(orderID)
-	if id == 0 || newStatus == "" {
+	if strings.TrimSpace(orderID) == "" || newStatus == "" {
 		return nil, badRequest("参数不完整")
 	}
 
@@ -551,8 +674,10 @@ func (s *FunctionService) UpdateOrderStatus(ctx context.Context, openID, orderID
 
 	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var order model.Order
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			First(&order, "id = ?", id).Error; err != nil {
+		if err := orderQueryByIdentifier(
+			tx.Clauses(clause.Locking{Strength: "UPDATE"}),
+			orderID,
+		).First(&order).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return badRequest("愿望单不存在")
 			}
@@ -616,15 +741,17 @@ func (s *FunctionService) UpdateWishlistDishProgress(ctx context.Context, openID
 		return nil, unauthorized("无厨师权限")
 	}
 
-	id := uintValue(wishlistID)
-	if id == 0 || itemIndex < 0 {
+	if strings.TrimSpace(wishlistID) == "" || itemIndex < 0 {
 		return nil, badRequest("愿望单菜品参数错误")
 	}
 
 	var updated model.Order
 	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var wishlist model.Order
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&wishlist, "id = ?", id).Error; err != nil {
+		if err := orderQueryByIdentifier(
+			tx.Clauses(clause.Locking{Strength: "UPDATE"}),
+			wishlistID,
+		).First(&wishlist).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return notFound("愿望单不存在")
 			}
@@ -832,6 +959,35 @@ func (s *FunctionService) SaveCategory(ctx context.Context, action string, categ
 
 	now := time.Now()
 	inputID := uintValue(category["_id"])
+	if _, updating := category["_id"]; updating && inputID == 0 {
+		return nil, badRequest("分类ID无效")
+	}
+	if value, swapping := category["swapWith"]; swapping {
+		otherID := uintValue(value)
+		if inputID == 0 || otherID == 0 || inputID == otherID {
+			return nil, badRequest("排序分类无效")
+		}
+		err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+			var categories []model.Category
+			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("id IN ?", []uint64{inputID, otherID}).Order("id asc").Find(&categories).Error; err != nil {
+				return err
+			}
+			if len(categories) != 2 {
+				return notFound("分类不存在，请刷新后重试")
+			}
+			categories[0].SortOrder, categories[1].SortOrder = categories[1].SortOrder, categories[0].SortOrder
+			for index := range categories {
+				if err := tx.Save(&categories[index]).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"success": true}, nil
+	}
 	if inputID > 0 {
 		var existing model.Category
 		if err := s.db.WithContext(ctx).First(&existing, "id = ?", inputID).Error; err != nil {
@@ -885,7 +1041,13 @@ func decodePayload(payload map[string]any, target any) error {
 	if len(payload) == 0 {
 		return nil
 	}
-	body, err := json.Marshal(payload)
+	fields := make(map[string]any, len(payload))
+	for key, value := range payload {
+		if key != "_id" {
+			fields[key] = value
+		}
+	}
+	body, err := json.Marshal(fields)
 	if err != nil {
 		return err
 	}
@@ -894,11 +1056,7 @@ func decodePayload(payload map[string]any, target any) error {
 
 func applyDishPatch(dst *model.Dish, input map[string]any) error {
 	var partial model.Dish
-	body, err := json.Marshal(input)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(body, &partial); err != nil {
+	if err := decodePayload(input, &partial); err != nil {
 		return err
 	}
 
@@ -947,16 +1105,16 @@ func applyDishPatch(dst *model.Dish, input map[string]any) error {
 
 func applyCategoryPatch(dst *model.Category, input map[string]any) error {
 	var partial model.Category
-	body, err := json.Marshal(input)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(body, &partial); err != nil {
+	if err := decodePayload(input, &partial); err != nil {
 		return err
 	}
 
 	if _, ok := input["name"]; ok {
-		dst.Name = defaultString(partial.Name, dst.Name)
+		name := strings.TrimSpace(partial.Name)
+		if name == "" || utf8.RuneCountInString(name) > 64 {
+			return fmt.Errorf("分类名称须为1至64字")
+		}
+		dst.Name = name
 	}
 	if _, ok := input["icon"]; ok {
 		dst.Icon = defaultString(partial.Icon, dst.Icon)
@@ -1007,15 +1165,30 @@ func uintValue(value any) uint64 {
 			return uint64(v)
 		}
 	case float64:
-		if v > 0 {
+		if v > 0 && v == math.Trunc(v) && v < math.Exp2(64) {
 			return uint64(v)
 		}
 	case string:
-		var parsed uint64
-		_, _ = fmt.Sscanf(strings.TrimSpace(v), "%d", &parsed)
+		parsed, err := strconv.ParseUint(strings.TrimSpace(v), 10, 64)
+		if err != nil {
+			return 0
+		}
 		return parsed
 	}
 	return 0
+}
+
+func orderQueryByIdentifier(query *gorm.DB, identifier string) *gorm.DB {
+	column, value := orderIdentifierCondition(identifier)
+	return query.Where(column+" = ?", value)
+}
+
+func orderIdentifierCondition(identifier string) (string, any) {
+	identifier = strings.TrimSpace(identifier)
+	if id := uintValue(identifier); id > 0 {
+		return "id", id
+	}
+	return "order_number", identifier
 }
 
 func (s *FunctionService) mustGetUserByOpenID(ctx context.Context, openID string) (*model.User, error) {

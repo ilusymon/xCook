@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   height: 110rpx;
-  background: #FFFFFF;
+  background: var(--color-bg-card, #FFFCF3);
   border-radius: 32rpx 32rpx 0 0;
   box-shadow: 0 -4rpx 20rpx rgba(255, 107, 129, 0.12);
   display: flex;
@@ -46,7 +46,7 @@
   height: 32rpx;
   line-height: 32rpx;
   text-align: center;
-  background: #FF6B81;
+  background: var(--color-primary, #FF9278);
   color: #FFFFFF;
   font-size: 20rpx;
   border-radius: 16rpx;
@@ -60,12 +60,12 @@
 
 .cart-calories {
   font-size: 22rpx;
-  color: #9B8888;
+  color: var(--color-text-secondary, #8A7466);
   margin-top: 4rpx;
 }
 
 .cart-btn {
-  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  background: linear-gradient(135deg, var(--color-primary, #FF9278), #FFB79C);
   color: #FFFFFF;
   font-size: 28rpx;
   font-weight: 600;

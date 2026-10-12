@@ -38,6 +38,18 @@ func (h *RestHandler) GetCurrentUser(c *gin.Context) {
 	h.respond(c, result, err)
 }
 
+func (h *RestHandler) UpdateCurrentUser(c *gin.Context) {
+	var request struct {
+		NickName string `json:"nickName"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "请求体格式错误"})
+		return
+	}
+	result, err := h.functionService.UpdateUserInfo(c.Request.Context(), middleware.OpenIDFromContext(c), request.NickName)
+	h.respond(c, result, err)
+}
+
 func (h *RestHandler) GetMenu(c *gin.Context) {
 	result, err := h.functionService.GetMenu(c.Request.Context(), c.Query("role"))
 	h.respond(c, result, err)

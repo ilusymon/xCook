@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  background: #FFFFFF;
+  background: var(--color-bg-card, #FFFCF3);
   border-radius: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.08);
   margin-bottom: 20rpx;
@@ -17,10 +17,11 @@
   border-radius: 20rpx;
   flex-shrink: 0;
   overflow: hidden;
-  background: #FFF5F5;
+  background: var(--color-bg, #FFF9EA);
 }
 
 .dish-cover-loading {
+  display: flex; align-items: center; justify-content: center; color: #8A7466; font-size: 24rpx;
   position: absolute;
   top: 0;
   left: 0;
@@ -51,9 +52,10 @@
 }
 
 .dish-name {
+  font-family: 'XCookHand', 'YouYuan', sans-serif;
   font-size: 30rpx;
   font-weight: 600;
-  color: #4A3333;
+  color: var(--color-text, #593B30);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -63,7 +65,7 @@
 
 .calorie-tag {
   background: #FFF0E6;
-  color: #FF9F43;
+  color: var(--color-secondary, #916A34);
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 12rpx;
@@ -72,7 +74,7 @@
 
 .dish-desc {
   font-size: 24rpx;
-  color: #9B8888;
+  color: var(--color-text-secondary, #8A7466);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -92,14 +94,14 @@
 
 .time-text {
   font-size: 22rpx;
-  color: #9B8888;
+  color: var(--color-text-secondary, #8A7466);
 }
 
 .add-btn {
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
+  background: linear-gradient(135deg, var(--color-primary, #FF9278), #FFB79C);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,185 +1,53 @@
-/* 星厨房 全局样式 — 温馨情侣主题 */
-
+@import './styles/button-reset.wxss';
+@import './styles/cartoon-font.wxss';
+@import './styles/cartoon-controls.wxss';
 page {
-  --color-primary: #EF8297;
-  --color-primary-light: #F6AEBB;
-  --color-primary-dark: #D96D82;
-  --color-secondary: #E8B453;
-  --color-bg: #FFF5D9;
-  --color-bg-card: #FFFDF7;
-  --color-text: #493B37;
-  --color-text-secondary: #816F69;
-  --color-success: #5FD068;
-  --color-warning: #FF9F43;
-  --color-border: #F1DDD2;
-
-  /* iView Weapp 主题覆盖 */
-  --button-primary-bg-color: #EF8297;
-  --button-primary-active-color: #D96D82;
-  --tab-bar-active-color: #EF8297;
-  --tag-primary-color: #EF8297;
-  --switch-checked-color: #EF8297;
-
-  background-color: #FFF5D9;
-  color: #493B37;
+  --color-primary: #FF9278;
+  --color-primary-light: #FFE4D8;
+  --color-primary-dark: #9F4F38;
+  --color-secondary: #916A34;
+  --color-bg: #FFF9EA;
+  --color-bg-card: #FFFCF3;
+  --color-text: #593B30;
+  --color-text-secondary: #8A7466;
+  --color-success: #63854C;
+  --color-warning: #916A34;
+  --color-border: #B89A80;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   font-size: 28rpx;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
-
-/* 通用卡片 */
-.card {
-  background: #FFFDF7;
-  border-radius: 24rpx;
-  border: 2rpx solid rgba(73, 59, 55, 0.05);
-  box-shadow: 0 6rpx 18rpx rgba(111, 82, 55, 0.09);
-  padding: 24rpx;
-  margin: 16rpx 24rpx;
-}
-
-/* 主按钮 */
-.btn-primary {
-  background: #EF8297;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 40rpx;
-  padding: 20rpx 48rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  text-align: center;
-  box-shadow: 0 6rpx 20rpx rgba(239, 130, 151, 0.28);
-}
-
-.btn-primary:active {
-  background: #D96D82;
-  transform: scale(0.98);
-}
-
-/* 次要按钮 */
-.btn-secondary {
-  background: #FFFDF7;
-  color: #EF8297;
-  border: 2rpx solid #EF8297;
-  border-radius: 40rpx;
-  padding: 18rpx 48rpx;
-  font-size: 28rpx;
-  text-align: center;
-}
-
-/* 标签 */
-.tag {
-  display: inline-block;
-  border-radius: 16rpx;
-  padding: 4rpx 16rpx;
-  font-size: 22rpx;
-  line-height: 1.6;
-}
-
-.tag-calorie {
-  background: #FFF0E6;
-  color: #FF9F43;
-}
-
-.tag-difficulty {
-  background: #FCE6EA;
-  color: #D96D82;
-}
-
-/* 区域标题 */
-.section-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #493B37;
-  margin: 24rpx 0 16rpx 0;
-}
-
-/* 辅助文字 */
-.text-secondary {
-  font-size: 24rpx;
-  color: #816F69;
-}
-
-/* 分割线 */
-.divider {
-  height: 1rpx;
-  background: #F1DDD2;
-  margin: 16rpx 0;
-}
-
-/* 空状态 */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 120rpx 48rpx;
-}
-
-.empty-state-image {
-  width: 240rpx;
-  height: 240rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.6;
-}
-
-.empty-state-text {
-  font-size: 28rpx;
-  color: #816F69;
-}
-
-/* 页面容器 */
-.page-container {
-  min-height: 100vh;
-  background: #FFF5D9;
-  padding-bottom: 120rpx;
-}
-
-/* 输入框 */
-.input-box {
-  border: 2rpx solid #F1DDD2;
-  border-radius: 16rpx;
-  padding: 16rpx 20rpx;
-  font-size: 28rpx;
-  background: #FFFDF7;
-}
-
-.input-box:focus {
-  border-color: #EF8297;
-}
-
-/* 浮动操作按钮 */
-.fab {
-  position: fixed;
-  right: 40rpx;
-  bottom: 160rpx;
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  background: #EF8297;
-  box-shadow: 0 8rpx 24rpx rgba(239, 130, 151, 0.34);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #FFFFFF;
-  font-size: 48rpx;
-  z-index: 100;
-}
-
-/* 弹跳动画 */
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-.bounce {
-  animation: bounce 0.3s ease;
-}
-
-/* 淡入动画 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20rpx); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
+button[disabled] { opacity: .55; }
+.card { margin: 16rpx 24rpx; padding: 24rpx; background: var(--color-bg-card); border: 2rpx solid var(--color-border); border-radius: 28rpx; box-shadow: 4rpx 6rpx 0 #EEDBC0; }
+.btn-primary, .btn-secondary { min-height: 88rpx; margin: 0; padding: 0 32rpx; border: 2rpx solid; border-radius: 44rpx; font-size: 28rpx; font-weight: 600; line-height: 86rpx; text-align: center; }
+.btn-primary { color: var(--color-text); background: var(--color-primary); border-color: #593B30; }
+.btn-secondary { color: var(--color-text-secondary); background: var(--color-bg-card); border-color: var(--color-border); }
+.btn-primary:active, .btn-secondary:active { opacity: .8; }
+.text-button { margin: 0; padding: 12rpx; color: var(--color-primary-dark); background: transparent; font-size: 24rpx; }
+.tag { display: inline-block; padding: 4rpx 16rpx; border-radius: 16rpx; font-size: 22rpx; }
+.tag-calorie { color: var(--color-secondary); background: #FFF4D8; }
+.tag-difficulty { color: var(--color-primary-dark); background: var(--color-primary-light); }
+.section-title { margin: 0 0 20rpx; font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 38rpx; font-weight: normal; color: var(--color-text); }
+.section-header { display: flex; align-items: center; justify-content: space-between; }
+.text-secondary { color: var(--color-text-secondary); font-size: 24rpx; }
+.divider { height: 1rpx; margin: 20rpx 0; background: var(--color-border); }
+.empty-state, .state-panel { position: relative; z-index: 1; padding: 48rpx 28rpx; display: flex; flex-direction: column; align-items: center; gap: 24rpx; color: var(--color-text-secondary); text-align: center; line-height: 1.7; }
+.empty-state-text { color: var(--color-text-secondary); font-size: 28rpx; }
+.empty-state-image { width: 200rpx; height: 200rpx; }
+.page-container { min-height: 100vh; padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
+.input-box { min-height: 88rpx; padding: 16rpx 20rpx; box-sizing: border-box; color: var(--color-text); background: var(--color-bg-card); border: 2rpx solid var(--color-border); border-radius: 18rpx; font-size: 28rpx; }
+.fab { position: fixed; z-index: 10; right: 32rpx; bottom: calc(32rpx + env(safe-area-inset-bottom)); width: 100rpx; height: 100rpx; display: flex; align-items: center; justify-content: center; color: var(--color-text); background: var(--color-primary); border: 2rpx solid #593B30; border-radius: 50%; box-shadow: 0 6rpx 18rpx rgba(65,83,91,.14); font-size: 48rpx; }
+.status-filters { position: relative; z-index: 1; margin: 20rpx 28rpx; display: flex; gap: 12rpx; }
+.status-filter { flex: 1; min-width: 0; min-height: 72rpx; margin: 0; padding: 0 8rpx; color: var(--color-text); background: #FFFCF3; border: 2rpx solid var(--color-text); border-radius: 22rpx; font-size: 24rpx; line-height: 68rpx; }
+.status-filter { border-radius: 20rpx 22rpx 18rpx 24rpx; border-color: #654131; background: linear-gradient(180deg, #FFFEF6, #FFF8E8); box-shadow: inset 0 2rpx 0 #FFFDF6; }
+.status-filter.active { color: #FFFDF5; font-weight: 600; background: linear-gradient(180deg, #FF9D85, #FF8269 42%, #F77C62); box-shadow: inset 0 3rpx 0 #FFD0BA; }
+.load-more { position: relative; z-index: 1; min-height: 88rpx; margin: 24rpx 36rpx; color: var(--color-primary-dark); background: var(--color-bg-card); border: 2rpx solid var(--color-border); border-radius: 44rpx; font-size: 26rpx; }
+.form-mask { position: fixed; z-index: 100; inset: 0; padding: 28rpx; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background: rgba(36,23,19,.35); }
+.form-actions { margin-top: 24rpx; display: flex; gap: 18rpx; }
+.form-actions button { flex: 1; }
+.flow-hint { position: relative; z-index: 1; display: block; margin: 28rpx; color: var(--color-text-secondary); font-size: 24rpx; line-height: 1.7; text-align: center; }
+@keyframes bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.bounce { animation: bounce .3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fadeIn .2s ease; }

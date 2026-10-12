@@ -1,5 +1,5 @@
 <view class="option-picker">
-  <view class="option-group" wx:for="{{optionGroups}}" wx:key="groupName" wx:for-item="group">
+  <view class="option-group" wx:for="{{groups}}" wx:key="groupName" wx:for-item="group">
     <view class="group-header">
       <text class="group-name">{{group.groupName}}</text>
       <text class="group-type" wx:if="{{group.required}}">必选</text>
@@ -9,8 +9,8 @@
 
     <!-- 单选 -->
     <view class="option-list" wx:if="{{group.type === 'single'}}">
-      <view
-        class="option-item {{selections[group.groupName] && selections[group.groupName][0] === option.value ? 'selected' : ''}}"
+      <button
+        class="option-item {{option.selected ? 'selected' : ''}}"
         wx:for="{{group.options}}"
         wx:key="value"
         wx:for-item="option"
@@ -19,13 +19,13 @@
         data-value="{{option.value}}"
       >
         <text class="option-label">{{option.label}}</text>
-      </view>
+      </button>
     </view>
 
     <!-- 多选 -->
     <view class="option-list" wx:if="{{group.type === 'multi'}}">
-      <view
-        class="option-item {{selections[group.groupName] && selections[group.groupName].indexOf(option.value) > -1 ? 'selected' : ''}}"
+      <button
+        class="option-item {{option.selected ? 'selected' : ''}}"
         wx:for="{{group.options}}"
         wx:key="value"
         wx:for-item="option"
@@ -34,7 +34,7 @@
         data-value="{{option.value}}"
       >
         <text class="option-label">{{option.label}}</text>
-      </view>
+      </button>
     </view>
   </view>
 </view>

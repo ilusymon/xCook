@@ -1,4 +1,3 @@
-const app = getApp()
 const cloud = require('../../../utils/cloud')
 const upload = require('../../../utils/upload')
 
@@ -21,42 +20,72 @@ Page({
     },
     categories: [],
     categoryNames: [],
-    categoryIndex: 0
+    categoryIndex: 0,
+    loading: true,
+    error: '',
+    saving: false
   },
 
   onLoad(options) {
-    this.loadCategories()
+    this._dishId = options.id
     if (options.id) {
       this.setData({ isEdit: true })
-      this.loadDish(options.id)
-    }
+      wx.setNavigationBarTitle({ title: '编辑菜品' })
+    } else wx.setNavigationBarTitle({ title: '新增菜品' })
+    this.loadCategories().then(() => {
+      if (options.id && !this.data.error) return this.loadDish(options.id)
+    })
+  },
+
+  onShow() {
+    if (this._loaded) this.loadCategories()
   },
 
   loadCategories() {
-    cloud.getMenu('chef').then(res => {
+    this.setData({ loading: true, error: '' })
+    return cloud.getMenu('chef').then(res => {
       if (res && res.categories) {
         const categoryNames = res.categories.map(c => c.name)
+        const index = res.categories.findIndex(c => String(c._id) === String(this.data.dish.categoryId))
         this.setData({
           categories: res.categories,
-          categoryNames
+          categoryNames,
+          categoryIndex: index >= 0 ? index : 0,
+          loading: false
         })
+        this._loaded = true
       }
-    })
+    }).catch(err => this.setData({ loading: false, error: err.message || '分类加载失败' }))
   },
 
   loadDish(dishId) {
+    this.setData({ loading: true, error: '' })
     wx.showLoading({ title: '加载中...' })
-    cloud.getDishDetail(dishId).then(res => {
+    return cloud.getDishDetail(dishId).then(res => {
       wx.hideLoading()
       if (res) {
         // 找到分类索引
-        const catIdx = this.data.categories.findIndex(c => c._id === res.categoryId)
+        const catIdx = this.data.categories.findIndex(c => String(c._id) === String(res.categoryId))
         this.setData({
           dish: res,
+          loading: false,
           categoryIndex: catIdx > -1 ? catIdx : 0
         })
       }
+    }).catch(err => {
+      wx.hideLoading()
+      this.setData({ loading: false, error: err.message || '菜品加载失败' })
     })
+  },
+
+  retryLoad() {
+    this.loadCategories().then(() => {
+      if (this._dishId && !this.data.error) return this.loadDish(this._dishId)
+    })
+  },
+
+  goCategories() {
+    wx.navigateTo({ url: '/package-chef/pages/category-manage/index' })
   },
 
   // 基本输入
@@ -231,7 +260,9 @@ Page({
 
   // === 保存 ===
   async saveDish() {
-    const dish = { ...this.data.dish }
+    if (this.data.saving || this.data.loading || this.data.error) return
+    const dish = JSON.parse(JSON.stringify(this.data.dish))
+    dish.name = dish.name.trim()
 
     // 清理选项组中的 UI 临时字段
     if (dish.optionGroups) {
@@ -249,11 +280,27 @@ Page({
     if (!dish.name) {
       wx.showToast({ title: '请输入菜品名称', icon: 'none' }); return
     }
-    if (!dish.categoryId && this.data.categories.length > 0) {
+    if (!this.data.categories.length) {
+      wx.showToast({ title: '请先添加菜品分类', icon: 'none' }); return
+    }
+    if (!this.data.categories.some(category => String(category._id) === String(dish.categoryId))) {
       dish.categoryId = this.data.categories[this.data.categoryIndex]._id
     }
 
-    wx.showLoading({ title: '保存中...' })
+    for (const group of dish.optionGroups) {
+      if (!group.groupName.trim() || !group.options.length || group.options.some(option => !option.label.trim())) {
+        wx.showToast({ title: '请补全口味组和选项', icon: 'none' }); return
+      }
+    }
+    if (dish.materials.some(material => !material.name.trim()) || dish.steps.some(step => !step.description.trim())) {
+      wx.showToast({ title: '请补全食材和制作步骤', icon: 'none' }); return
+    }
+    dish.calories = Number(dish.calories || 0)
+    dish.preparationTime = Number(dish.preparationTime || 0)
+    dish.steps = dish.steps.map((step, index) => ({ ...step, stepNumber: index + 1, duration: Number(step.duration || 0) }))
+
+    this.setData({ saving: true })
+    wx.showLoading({ title: '保存中...', mask: true })
 
     try {
       // 收集需要上传的本地图片
@@ -293,6 +340,7 @@ Page({
       wx.hideLoading()
 
       if (res && res.success) {
+        this._saved = true
         wx.showToast({ title: '保存成功', icon: 'success' })
         setTimeout(() => wx.navigateBack(), 800)
       } else {
@@ -307,6 +355,8 @@ Page({
         content: errMsg,
         showCancel: false
       })
+    } finally {
+      if (!this._saved) this.setData({ saving: false })
     }
   }
 })

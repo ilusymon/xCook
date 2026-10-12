@@ -1,9 +1,9 @@
 <view class="detail-page">
+  <view class="state-panel" wx:if="{{loading}}">菜品加载中...</view>
+  <view class="state-panel" wx:elif="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadDish">重新加载</button></view>
+  <block wx:else>
   <!-- 封面图 -->
-  <view class="dish-hero-wrap">
-    <image class="dish-hero-loading" src="/images/loading.gif" wx:if="{{!heroLoaded}}" mode="aspectFill" />
-    <image class="dish-hero" src="{{dish.coverImage}}" mode="aspectFill" bindload="onHeroLoad" binderror="onHeroLoad" style="opacity:{{heroLoaded ? 1 : 0}}" />
-  </view>
+  <view class="dish-hero-wrap"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.name}}" mode="aspectFit" /></view>
 
   <!-- 基本信息 -->
   <view class="info-card">
@@ -31,9 +31,9 @@
   <view class="section-card">
     <text class="section-title">数量</text>
     <view class="quantity-row">
-      <view class="qty-btn" bindtap="decreaseQty">-</view>
+      <button class="qty-btn" bindtap="decreaseQty" disabled="{{quantity <= 1}}" aria-label="减少数量">−</button>
       <text class="qty-value">{{quantity}}</text>
-      <view class="qty-btn" bindtap="increaseQty">+</view>
+      <button class="qty-btn" bindtap="increaseQty" disabled="{{quantity >= 99}}" aria-label="增加数量">＋</button>
     </view>
   </view>
 
@@ -43,6 +43,7 @@
       <text class="total-label">营养参考</text>
       <text class="total-cal">{{totalCalories}}kcal</text>
     </view>
-    <view class="add-cart-btn" bindtap="addToCart">加入购物车</view>
+    <button class="add-cart-btn cartoon-button cartoon-button--compact" bindtap="addToCart" disabled="{{adding || dish.isDeleted || !dish.isAvailable}}" hover-class="cartoon-button--pressed">{{dish.isDeleted || !dish.isAvailable ? '暂未上架' : '放进小餐单'}}</button>
   </view>
+  </block>
 </view>

@@ -4,6 +4,8 @@
     <home-btn />
     <text class="page-title">分类管理</text>
   </view>
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadCategories">重新加载</button></view>
+  <view class="state-panel" wx:elif="{{loading}}">分类加载中...</view>
 
   <!-- 分类列表 -->
   <view class="category-list">
@@ -24,7 +26,8 @@
           <switch
             class="active-switch"
             checked="{{item.isActive}}"
-            color="#FF6B81"
+            disabled="{{saving}}"
+            color="#FF9278"
             bindchange="toggleActive"
             data-id="{{item._id}}"
             data-active="{{item.isActive}}"
@@ -40,7 +43,7 @@
           <block wx:for="{{iconList}}" wx:for-item="ic" wx:key="key">
             <text class="edit-emoji-display" wx:if="{{ic.key === editIcon}}" bindtap="toggleIconPicker">{{ic.emoji}}</text>
           </block>
-          <input class="edit-input" value="{{editName}}" bindinput="onNameInput" placeholder="分类名称" focus="{{true}}" />
+          <input class="edit-input" value="{{editName}}" bindinput="onNameInput" placeholder="分类名称" focus="{{true}}" maxlength="64" />
         </view>
 
         <!-- 图标选择器 -->
@@ -73,8 +76,8 @@
   </view>
 
   <!-- 添加按钮 -->
-  <view class="add-btn" bindtap="addCategory">
+  <button class="add-btn cartoon-button cartoon-button--compact" bindtap="addCategory" disabled="{{saving}}" loading="{{saving}}" hover-class="cartoon-button--pressed">
     <text class="add-icon">+</text>
     <text class="add-text">添加分类</text>
-  </view>
+  </button>
 </view>

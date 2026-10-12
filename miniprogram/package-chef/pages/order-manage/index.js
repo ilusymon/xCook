@@ -1,101 +1,84 @@
 const cloud = require('../../../utils/cloud')
-const { formatDate } = require('../../../utils/format')
+const { formatDate, formatCartItem } = require('../../../utils/format')
 
 Page({
   data: {
     tabs: [
-      { label: '新订单', value: 'placed', count: 0 },
-      { label: '制作中', value: 'cooking', count: 0 },
-      { label: '已完成', value: 'done', count: 0 }
+      { label: '新愿望', value: 'placed' },
+      { label: '待制作', value: 'accepted' },
+      { label: '制作中', value: 'cooking' },
+      { label: '已完成', value: 'done' },
+      { label: '已取消', value: 'cancelled' }
     ],
     currentTab: 0,
-    orders: []
+    orders: [],
+    loading: true,
+    error: '',
+    pageSize: 20,
+    hasMore: false,
+    total: 0,
+    busy: false
   },
 
-  _watcher: null,
-
-  onShow() {
-    this.loadOrders()
-    this.startWatch()
+  onLoad(options) {
+    const index = this.data.tabs.findIndex(tab => tab.value === options.tab)
+    if (index >= 0) this.setData({ currentTab: index })
   },
 
-  onHide() {
-    this.stopWatch()
-  },
-
-  onUnload() {
-    this.stopWatch()
-  },
-
-  startWatch() {
-    this._watcher = cloud.watchNewOrders((orders) => {
-      // 更新新订单数量
-      this.setData({ 'tabs[0].count': orders.length })
-      // 如果当前在新订单标签，刷新列表
-      if (this.data.currentTab === 0) {
-        this.loadOrders()
-      }
-    })
-  },
+  onShow() { this._visible = true; this.loadOrders() },
+  onHide() { this._visible = false; this.stopWatch() },
+  onUnload() { this._visible = false; this.stopWatch() },
 
   stopWatch() {
-    if (this._watcher) {
-      this._watcher.close()
-      this._watcher = null
-    }
+    if (this._watcher) this._watcher.close()
+    this._watcher = null
   },
 
   onTabChange(e) {
-    this.setData({
-      currentTab: e.currentTarget.dataset.index,
-      orders: []
-    })
+    this.setData({ currentTab: Number(e.currentTarget.dataset.index), orders: [], pageSize: 20 })
     this.loadOrders()
   },
 
   loadOrders() {
-    const status = this.data.tabs[this.data.currentTab].value
-    // 对于 "制作中" tab，需要包含 accepted 和 cooking
-    const queryStatus = status === 'cooking' ? 'active' : status
-    cloud.getOrders('chef', queryStatus).then(res => {
-      if (res && res.orders) {
-        const orders = res.orders.map(order => ({
-          ...order,
-          createdAtText: formatDate(order.createdAt)
-        }))
-        this.setData({ orders })
-      }
-    })
+    this.stopWatch()
+    if (this._visible === false) return
+    this.setData({ loading: true, error: '' })
+    this._watcher = cloud.watchWishlist('chef', (orders, res) => {
+      this.setData({
+        orders: orders.map(order => ({ ...order, createdAtText: formatDate(order.createdAt), items: order.items.map((item, itemIndex) => ({ ...formatCartItem(item), itemIndex })) })),
+        loading: false,
+        error: '',
+        total: res.total || 0,
+        hasMore: !!res.hasMore
+      })
+    }, err => this.setData({ loading: false, error: err.message || '愿望单加载失败' }),
+    this.data.tabs[this.data.currentTab].value, this.data.pageSize)
+  },
+
+  loadMore() {
+    if (this.data.loading || !this.data.hasMore) return
+    this.setData({ pageSize: this.data.pageSize + 20 })
+    this.loadOrders()
+  },
+
+  openOrder(e) {
+    const order = this.data.orders[Number(e.currentTarget.dataset.index)]
+    if (!order) return
+    wx.navigateTo({ url: '/package-order/pages/wishlist-detail/index?id=' + order._id + '&role=chef' })
   },
 
   acceptOrder(e) {
-    const id = e.currentTarget.dataset.id
-    this.updateStatus(id, 'accepted', '已接单')
-  },
-
-  startCooking(e) {
-    const id = e.currentTarget.dataset.id
-    this.updateStatus(id, 'cooking', '开始制作')
-  },
-
-  markDone(e) {
-    const id = e.currentTarget.dataset.id
-    this.updateStatus(id, 'done', '已完成')
-  },
-
-  updateStatus(orderId, newStatus, message) {
-    wx.showLoading({ title: '更新中...' })
-    cloud.updateOrderStatus(orderId, newStatus).then(res => {
+    const order = this.data.orders[Number(e.currentTarget.dataset.index)]
+    if (!order || !order._id || this.data.busy) return
+    this.setData({ busy: true })
+    wx.showLoading({ title: '接下愿望中...', mask: true })
+    cloud.updateWishlistStatus(order._id, 'accepted').then(() => {
       wx.hideLoading()
-      if (res && res.success) {
-        wx.showToast({ title: message, icon: 'success' })
-        this.loadOrders()
-      } else {
-        wx.showToast({ title: '更新失败', icon: 'none' })
-      }
-    }).catch(() => {
+      this.loadOrders()
+      this.openOrder(e)
+    }).catch(err => {
       wx.hideLoading()
-      wx.showToast({ title: '更新失败', icon: 'none' })
-    })
+      wx.showToast({ title: err.message || '接单失败', icon: 'none' })
+    }).finally(() => this.setData({ busy: false }))
   }
 })

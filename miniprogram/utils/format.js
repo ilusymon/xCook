@@ -6,10 +6,19 @@
  * 格式化卡路里
  */
 function formatCalories(cal) {
-  if (cal >= 1000) {
-    return (cal / 1000).toFixed(1) + 'kcal'
+  return Number(cal || 0) + ' kcal'
+}
+
+function formatCartItem(item) {
+  const optionBadges = Object.keys(item.selectedOptions || {}).reduce((tags, group) =>
+    tags.concat((item.selectedOptions[group] || []).map(value => ({
+      label: value, tag: `${group}：${value}`
+    }))), [])
+  return {
+    ...item,
+    optionBadges,
+    optionTags: optionBadges.map(badge => badge.tag)
   }
-  return cal + 'kcal'
 }
 
 /**
@@ -80,6 +89,7 @@ function formatRelativeTime(date) {
 
 module.exports = {
   formatCalories,
+  formatCartItem,
   formatDate,
   formatFullDate,
   formatDuration,

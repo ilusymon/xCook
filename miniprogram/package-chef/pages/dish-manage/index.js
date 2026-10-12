@@ -1,10 +1,12 @@
-const app = getApp()
 const cloud = require('../../../utils/cloud')
 
 Page({
   data: {
     categories: [],
-    dishMap: {}
+    dishMap: {},
+    loading: false,
+    error: '',
+    busy: false
   },
 
   onShow() {
@@ -12,17 +14,20 @@ Page({
   },
 
   loadMenu() {
+    this.setData({ loading: true, error: '' })
     wx.showLoading({ title: '加载中...' })
-    cloud.getMenu('chef').then(res => {
+    return cloud.getMenu('chef').then(res => {
       wx.hideLoading()
       if (res) {
         this.setData({
           categories: res.categories || [],
-          dishMap: res.dishes || {}
+          dishMap: res.dishes || {},
+          loading: false
         })
       }
-    }).catch(() => {
+    }).catch(err => {
       wx.hideLoading()
+      this.setData({ loading: false, error: err.message || '菜品加载失败' })
     })
   },
 
@@ -41,11 +46,17 @@ Page({
   },
 
   toggleAvailable(e) {
+    if (this.data.busy) return
     const id = e.currentTarget.dataset.id
-    const available = !e.currentTarget.dataset.available
+    const available = e.detail.value
+    this.setData({ busy: true })
     cloud.saveDish({ _id: id, isAvailable: available }).then(() => {
       wx.showToast({ title: available ? '已上架' : '已下架', icon: 'success' })
-    })
+      return this.loadMenu()
+    }).catch(err => {
+      wx.showToast({ title: err.message || '更新失败', icon: 'none' })
+      this.loadMenu()
+    }).finally(() => this.setData({ busy: false }))
   },
 
   deleteDish(e) {
@@ -59,7 +70,7 @@ Page({
           cloud.deleteDish(id).then(() => {
             wx.showToast({ title: '已删除', icon: 'success' })
             this.loadMenu()
-          })
+          }).catch(err => wx.showToast({ title: err.message || '删除失败', icon: 'none' }))
         }
       }
     })

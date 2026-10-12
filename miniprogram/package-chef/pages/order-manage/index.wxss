@@ -1,183 +1,25 @@
-.order-manage-page {
-  min-height: 100vh;
-  background: #FFF5F5;
-}
-
-/* 筛选标签 */
-.filter-tabs {
-  display: flex;
-  background: #FFFFFF;
-  padding: 16rpx 24rpx;
-  gap: 16rpx;
-}
-
-.filter-tab {
-  flex: 1;
-  text-align: center;
-  padding: 16rpx 0;
-  font-size: 26rpx;
-  color: #9B8888;
-  border-radius: 28rpx;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.filter-tab.active {
-  color: #FFFFFF;
-  background: linear-gradient(135deg, #FF6B81, #FF8E9E);
-  font-weight: 600;
-}
-
-.tab-badge {
-  position: absolute;
-  top: -6rpx;
-  right: 20rpx;
-  min-width: 28rpx;
-  height: 28rpx;
-  line-height: 28rpx;
-  text-align: center;
-  background: #FF6B81;
-  color: #FFFFFF;
-  font-size: 18rpx;
-  border-radius: 14rpx;
-  padding: 0 6rpx;
-}
-
-.filter-tab.active .tab-badge {
-  background: #FFFFFF;
-  color: #FF6B81;
-}
-
-/* 订单卡片 */
-.orders {
-  padding: 16rpx 24rpx;
-}
-
-.order-card {
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  padding: 24rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16rpx;
-}
-
-.order-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.order-number {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #4A3333;
-}
-
-.order-time {
-  font-size: 22rpx;
-  color: #B0B0B0;
-  margin-top: 4rpx;
-}
-
-.order-dishes {
-  background: #FFF9F9;
-  border-radius: 16rpx;
-  padding: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-.dish-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6rpx 0;
-}
-
-.dish-name {
-  font-size: 26rpx;
-  color: #4A3333;
-}
-
-.dish-qty {
-  font-size: 26rpx;
-  color: #9B8888;
-}
-
-.order-note {
-  font-size: 24rpx;
-  color: #9B8888;
-  padding: 8rpx 16rpx;
-  background: #FFF8E6;
-  border-radius: 12rpx;
-  margin-bottom: 12rpx;
-}
-
-.note-label {
-  color: #C89030;
-  font-weight: 500;
-}
-
-/* 操作区 */
-.order-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.total-info {
-  color: #FF9F43;
-  font-size: 23rpx;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 12rpx;
-}
-
-.action-btn {
-  padding: 14rpx 28rpx;
-  border-radius: 28rpx;
-  font-size: 26rpx;
-  font-weight: 600;
-}
-
-.action-btn.accept {
-  background: #FF6B81;
-  color: #FFFFFF;
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 129, 0.3);
-}
-
-.action-btn.cooking {
-  background: #54A0FF;
-  color: #FFFFFF;
-  box-shadow: 0 4rpx 12rpx rgba(84, 160, 255, 0.3);
-}
-
-.action-btn.done {
-  background: #5FD068;
-  color: #FFFFFF;
-  box-shadow: 0 4rpx 12rpx rgba(95, 208, 104, 0.3);
-}
-
-/* 空状态 */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 200rpx 48rpx;
-}
-
-.empty-emoji {
-  font-size: 100rpx;
-  margin-bottom: 20rpx;
-}
-
-.empty-text {
-  font-size: 28rpx;
-  color: #9B8888;
-}
+.order-manage-page { min-height: 100vh; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); background: var(--color-bg); }
+.filter-tabs { display: flex; flex-wrap: wrap; gap: 12rpx; padding: 24rpx 28rpx; }
+.filter-tab { position: relative; flex: 1 1 100rpx; display: flex; align-items: center; justify-content: center; min-height: 76rpx; padding: 0 12rpx; border: 2rpx solid var(--color-text); border-radius: 20rpx; background: var(--color-bg-card); font-size: 24rpx; text-align: center; }
+.filter-tab.active { background: var(--color-primary); }
+.tab-badge { position: absolute; right: 4rpx; top: -12rpx; padding: 2rpx 8rpx; border: 1rpx solid var(--color-text); border-radius: 20rpx; background: #FFE293; font-size: 20rpx; }
+.orders { padding: 0 28rpx; }
+.order-card { padding: 26rpx; margin-bottom: 24rpx; border: 2rpx solid var(--color-text); border-radius: 26rpx; background: var(--color-bg-card); box-shadow: 4rpx 6rpx 0 #EEDBC0; }
+.order-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18rpx; margin-bottom: 18rpx; }
+.order-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8rpx; }
+.order-number { font-size: 26rpx; }
+.order-time { font-size: 22rpx; color: var(--color-text-secondary); }
+.order-dishes { padding: 16rpx; border: 1rpx dashed var(--color-border); border-radius: 20rpx; background: var(--color-bg); }
+.dish-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8rpx; padding: 10rpx 0; }
+.dish-name { font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 30rpx; }
+.dish-qty { font-size: 26rpx; }
+.dish-options { flex: 0 0 100%; font-size: 22rpx; color: var(--color-text-secondary); }
+.order-note { padding: 18rpx; margin-top: 18rpx; border-radius: 20rpx; background: #FFE0D1; font-size: 24rpx; line-height: 1.6; word-break: break-all; }
+.note-label { font-weight: 600; }
+.order-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16rpx; margin-top: 22rpx; }
+.total-info { font-size: 24rpx; color: var(--color-secondary); }
+.action-buttons { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.action-btn { min-height: 88rpx; margin: 0; padding: 0 22rpx; border: 2rpx solid var(--color-text); border-radius: 44rpx; background: var(--color-primary); font-size: 26rpx; line-height: 84rpx; box-shadow: 0 4rpx 0 #E4C5A8; }
+.action-btn.cooking { background: #BDDCED; }
+.empty-emoji { font-size: 72rpx; }
+.empty-text { font-size: 28rpx; }

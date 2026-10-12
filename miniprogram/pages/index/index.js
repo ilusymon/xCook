@@ -1,27 +1,9 @@
-// 首页主题可配置为 blue 或 yellow，默认 blue。
-const HOME_THEME = 'blue'
-
 Page({
-  data: {
-    homeTheme: HOME_THEME
-  },
-
-  goOrder() {
-    wx.switchTab({ url: '/pages/order/menu/index' })
-  },
-
-  goChef() {
-    wx.navigateTo({ url: '/pages/chef/dashboard/index' })
-  },
-
-  goOrders() {
-    wx.switchTab({ url: '/pages/order/records/index' })
-  },
-
-  showPending() {
-    wx.showToast({
-      title: '待开发',
-      icon: 'none'
-    })
+  goOrder() { wx.switchTab({ url: '/pages/order/menu/index' }) },
+  goChef() { wx.navigateTo({ url: '/pages/chef/dashboard/index' }) },
+  goOrders() { wx.switchTab({ url: '/pages/order/records/index' }) },
+  goWishlist() {
+    getApp().globalData.wishlistRole = 'orderer'
+    wx.switchTab({ url: '/pages/order/wishlist/index' })
   }
 })

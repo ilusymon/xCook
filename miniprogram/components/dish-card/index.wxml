@@ -1,6 +1,6 @@
 <view class="dish-card" bindtap="onTap">
   <view class="dish-cover-wrap">
-    <image class="dish-cover-loading" src="/images/loading.gif" wx:if="{{!coverLoaded}}" mode="aspectFill" />
+    <view class="dish-cover-loading" wx:if="{{!coverLoaded}}" aria-hidden="true">图片加载中…</view>
     <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" lazy-load bindload="onCoverLoad" binderror="onCoverLoad" style="opacity:{{coverLoaded ? 1 : 0}}" />
   </view>
   <view class="dish-info">

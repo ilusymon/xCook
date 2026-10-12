@@ -1,10 +1,13 @@
 <view class="manage-page">
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadMenu">重新加载</button></view>
+  <view class="state-panel" wx:elif="{{loading}}">菜单加载中...</view>
+  <view class="state-panel" wx:elif="{{!categories.length}}">先添加分类，再把拿手菜放进菜单吧。<button class="btn-primary cartoon-button cartoon-button--compact" bindtap="addDish" hover-class="cartoon-button--pressed">新增菜品</button></view>
   <!-- 菜品列表按分类分组 -->
   <view class="category-group" wx:for="{{categories}}" wx:key="_id">
-    <text class="category-name">{{item.name}}</text>
+    <text class="category-name">{{item.name}}{{item.isActive ? '' : ' · 已停用'}}</text>
     <view class="dish-list">
       <view class="dish-item" wx:for="{{dishMap[item._id]}}" wx:for-item="dish" wx:key="_id">
-        <image class="dish-cover" src="{{dish.coverImage}}" mode="aspectFill" />
+        <view class="dish-cover"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.name}}" /></view>
         <view class="dish-info">
           <text class="dish-name">{{dish.name}}</text>
           <view class="dish-meta">
@@ -15,10 +18,11 @@
           <switch
             class="avail-switch"
             checked="{{dish.isAvailable}}"
+            disabled="{{busy}}"
             bindchange="toggleAvailable"
             data-id="{{dish._id}}"
             data-available="{{dish.isAvailable}}"
-            color="#FF6B81"
+            color="#FF9278"
           />
           <view class="action-btns">
             <view class="action-btn edit" bindtap="editDish" data-id="{{dish._id}}">编辑</view>

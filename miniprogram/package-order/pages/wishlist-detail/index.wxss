@@ -1,45 +1,26 @@
-page { min-height: 100%; background: #EAF8FF; }
-.detail-page { position: relative; min-height: 100vh; padding: 28rpx 34rpx 60rpx; box-sizing: border-box; color: #241713; }
-.gingham-grid { position: absolute; z-index: 0; top: 0; left: 0; width: 848rpx; display: flex; flex-wrap: wrap; pointer-events: none; }
-.gingham-grid image { flex: 0 0 212rpx; width: 212rpx; height: 212rpx; }
-.top-bar, .dish-card, .progress-card, .chef-card, .items-card, .tip-card, .cheer { position: relative; z-index: 1; }
-.top-bar { height: 72rpx; display: flex; align-items: center; justify-content: center; font: 700 34rpx Georgia, serif; }
-.back { position: absolute; left: 24rpx; width: 88rpx; min-height: 88rpx; padding: 0; background: rgba(255,255,255,.9); border: 0; border-radius: 50%; font-size: 44rpx; line-height: 82rpx; }
-.back::after { display: none; }
-.dish-card, .progress-card, .chef-card { margin-top: 18rpx; padding: 24rpx; display: flex; align-items: center; box-sizing: border-box; background: rgba(255,253,249,.98); border-radius: 30rpx; box-shadow: 0 4rpx 14rpx rgba(76,112,128,.08); }
-.cover-wrap { width: 142rpx; height: 122rpx; display: flex; align-items: center; justify-content: center; background: #FFF4D8; border-radius: 22rpx; }
-.cover-wrap image { width: 126rpx; height: 106rpx; }
-.dish-copy { flex: 1; min-width: 0; margin-left: 24rpx; }
-.dish-name { display: block; font-size: 29rpx; font-weight: 700; }
-.dish-state { display: block; margin-top: 10rpx; color: #EF667E; font-size: 22rpx; font-weight: 600; }
-.dish-state.done { color: #51BF62; }
-.remaining, .updated { display: block; margin-top: 7rpx; color: #99908B; font-size: 20rpx; }
-.status-pill { align-self: flex-start; padding: 10rpx 18rpx; color: #EF667E; background: #FFF0F3; border-radius: 24rpx; font-size: 20rpx; }
-.progress-card { display: block; padding: 30rpx 28rpx; }
-.section-title { display: block; font-size: 29rpx; font-weight: 700; }
-.progress-row { margin-top: 30rpx; display: flex; align-items: flex-start; }
-.progress-node { width: 76rpx; display: flex; flex-direction: column; align-items: center; color: #ACA4A0; font-size: 18rpx; white-space: nowrap; }
-.progress-node view { width: 28rpx; height: 28rpx; margin-bottom: 12rpx; background: #F6DDE1; border-radius: 50%; }
-.progress-node.active { color: #EF667E; }
-.progress-node.active view { background: #FF7180; }
-.line { flex: 1; height: 4rpx; margin-top: 12rpx; background: #F6DDE1; }
-.line.active { background: #FF7180; }
-.chef-card { min-height: 190rpx; }
-.chef-copy { flex: 1; }
-.current-step { display: block; margin-top: 22rpx; font-size: 30rpx; font-weight: 700; }
-.chef-card image { width: 130rpx; height: 130rpx; }
-.wishlist-summary { justify-content: space-between; }
-.items-card { margin-top: 18rpx; padding: 30rpx 28rpx; box-sizing: border-box; background: rgba(255,253,249,.98); border-radius: 30rpx; box-shadow: 0 4rpx 14rpx rgba(76,112,128,.08); }
-.wishlist-item { min-height: 138rpx; padding: 20rpx 0; display: flex; align-items: center; border-bottom: 1rpx solid #F0E5DF; }
-.wishlist-item:last-child { border-bottom: 0; }
-.wishlist-item .cover-wrap { flex: none; width: 112rpx; height: 100rpx; }
-.wishlist-item .cover-wrap image { width: 98rpx; height: 88rpx; }
-.option-list { margin-top: 8rpx; display: flex; flex-wrap: wrap; gap: 8rpx; }
-.option-tag { padding: 4rpx 10rpx; color: #8A746C; background: #FFF4F5; border-radius: 12rpx; font-size: 18rpx; }
-.item-action, .item-done { flex: none; margin-left: 12rpx; color: #EF667E; font-size: 22rpx; font-weight: 700; }
-.item-done { color: #51BF62; }
-.tip-card { margin-top: 22rpx; padding: 28rpx; color: #B3873A; background: rgba(255,248,224,.98); border-radius: 26rpx; font-size: 22rpx; }
-.note-text { display: block; margin-top: 14rpx; line-height: 1.7; }
-.cheer { width: 330rpx; min-height: 88rpx; margin: 46rpx auto 0; color: #fff; background: #FF7180; border: 1rpx solid #50302C; border-radius: 44rpx; font-size: 27rpx; line-height: 86rpx; }
-.cheer.secondary { color: #8A746C; background: #FFFDF9; border-color: #D8C6BD; }
-.cheer::after { display: none; }
+page { min-height: 100%; background: var(--color-bg); }
+.detail-page { min-height: 100vh; padding: 24rpx 28rpx calc(60rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
+.dish-card, .progress-card, .items-card { margin-bottom: 22rpx; padding: 28rpx; border: 2rpx solid var(--color-text); border-radius: 22rpx 28rpx 20rpx 26rpx; background: var(--color-bg-card); box-shadow: 4rpx 6rpx 0 #EEDBC0; }
+.wishlist-summary { display: flex; align-items: flex-start; gap: 18rpx; }
+.dish-copy { flex: 1; min-width: 0; }
+.dish-name { display: block; font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 32rpx; line-height: 1.4; }
+.remaining { display: block; margin-top: 10rpx; font-size: 22rpx; color: var(--color-text-secondary); line-height: 1.5; }
+.status-pill { flex-shrink: 0; padding: 8rpx 16rpx; border-radius: 20rpx; background: #FFE293; font-size: 22rpx; }
+.progress-row { display: flex; align-items: flex-start; margin-top: 24rpx; }
+.progress-node { width: 90rpx; display: flex; flex-direction: column; align-items: center; font-size: 22rpx; color: var(--color-text-secondary); white-space: nowrap; }
+.progress-heart { margin-bottom: 8rpx; font-size: 44rpx; line-height: 1.2; color: var(--color-text); }
+.progress-node.active .progress-heart { color: var(--color-primary); text-shadow: 1rpx 1rpx 0 var(--color-text); }
+.progress-node.active { color: var(--color-text); }
+.line { flex: 1; margin-top: 28rpx; border-top: 2rpx dashed var(--color-border); }
+.line.active { border-color: var(--color-primary-dark); }
+.wishlist-item { display: flex; align-items: center; gap: 18rpx; padding: 18rpx 0; border-bottom: 1rpx dashed var(--color-border); }
+.wishlist-item:last-child { border: 0; }
+.cover-wrap { flex-shrink: 0; width: 116rpx; height: 116rpx; border-radius: 18rpx; overflow: hidden; }
+.option-list { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 10rpx; }
+.option-tag { padding: 5rpx 12rpx; border-radius: 12rpx; background: #FFE4D8; font-size: 22rpx; }
+.item-action, .item-done { flex-shrink: 0; font-size: 24rpx; color: var(--color-primary-dark); }
+.item-done { color: var(--color-success); }
+.tip-card { margin: 24rpx 0; padding: 24rpx; border: 2rpx dashed #C99A7D; border-radius: 22rpx; background: #FFE0D1; }
+.note-text { display: block; margin-top: 14rpx; font-size: 26rpx; line-height: 1.7; word-break: break-all; }
+.cheer { min-height: 88rpx; margin: 28rpx 0 0; padding: 0 24rpx; border: 2rpx solid var(--color-text); border-radius: 44rpx; background: var(--color-primary); font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 34rpx; line-height: 84rpx; box-shadow: 0 4rpx 0 #E4C5A8; }
+.cheer.secondary { background: var(--color-bg-card); font-family: sans-serif; font-size: 28rpx; }

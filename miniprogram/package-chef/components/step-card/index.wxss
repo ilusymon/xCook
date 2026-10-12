@@ -16,8 +16,8 @@
   width: 52rpx;
   height: 52rpx;
   border-radius: 50%;
-  background: #FFE4E4;
-  color: #FF6B81;
+  background: #FFE4D8;
+  color: var(--color-primary-dark, #9F4F38);
   font-size: 26rpx;
   font-weight: bold;
   display: flex;
@@ -26,17 +26,17 @@
 }
 
 .step-card.active .step-number {
-  background: #FF6B81;
-  color: #FFFFFF;
-  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.4);
+  background: var(--color-primary, #FF9278);
+  color: #593B30;
+  box-shadow: 0 4rpx 14rpx rgba(255, 105, 119, 0.24);
 }
 
 .step-check {
   width: 52rpx;
   height: 52rpx;
   border-radius: 50%;
-  background: #5FD068;
-  color: #FFFFFF;
+  background: #91AB73;
+  color: #593B30;
   font-size: 28rpx;
   display: flex;
   align-items: center;
@@ -47,30 +47,31 @@
   width: 4rpx;
   flex: 1;
   min-height: 40rpx;
-  background: #FFE4E4;
+  background: #F3D9DE;
   margin: 8rpx 0;
 }
 
 .step-card.completed .step-line {
-  background: #5FD068;
+  background: #91AB73;
 }
 
 .step-content {
   flex: 1;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(255, 107, 129, 0.06);
+  padding: 22rpx;
+  background: #FFFCF3;
+  border: 2rpx solid #593B30;
+  border-radius: 26rpx;
+  box-shadow: 3rpx 5rpx 0 #EEDBC0;
 }
 
 .step-card.active .step-content {
-  border: 2rpx solid #FF6B81;
-  box-shadow: 0 4rpx 16rpx rgba(255, 107, 129, 0.12);
+  border: 2rpx solid #B89A80;
+  box-shadow: 0 5rpx 16rpx rgba(239, 102, 126, 0.12);
 }
 
 .step-desc {
   font-size: 28rpx;
-  color: #4A3333;
+  color: var(--color-text, #593B30);
   line-height: 1.6;
 }
 
@@ -81,10 +82,11 @@
   border-radius: 16rpx;
   margin-top: 16rpx;
   overflow: hidden;
-  background: #FFF5F5;
+  background: #FFF4D8;
 }
 
 .step-image-loading {
+  display: flex; align-items: center; justify-content: center; color: #8A7466; font-size: 24rpx;
   position: absolute;
   top: 0;
   left: 0;
@@ -107,5 +109,5 @@
 
 .step-duration {
   font-size: 24rpx;
-  color: #9B8888;
+  color: #8B8581;
 }

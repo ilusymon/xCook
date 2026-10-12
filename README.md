@@ -2,7 +2,7 @@
 
 > 属于我们的小厨房
 
-星厨房是一款面向情侣的私人点餐微信小程序。一方把想吃的完整菜单加入「愿望单」，另一方在「厨师端」接下愿望并逐道制作。愿望单是唯一业务入口，不包含支付。
+星厨房是一款情侣点餐微信小程序。一方把想吃的完整菜单加入「愿望单」，另一方在「厨师端」接下愿望并逐道制作。当前版本采用共享厨房：分类、菜品和厨师端愿望池共享，吃货端愿望与日常记录按登录用户展示。愿望单是唯一业务入口，不包含支付或情侣绑定。
 
 当前版本已将原来的「微信云开发 + 云数据库 + GitCode 图床」方案，替换为：
 
@@ -31,7 +31,7 @@
 | 层级 | 技术 |
 |------|------|
 | 前端 | 微信小程序原生框架 |
-| UI 组件 | iView Weapp |
+| UI 组件 | 原生组件与公共导航、主题样式 |
 | 后端 | Go + Gin |
 | 数据库 | MySQL + GORM |
 | 图片存储 | MinIO |
@@ -133,14 +133,14 @@ cp secret.config.example.js secret.config.js
 
 小程序的 [project.config.json](/D:/projects/laixm/xCook/miniprogram/project.config.json) 已经使用占位 `appid`，不要把真实 `appid` 写回仓库。建议只在微信开发者工具本地维护真实配置，并使用 [project.private.config.json](/D:/projects/laixm/xCook/miniprogram/project.private.config.json) 保存个人配置；该文件已被 [.gitignore](/D:/projects/laixm/xCook/.gitignore) 忽略，不会进入 Git。
 
-### 5. 安装前端依赖
+### 5. 检查小程序
 
 ```bash
 cd miniprogram
-npm install
+npm test
 ```
 
-然后在微信开发者工具中执行“工具 -> 构建 npm”。
+前端没有第三方运行依赖，无需构建 npm。测试使用 Node.js 22 的内置测试工具，覆盖购物车、口味选择、提交、制作、轮询和页面入口检查。
 
 打开项目时，请直接选择 [miniprogram](/D:/projects/laixm/xCook/miniprogram) 目录作为小程序项目根目录。
 
@@ -168,6 +168,7 @@ backend/internal/migrate/sql/
 ### 业务接口
 
 - `GET /api/users/me`
+- `PATCH /api/users/me`：修改昵称，1～32 字
 - `GET /api/menu`
 - `GET /api/dishes/:id`
 - `POST /api/dishes`
@@ -181,6 +182,14 @@ backend/internal/migrate/sql/
 - `POST /api/categories`
 - `PATCH /api/categories/:id`
 - `DELETE /api/categories/:id`
+
+分类排序使用 `PATCH /api/categories/:id`，请求体为 `{ "swapWith": 另一分类ID }`，在同一事务内交换排序。
+
+## 页面与流程验证
+
+全部 15 个注册页面采用暖奶油、巧克力描边和珊瑚橙的卡通绘本风。菜单、愿望单、厨房按选定高保真稿实现，四个主导航页使用公共底部导航。购物车实时保存，确认愿望展示数量、口味和备注；厨师接下后逐道推进制作，全部完成后自动进入饮食记录。加载失败可重试，提交失败保留已选菜品。
+
+验证命令：小程序目录 `npm test`，后端目录 `go test ./...` 和 `go vet ./...`。离线编译与真机验收的边界见 [design-qa.md](design-qa.md)。卡通素材、旧素材归档和字体生成方式见 [卡通设计说明](design-assets/cartoon-kitchen/README.md)，设计源文件不进入小程序主包。
 
 ## 迁移说明
 

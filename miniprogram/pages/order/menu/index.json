@@ -1,14 +1,11 @@
 {
   "usingComponents": {
-    "dish-card": "/components/dish-card/index",
-    "cart-bar": "/components/cart-bar/index",
-    "home-btn": "/components/home-btn/index",
-    "placeholder": "/components/placeholder/index"
-  },
-  "componentPlaceholder": {
-    "dish-card": "placeholder",
-    "cart-bar": "placeholder"
+    "bottom-navigation": "/components/bottom-navigation/index",
+    "storybook-header": "/components/storybook-header/index",
+    "dish-art": "/components/dish-art/index",
+    "kitchen-art": "/components/kitchen-art/index"
   },
   "navigationStyle": "custom",
-  "navigationBarTitleText": "Couple Wishlist"
+  "disableScroll": true,
+  "navigationBarTitleText": "星厨房 · 菜单"
 }

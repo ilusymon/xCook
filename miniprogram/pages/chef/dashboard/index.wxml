@@ -1,74 +1,33 @@
 <view class="dashboard-page">
-  <!-- 顶部返回首页 -->
-  <view class="top-bar">
-    <home-btn />
-    <text class="page-title">星厨房</text>
-  </view>
-
-  <!-- 问候区域 -->
-  <view class="greeting-card">
-    <text class="greeting-emoji">👨‍🍳</text>
-    <view class="greeting-text">
-      <text class="greeting-title">大厨你好！</text>
-      <text class="greeting-sub">今天想做什么好吃的？</text>
+  <storybook-header title="大厨，开工啦！" subtitle="把喜欢，做成热乎的一顿饭。" scene="chef" bind:hometap="goHome" />
+  <view class="dashboard-body">
+    <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadStats">重新加载</button></view>
+    <view class="state-panel" wx:elif="{{loading}}">厨房信息加载中…</view>
+    <view class="stats-row">
+      <button class="stat-card waiting" bindtap="goOrderManage"><image src="/images/cartoon/record.svg" mode="aspectFit" /><view><text>待处理</text><text class="stat-value">{{pendingCount}}</text></view></button>
+      <button class="stat-card cooking" bindtap="goWishlist"><image src="/images/cartoon/menu.svg" mode="aspectFit" /><view><text>制作中</text><text class="stat-value">{{cookingCount}}</text></view></button>
+      <button class="stat-card dishes" bindtap="goDishManage"><image src="/images/cartoon/star.svg" mode="aspectFit" /><view><text>拿手菜</text><text class="stat-value">{{dishCount}}</text></view></button>
     </view>
-  </view>
-
-  <!-- 新愿望提醒 -->
-  <view class="notice-bar" wx:if="{{pendingCount > 0}}" bindtap="goOrderManage">
-    <text class="notice-icon">🔔</text>
-    <text class="notice-text">你有 {{pendingCount}} 份愿望待处理</text>
-    <text class="notice-arrow">›</text>
-  </view>
-
-  <!-- 统计卡片 -->
-  <view class="stats-row">
-    <view class="stat-card">
-      <text class="stat-value">{{pendingCount}}</text>
-      <text class="stat-label">待处理</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-value">{{todayCount}}</text>
-      <text class="stat-label">全部愿望</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-value">{{dishCount}}</text>
-      <text class="stat-label">菜品总数</text>
-    </view>
-  </view>
-
-  <!-- 快捷操作 -->
-  <view class="section-title">快捷操作</view>
-  <view class="action-grid">
-    <view class="action-item" bindtap="goDishManage">
-      <view class="action-icon-wrap">
-        <text class="action-icon">📋</text>
+    <view class="section-heading"><image src="/images/cartoon/menu.svg" mode="aspectFit" /><text>要做的这些小愿望</text><button class="text-button" bindtap="goOrderManage">全部 ›</button></view>
+    <view class="request-card" wx:for="{{requests}}" wx:key="_id">
+      <view class="request-heading"><text>{{item.orderNumber}}</text><text class="request-status">{{item.statusText}}</text></view>
+      <view class="request-body">
+        <view class="request-dishes">
+          <view class="request-dish" wx:for="{{item.previewItems}}" wx:for-item="dish" wx:key="index"><view class="request-art"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.dishName}}" /></view><text>{{dish.dishName}}</text></view>
+          <text class="more-dishes" wx:if="{{item.items.length > 2}}">等 {{item.items.length}} 道</text>
+        </view>
+        <button class="start-button cartoon-button cartoon-button--compact" data-index="{{index}}" bindtap="openRequest" disabled="{{busy}}" loading="{{busy}}" hover-class="cartoon-button--pressed">{{item.status === 'placed' ? '接下愿望' : '开始制作'}}</button>
       </view>
-      <text class="action-text">管理菜品</text>
     </view>
-    <view class="action-item" bindtap="goAddDish">
-      <view class="action-icon-wrap add">
-        <text class="action-icon">➕</text>
-      </view>
-      <text class="action-text">新增菜品</text>
+    <view class="quiet-kitchen" wx:if="{{!loading && !error && !requests.length}}"><text>♡ 今天的小厨房，等一份新愿望。</text><button class="text-button" bindtap="goMenu">去菜单点菜 ›</button></view>
+    <view class="section-heading"><image src="/images/cartoon/star.svg" mode="aspectFit" /><text>打理小厨房</text></view>
+    <view class="action-grid">
+      <button class="action-item" bindtap="goDishManage"><view class="action-art"><kitchen-art kind="dishes" /></view><view class="action-copy"><text>菜品管理</text><text class="action-detail">管理和编辑现有菜品</text></view><text class="arrow">›</text></button>
+      <button class="action-item" bindtap="goAddDish"><view class="action-art"><kitchen-art kind="add" /></view><view class="action-copy"><text>新增菜品</text><text class="action-detail">添加新的美味菜品</text></view><text class="arrow">›</text></button>
+      <button class="action-item" bindtap="goCategoryManage"><view class="action-art"><kitchen-art kind="categories" /></view><view class="action-copy"><text>分类管理</text><text class="action-detail">整理菜品分类标签</text></view><text class="arrow">›</text></button>
+      <button class="action-item" bindtap="goOrderManage"><view class="action-art"><kitchen-art kind="wishes" /></view><view class="action-copy"><text>愿望管理</text><text class="action-detail">查看和处理大家的愿望</text></view><text class="arrow">›</text></button>
     </view>
-    <view class="action-item" bindtap="goOrderManage">
-      <view class="action-icon-wrap order">
-        <text class="action-icon">📦</text>
-      </view>
-      <text class="action-text">愿望单管理</text>
-    </view>
-    <view class="action-item" bindtap="goCategoryManage">
-      <view class="action-icon-wrap category">
-        <text class="action-icon">🏷️</text>
-      </view>
-      <text class="action-text">分类管理</text>
-    </view>
-    <view class="action-item" bindtap="goWishlist">
-      <view class="action-icon-wrap wishlist">
-        <text class="action-icon">♡</text>
-      </view>
-      <text class="action-text">制作进度</text>
-    </view>
+    <button class="text-button progress-link" bindtap="goWishlist">查看所有制作进度 ›</button>
   </view>
+  <bottom-navigation active="profile" />
 </view>

@@ -1,16 +1,11 @@
 <view class="detail-page">
-  <view class="gingham-grid" aria-hidden="true">
-    <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
-  </view>
-  <view class="top-bar">
-    <button class="back" bindtap="goBack" aria-label="返回">‹</button>
-    <text>Couple Wishlist</text>
-  </view>
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="refreshProgress">重新加载</button></view>
+  <view class="state-panel" wx:elif="{{loading}}">愿望进度加载中...</view>
+  <block wx:if="{{wishlist._id}}">
 
   <view class="dish-card wishlist-summary">
     <view class="dish-copy">
-      <text class="dish-name">愿望编号 {{wishlist.orderNumber}}</text>
-      <text class="dish-state {{wishlist.status === 'done' ? 'done' : ''}}">{{statusText}}</text>
+      <text class="dish-name">这份小愿望 ♡</text><text class="remaining">{{wishlist.orderNumber}}</text>
       <text class="remaining">{{wishlist.items.length}} 道菜 · {{wishlist.totalCalories}} kcal · 更新于 {{updatedText}}</text>
     </view>
     <view class="status-pill">{{statusText}}</view>
@@ -19,20 +14,20 @@
   <view class="progress-card" wx:if="{{wishlist.status !== 'cancelled'}}">
     <text class="section-title">愿望进度</text>
     <view class="progress-row">
-      <view class="progress-node {{statusStep >= 0 ? 'active' : ''}}"><view></view><text>已许愿</text></view>
+      <view class="progress-node {{statusStep >= 0 ? 'active' : ''}}"><text class="progress-heart">{{statusStep >= 0 ? '♥' : '♡'}}</text><text>已许愿</text></view>
       <view class="line {{statusStep >= 1 ? 'active' : ''}}"></view>
-      <view class="progress-node {{statusStep >= 1 ? 'active' : ''}}"><view></view><text>已接下</text></view>
+      <view class="progress-node {{statusStep >= 1 ? 'active' : ''}}"><text class="progress-heart">{{statusStep >= 1 ? '♥' : '♡'}}</text><text>已接下</text></view>
       <view class="line {{statusStep >= 2 ? 'active' : ''}}"></view>
-      <view class="progress-node {{statusStep >= 2 ? 'active' : ''}}"><view></view><text>制作中</text></view>
+      <view class="progress-node {{statusStep >= 2 ? 'active' : ''}}"><text class="progress-heart">{{statusStep >= 2 ? '♥' : '♡'}}</text><text>制作中</text></view>
       <view class="line {{statusStep >= 3 ? 'active' : ''}}"></view>
-      <view class="progress-node {{statusStep >= 3 ? 'active' : ''}}"><view></view><text>已完成</text></view>
+      <view class="progress-node {{statusStep >= 3 ? 'active' : ''}}"><text class="progress-heart">{{statusStep >= 3 ? '♥' : '♡'}}</text><text>已完成</text></view>
     </view>
   </view>
 
   <view class="items-card">
     <text class="section-title">愿望菜单</text>
     <view class="wishlist-item" wx:for="{{wishlist.items}}" wx:key="index" bindtap="openDish" data-index="{{index}}">
-      <view class="cover-wrap"><image src="{{item.coverImage || '/images/menu/09_dish_pasta.png'}}" mode="aspectFit" /></view>
+      <view class="cover-wrap"><dish-art cover-image="{{item.coverImage}}" dish-name="{{item.dishName}}" /></view>
       <view class="dish-copy">
         <text class="dish-name">{{item.dishName}} × {{item.quantity}}</text>
         <view class="option-list" wx:if="{{item.optionTags.length}}">
@@ -46,7 +41,9 @@
   </view>
 
   <view class="tip-card" wx:if="{{wishlist.note}}"><text class="section-title">愿望备注</text><text class="note-text">{{wishlist.note}}</text></view>
-  <button class="cheer" wx:if="{{isChef && wishlist.status === 'placed'}}" bindtap="acceptWishlist">接下这份愿望</button>
-  <button class="cheer secondary" wx:elif="{{!isChef && wishlist.status === 'placed'}}" bindtap="cancelWishlist">取消愿望</button>
-  <button class="cheer" wx:elif="{{!isChef && (wishlist.status === 'accepted' || wishlist.status === 'cooking')}}" bindtap="cheer">给大厨加油</button>
+  <button class="cheer cartoon-button" wx:if="{{isChef && wishlist.status === 'placed'}}" bindtap="acceptWishlist" disabled="{{busy}}" hover-class="cartoon-button--pressed">接下这份愿望</button>
+  <button class="cheer secondary" wx:elif="{{!isChef && (wishlist.status === 'placed' || wishlist.status === 'accepted')}}" bindtap="cancelWishlist" disabled="{{busy}}">取消愿望</button>
+  <text class="flow-hint" wx:if="{{isChef && (wishlist.status === 'accepted' || wishlist.status === 'cooking')}}">点击菜品进入制作，全部菜品完成后愿望自动完成。</text>
+  </block>
+  <button class="cheer secondary" bindtap="goBack">返回愿望单</button>
 </view>

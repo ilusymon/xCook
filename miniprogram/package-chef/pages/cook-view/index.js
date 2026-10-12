@@ -14,54 +14,85 @@ Page({
     itemStatus: '',
     wishlistItem: null,
     nextLabel: '下一步 ›',
-    ginghamTiles: Array.from({ length: 48 }, (_, index) => index)
+    loading: true,
+    error: '',
+    progressError: '',
+    busy: false,
   },
 
   onLoad(options) {
+    this._dishId = options.dishId || options.id
     if (options.wishlistId) {
       const itemIndex = Number(options.itemIndex || 0)
       this.setData({ wishlistMode: true, wishlistId: options.wishlistId, itemIndex })
       wx.setNavigationBarTitle({ title: 'Couple Wishlist' })
       if (options.dishId) this.loadDish(options.dishId)
-      this._watcher = cloud.watchWishlistDetail(options.wishlistId, 'chef', wishlist => this.setWishlist(wishlist))
     } else if (options.id) {
       this.loadDish(options.id)
-    }
+    } else this.setData({ loading: false, error: '缺少菜品信息' })
+  },
+
+  onShow() { this._visible = true; this.startWatch() },
+
+  onHide() { this._visible = false; this.stopWatch() },
+
+  startWatch() {
+    this.stopWatch()
+    if (!this.data.wishlistMode || this._visible === false) return
+    this._watcher = cloud.watchWishlistDetail(this.data.wishlistId, 'chef', wishlist => this.setWishlist(wishlist),
+      err => this.setData({ progressError: err.message || '制作进度加载失败' }))
+  },
+
+  stopWatch() {
+    if (this._watcher) this._watcher.close()
+    this._watcher = null
   },
 
   onUnload() {
-    if (this._watcher) this._watcher.close()
+    this._visible = false
+    this.stopWatch()
   },
 
   setWishlist(wishlist) {
     if (!wishlist) return
+    this._wishlist = wishlist
     const item = (wishlist.items || [])[this.data.itemIndex]
-    if (!item) return
+    if (!item) {
+      this.setData({ progressError: '愿望中的菜品不存在' })
+      return
+    }
     const steps = this.data.dish.steps || []
     const currentStep = Math.min(item.currentStep || 0, Math.max(steps.length - 1, 0))
     const nextLabel = item.status === 'accepted'
       ? '开始制作'
-      : item.status === 'done' ? '已完成 ✓' : '完成这一步 ›'
+      : item.status === 'done' ? '已完成 ✓' : steps.length && currentStep < steps.length - 1 ? '完成这一步 ›' : '完成这道菜 ✓'
     this.setData({
       currentStep,
       wishlistStatus: wishlist.status,
       itemStatus: item.status,
       wishlistItem: item,
-      nextLabel
+      nextLabel,
+      progressError: ''
     })
   },
 
   loadDish(dishId) {
+    dishId = typeof dishId === 'string' ? dishId : this._dishId
+    this.setData({ loading: true, error: '' })
     wx.showLoading({ title: '加载中...' })
-    cloud.getDishDetail(dishId).then(res => {
+    return cloud.getDishDetail(dishId).then(res => {
       wx.hideLoading()
       if (res) {
         const item = this.data.wishlistItem
         const currentStep = item
           ? Math.min(item.currentStep || 0, Math.max((res.steps || []).length - 1, 0))
           : this.data.currentStep
-        this.setData({ dish: res, currentStep })
+        this.setData({ dish: res, currentStep, loading: false, error: '' })
+        if (this._wishlist) this.setWishlist(this._wishlist)
       }
+    }).catch(err => {
+      wx.hideLoading()
+      this.setData({ loading: false, error: err.message || '菜品加载失败' })
     })
   },
 
@@ -78,13 +109,15 @@ Page({
   },
 
   nextStep() {
+    if (this.data.busy || this.data.loading || this.data.error || this.data.progressError) return
     const { currentStep, dish } = this.data
     if (this.data.wishlistMode) {
       const action = this.data.itemStatus === 'accepted' ? 'start' : 'next'
-      if (this.data.itemStatus === 'done') return
-      wx.showLoading({ title: '更新中...' })
+      if (!['accepted', 'cooking'].includes(this.data.itemStatus)) return
+      this.setData({ busy: true })
+      this.stopWatch()
+      wx.showLoading({ title: '更新中...', mask: true })
       cloud.updateWishlistDishProgress(this.data.wishlistId, this.data.itemIndex, action)
-        .then(() => cloud.getWishlistDetail(this.data.wishlistId, 'chef'))
         .then(res => {
           wx.hideLoading()
           this.setWishlist(res.wishlist)
@@ -95,10 +128,11 @@ Page({
           })
           if (item.status === 'done') setTimeout(() => wx.navigateBack(), 900)
         })
-        .catch(() => {
+        .catch(err => {
           wx.hideLoading()
-          wx.showToast({ title: '更新失败', icon: 'none' })
+          wx.showToast({ title: err.message || '更新失败', icon: 'none' })
         })
+        .finally(() => { this.setData({ busy: false }); this.startWatch() })
       return
     }
     if (currentStep < dish.steps.length - 1) {
@@ -113,9 +147,9 @@ Page({
   playVideo() {
     const url = this.data.dish.videoUrl
     if (url) {
-      // 如果是网页链接则用 web-view 或视频组件
       wx.previewMedia({
-        sources: [{ url, type: 'video' }]
+        sources: [{ url, type: 'video' }],
+        fail: () => wx.showToast({ title: '视频无法播放，请检查视频链接', icon: 'none' })
       })
     }
   }

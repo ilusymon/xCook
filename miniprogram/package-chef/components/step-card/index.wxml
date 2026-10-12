@@ -7,7 +7,7 @@
   <view class="step-content">
     <text class="step-desc">{{step.description}}</text>
     <view class="step-image-wrap" wx:if="{{step.image}}">
-      <image class="step-image-loading" src="/images/loading.gif" wx:if="{{!imageLoaded}}" mode="aspectFill" />
+      <view class="step-image-loading" wx:if="{{!imageLoaded}}" aria-hidden="true">图片加载中…</view>
       <image class="step-image" src="{{step.image}}" mode="aspectFill" lazy-load bindload="onImageLoad" binderror="onImageLoad" style="opacity:{{imageLoaded ? 1 : 0}}" />
     </view>
     <view class="step-meta" wx:if="{{step.duration}}">

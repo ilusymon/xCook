@@ -22,11 +22,11 @@ const ORDER_STATUS_TEXT = {
 
 // 愿望单状态颜色
 const ORDER_STATUS_COLOR = {
-  placed: '#FF9F43',
-  accepted: '#54A0FF',
-  cooking: '#FF6B6B',
-  done: '#5FD068',
-  cancelled: '#B0B0B0'
+  placed: '#B47725',
+  accepted: '#356D86',
+  cooking: '#D95467',
+  done: '#398F45',
+  cancelled: '#716D6A'
 }
 
 // 愿望单状态步骤序号（用于 steps 组件）
@@ -76,14 +76,14 @@ const DEFAULT_CATEGORIES = [
 
 // 主题色
 const THEME = {
-  primary: '#FF6B81',
-  primaryLight: '#FFB8C6',
-  primaryDark: '#E84660',
-  secondary: '#FFC048',
-  bg: '#FFF5F5',
-  text: '#4A3333',
-  textSecondary: '#9B8888',
-  border: '#FFE4E4'
+  primary: '#FF7180',
+  primaryLight: '#FFF0F3',
+  primaryDark: '#D95467',
+  secondary: '#B47725',
+  bg: '#EAF8FF',
+  text: '#241713',
+  textSecondary: '#716D6A',
+  border: '#EBD9CE'
 }
 
 module.exports = {

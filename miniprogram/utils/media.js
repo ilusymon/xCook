@@ -35,6 +35,10 @@ function normalizeDish(dish) {
   if (!dish) return dish
   const normalized = { ...dish }
   normalized.coverImage = resolveMediaUrl(normalized.coverImage)
+  normalized.materials = Array.isArray(dish.materials) ? dish.materials : []
+  normalized.optionGroups = Array.isArray(dish.optionGroups) ? dish.optionGroups.map(group => ({
+    ...group, options: Array.isArray(group.options) ? group.options : []
+  })) : []
   normalized.steps = Array.isArray(normalized.steps)
     ? normalized.steps.map(step => ({
       ...step,
@@ -47,20 +51,36 @@ function normalizeDish(dish) {
 function denormalizeDish(dish) {
   if (!dish) return dish
   const normalized = { ...dish }
-  normalized.coverImage = toMediaPath(normalized.coverImage)
-  normalized.steps = Array.isArray(normalized.steps)
-    ? normalized.steps.map(step => ({
+  if (Object.prototype.hasOwnProperty.call(dish, 'coverImage')) {
+    normalized.coverImage = toMediaPath(normalized.coverImage)
+  }
+  if (Array.isArray(dish.steps)) {
+    normalized.steps = dish.steps.map(step => ({
       ...step,
       image: toMediaPath(step.image)
     }))
-    : []
+  }
   return normalized
 }
 
 function normalizeOrder(order) {
   if (!order) return order
+  const resourceId = [
+    order._id,
+    order.id,
+    order.ID,
+    order.orderId,
+    order.order_id,
+    order.wishlistId,
+    order.wishlistID,
+    order.wishlist_id,
+    order.orderNumber,
+    order.order_number
+  ]
+    .find(value => value !== undefined && value !== null && String(value) !== '' && String(value) !== '0')
   return {
     ...order,
+    _id: resourceId !== undefined ? String(resourceId) : '',
     items: Array.isArray(order.items)
       ? order.items.map(item => ({
         ...item,

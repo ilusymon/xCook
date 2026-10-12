@@ -1,6 +1,8 @@
 {
   "usingComponents": {
-    "home-btn": "/components/home-btn/index"
+    "home-btn": "/components/home-btn/index",
+    "dish-art": "/components/dish-art/index",
+    "kitchen-art": "/components/kitchen-art/index"
   },
-  "navigationBarTitleText": "购物车"
+  "navigationBarTitleText": "我的小餐单"
 }

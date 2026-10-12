@@ -1,101 +1,27 @@
 <view class="profile-page">
-  <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
-    <view class="navigation-button home-button" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;">
-      <button class="navigation-tap" bindtap="goHome" aria-label="返回首页">
-        <image src="/images/menu/home.png" mode="aspectFit" />
-      </button>
+  <storybook-header title="我的小厨房" subtitle="好好吃饭，也好好收藏生活。" scene="chef" compact show-search bind:hometap="goHome" bind:searchtap="goSearch" />
+  <view class="profile-content">
+    <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadProfile">重新加载</button></view>
+    <view class="state-panel" wx:elif="{{loading}}">厨房信息加载中…</view>
+    <button class="person-card" bindtap="showProfileInfo" aria-label="编辑昵称">
+      <image class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
+      <view class="person-copy"><text class="person-name">{{user.nickName}}</text><text class="role-pill">{{user.roleLabel}} · 厨房伙伴</text></view><text class="edit-copy">编辑 ›</text>
+    </button>
+    <view class="kitchen-card"><view class="kitchen-art"><kitchen-art kind="wishes" /></view><view><text class="kitchen-title">我们的厨房</text><text class="together-copy">共享厨房 · 加入 {{togetherDays}} 天</text></view><text class="kitchen-heart">♥</text></view>
+    <view class="stats-card">
+      <view class="stat-item"><text class="stat-value">{{orderCount}}</text><text class="stat-label">份愿望</text></view>
+      <view class="stat-item"><text class="stat-value">{{dishCount}}</text><text class="stat-label">道菜</text></view>
+      <view class="stat-item"><text class="stat-value">{{recordDays}}</text><text class="stat-label">天记录</text></view>
     </view>
-    <text class="navigation-title" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;">Couple Wishlist</text>
-    <view class="navigation-button search-button" style="top: {{navigationContentTop}}px; right: {{navigationRight}}px; height: {{navigationContentHeight}}px;">
-      <button class="navigation-tap" bindtap="goSearch" aria-label="进入菜单搜索">
-        <image src="/images/menu/search.png" mode="aspectFit" />
-      </button>
+    <view class="settings-card">
+      <button class="setting-row" bindtap="goDishManage"><view class="setting-art"><kitchen-art kind="dishes" /></view><text class="setting-label">菜品管理</text><text class="setting-value">{{dishCount}} 道菜</text><text>›</text></button>
+      <button class="setting-row" bindtap="goCategoryManage"><view class="setting-art"><kitchen-art kind="categories" /></view><text class="setting-label">分类管理</text><text class="setting-value">整理菜单</text><text>›</text></button>
+      <button class="setting-row" bindtap="goChef"><view class="setting-art"><kitchen-art kind="add" /></view><text class="setting-label">进入厨房</text><text class="setting-value">我是大厨</text><text>›</text></button>
+      <button class="setting-row" open-type="feedback"><image class="feedback-icon" src="/images/cartoon/wishlist.svg" mode="aspectFit" /><text class="setting-label">意见反馈</text><text>›</text></button>
     </view>
   </view>
-
-  <scroll-view class="profile-body" scroll-y enhanced show-scrollbar="{{false}}">
-    <view class="gingham-grid" aria-hidden="true">
-      <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
-    </view>
-
-    <view class="profile-content">
-      <view class="person-card">
-        <image class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
-        <view class="person-copy">
-          <text class="person-name">{{user.nickName}}</text>
-          <view class="person-meta">
-            <text class="role-pill">{{user.roleLabel}}</text>
-            <text class="identity-copy">切换身份 ›</text>
-          </view>
-        </view>
-        <text class="edit-copy">编辑资料 ›</text>
-        <button class="person-card-tap" hover-class="person-card-tap-active" bindtap="showProfileInfo" aria-label="{{user.nickName}}，{{user.roleLabel}}，编辑资料"></button>
-      </view>
-
-      <view class="kitchen-card">
-        <view class="card-heading">
-          <text>我们的厨房</text>
-          <text class="relation-status">相伴中</text>
-        </view>
-        <view class="kitchen-body">
-          <image class="partner-avatar" src="/images/menu/01_chef_girl.png" mode="aspectFit" />
-          <view class="heart-badge">♥</view>
-          <image class="partner-avatar" src="/images/menu/02_chef_boy.png" mode="aspectFit" />
-        </view>
-        <text class="together-copy">一起开饭 {{togetherDays}} 天</text>
-      </view>
-
-      <view class="stats-card" aria-label="个人统计">
-        <view class="stat-item">
-          <text class="stat-value">{{orderCount}}</text>
-          <text class="stat-label">份愿望</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-value">{{dishCount}}</text>
-          <text class="stat-label">道菜</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-value">{{recordDays}}</text>
-          <text class="stat-label">天记录</text>
-        </view>
-      </view>
-
-      <view class="settings-card">
-        <view class="setting-row">
-          <text class="setting-icon pink">菜</text>
-          <text class="setting-label">菜品管理</text>
-          <text class="setting-value">{{dishCount}} 道菜</text>
-          <text class="setting-arrow">›</text>
-          <button class="setting-row-tap" hover-class="setting-row-tap-active" bindtap="goDishManage" aria-label="菜品管理，{{dishCount}} 道菜"></button>
-        </view>
-        <view class="setting-row">
-          <text class="setting-icon yellow">铃</text>
-          <text class="setting-label">消息提醒</text>
-          <text class="setting-value">去设置</text>
-          <text class="setting-arrow">›</text>
-          <button class="setting-row-tap" hover-class="setting-row-tap-active" bindtap="openNotifications" aria-label="消息提醒，去设置"></button>
-        </view>
-        <view class="setting-row">
-          <text class="setting-icon green">伴</text>
-          <text class="setting-label">情侣关系</text>
-          <text class="setting-value">相伴中</text>
-          <text class="setting-arrow">›</text>
-          <button class="setting-row-tap" hover-class="setting-row-tap-active" bindtap="showRelationship" aria-label="情侣关系，相伴中"></button>
-        </view>
-        <view class="setting-row">
-          <text class="setting-icon blue">言</text>
-          <text class="setting-label">意见反馈</text>
-          <text class="setting-arrow">›</text>
-          <button class="setting-row-tap" hover-class="setting-row-tap-active" open-type="feedback" aria-label="意见反馈"></button>
-        </view>
-      </view>
-    </view>
-  </scroll-view>
-
-  <view class="bottom-navigation" aria-role="navigation" aria-label="底部导航">
-    <button class="bottom-nav-item {{item.key === 'profile' ? 'active' : ''}}" wx:for="{{bottomNavigation}}" wx:key="key" hover-class="bottom-nav-item--pressed" bindtap="onBottomNavTap" data-key="{{item.key}}" aria-label="{{item.label}}">
-      <image src="{{item.icon}}" mode="aspectFit" style="width: {{item.width}}rpx; height: {{item.height}}rpx;" />
-      <text>{{item.label}}</text>
-    </button>
+  <bottom-navigation active="profile" />
+  <view class="form-mask" wx:if="{{showForm}}" bindtap="closeForm">
+    <view class="profile-form" catchtap="stopPropagation"><text class="section-title">编辑昵称</text><input class="input-box" value="{{nickName}}" bindinput="onNameInput" placeholder="给自己取个昵称" maxlength="32" /><view class="form-actions"><button class="btn-secondary" bindtap="closeForm" disabled="{{saving}}">取消</button><button class="btn-primary cartoon-button cartoon-button--compact" bindtap="saveProfile" loading="{{saving}}" disabled="{{saving}}" hover-class="cartoon-button--pressed">保存</button></view></view>
   </view>
 </view>

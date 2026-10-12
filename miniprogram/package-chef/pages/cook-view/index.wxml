@@ -1,14 +1,14 @@
 <view class="cook-page {{wishlistMode ? 'wishlist-mode' : ''}}">
-  <view class="gingham-grid" wx:if="{{wishlistMode}}" aria-hidden="true">
-    <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
-  </view>
+  <view class="state-panel" wx:if="{{loading}}">菜谱加载中...</view>
+  <view class="state-panel" wx:elif="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadDish">重新加载菜谱</button></view>
+  <view class="state-panel" wx:if="{{progressError}}"><text>{{progressError}}</text><button class="btn-secondary" bindtap="startWatch">重新加载进度</button></view>
   <!-- 菜品头部 -->
   <view class="dish-header">
-    <image class="dish-cover" src="{{dish.coverImage}}" mode="{{wishlistMode ? 'aspectFit' : 'aspectFill'}}" />
+    <view class="dish-cover"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.name}}" /></view>
     <view class="dish-overlay">
       <text class="dish-name">{{dish.name}}</text>
       <view class="dish-tags">
-        <text class="dish-tag" wx:if="{{wishlistMode}}">{{itemStatus === 'accepted' ? '等待制作' : itemStatus === 'done' ? '已完成' : '制作中'}} · 步骤 {{currentStep + 1}} / {{dish.steps.length}}</text>
+        <text class="dish-tag" wx:if="{{wishlistMode}}">{{itemStatus === 'accepted' ? '等待制作' : itemStatus === 'done' ? '已完成' : wishlistStatus === 'cancelled' ? '已取消' : '制作中'}} · {{wishlistItem.quantity}} 份</text>
         <text class="dish-tag" wx:if="{{!wishlistMode}}">{{dish.calories}}kcal</text>
         <text class="dish-tag" wx:if="{{!wishlistMode && dish.preparationTime}}">{{dish.preparationTime}}分钟</text>
       </view>
@@ -16,7 +16,7 @@
   </view>
 
   <!-- 食材清单 -->
-  <view class="section" wx:if="{{!wishlistMode}}">
+  <view class="section" wx:if="{{dish.materials.length}}">
     <material-list
       id="materialList"
       materials="{{dish.materials}}"
@@ -28,10 +28,11 @@
   <view class="section">
     <view class="section-title-bar">
       <text class="section-title">制作步骤</text>
-      <text class="step-progress">{{currentStep + 1}} / {{dish.steps.length}}</text>
+      <text class="step-progress" wx:if="{{dish.steps.length}}">{{currentStep + 1}} / {{dish.steps.length}}</text>
     </view>
 
     <view class="steps-timeline">
+      <view class="state-panel" wx:if="{{!loading && !dish.steps.length}}">这道菜没有配置步骤，可直接开始并确认完成。</view>
       <step-card
         wx:for="{{dish.steps}}"
         wx:key="stepNumber"
@@ -47,14 +48,14 @@
 
   <!-- 底部导航 -->
   <view class="bottom-nav">
-    <view class="nav-btn prev {{wishlistMode || currentStep <= 0 ? 'disabled' : ''}}" bindtap="prevStep">
+    <button class="nav-btn prev" disabled="{{wishlistMode || currentStep <= 0}}" bindtap="prevStep">
       ‹ 上一步
-    </view>
-    <view class="nav-btn video" wx:if="{{dish.videoUrl}}" bindtap="playVideo">
+    </button>
+    <button class="nav-btn video" wx:if="{{dish.videoUrl}}" bindtap="playVideo">
       ▶ 看视频
-    </view>
-    <view class="nav-btn next {{itemStatus === 'done' || (!wishlistMode && currentStep >= dish.steps.length - 1) ? 'done' : ''}}" bindtap="nextStep">
+    </button>
+    <button class="nav-btn next {{itemStatus === 'done' || (!wishlistMode && currentStep >= dish.steps.length - 1) ? 'done' : ''}}" bindtap="nextStep" disabled="{{busy || loading || error || progressError || (wishlistMode && itemStatus !== 'accepted' && itemStatus !== 'cooking')}}" loading="{{busy}}">
       {{wishlistMode ? nextLabel : currentStep >= dish.steps.length - 1 ? '完成 ✓' : '下一步 ›'}}
-    </view>
+    </button>
   </view>
 </view>

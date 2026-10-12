@@ -1,62 +1,46 @@
 <view class="wishlist-page">
-  <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
-    <button class="nav-home" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;" bindtap="goHome" aria-label="返回首页">
-      <image src="/images/menu/home.png" mode="aspectFit" />
-    </button>
-    <text class="nav-title" style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;">Couple Wishlist</text>
+  <storybook-header title="{{title}}" subtitle="每一个想吃，都值得被认真回应。" scene="wishlist" bind:hometap="goHome" />
+  <view class="status-filters" aria-role="tablist" aria-label="愿望状态">
+    <button class="status-filter {{currentStatus === item.value ? 'active' : ''}}" wx:for="{{filters}}" wx:key="value" bindtap="changeFilter" data-value="{{item.value}}" aria-role="tab" aria-selected="{{currentStatus === item.value}}">{{item.label}}</button>
   </view>
-
-  <view class="role-stage">
-    <image src="/images/menu/01_chef_girl.png" class="role-image girl" mode="aspectFit" />
-    <view class="role-pill left">我是吃货</view>
-    <text class="heart">♥</text>
-    <view class="role-pill right">我是大厨</view>
-    <image src="/images/menu/02_chef_boy.png" class="role-image boy" mode="aspectFit" />
-  </view>
-
-  <scroll-view class="wishlist-body" scroll-y enhanced show-scrollbar="{{false}}">
-    <view class="gingham-grid" aria-hidden="true">
-      <image wx:for="{{ginghamTiles}}" wx:key="*this" src="/images/menu/blue-gingham-background.png" mode="scaleToFill" />
-    </view>
-    <view class="summary-card">
-      <view>
-        <text class="summary-title">{{title}}</text>
-        <text class="summary-subtitle">{{subtitle}}</text>
+  <view class="list-caption"><text>{{total}} 份愿望 · {{isChef ? '大厨视角' : '吃货视角'}}</text><button class="text-button" bindtap="switchRole" data-role="{{isChef ? 'orderer' : 'chef'}}">切换{{isChef ? '吃货' : '大厨'}} ›</button></view>
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="startWatch">重新加载</button></view>
+  <view class="state-panel" wx:elif="{{loading && !items.length}}">愿望单加载中…</view>
+  <view class="wish-entry" wx:for="{{items}}" wx:key="_id" wx:for-index="wishIndex">
+    <view class="wish-paper">
+      <view class="paper-skin" aria-hidden="true">
+        <image class="paper-top" src="/images/cartoon/paper-top.svg" mode="scaleToFill" />
+        <image class="paper-middle" src="/images/cartoon/paper-middle.svg" mode="scaleToFill" />
+        <image class="paper-bottom" src="/images/cartoon/paper-bottom.svg" mode="scaleToFill" />
       </view>
-      <view class="count-pill"><text>♡</text><text>{{items.length}}</text></view>
-    </view>
-
-    <view class="wish-list" wx:if="{{items.length}}">
-      <view class="wish-card" wx:for="{{items}}" wx:key="_id">
-        <view class="dish-cover-wrap">
-          <image class="dish-cover" src="{{item.coverImage}}" mode="aspectFit" />
+      <image class="paper-clip" src="/images/cartoon/paper-clip.svg" mode="aspectFit" aria-hidden="true" />
+      <image class="paper-leaf paper-leaf-left" src="/images/cartoon/paper-leaf.svg" mode="aspectFit" aria-hidden="true" />
+      <image class="paper-leaf paper-leaf-right" src="/images/cartoon/paper-leaf.svg" mode="aspectFit" aria-hidden="true" />
+      <view class="paper-content">
+        <view class="paper-title"><text>这份小愿望 <text class="heart">♥</text></text><text class="wish-status {{item.status}}">{{item.statusText}}</text></view>
+        <view class="paper-dishes">
+          <view class="paper-dish" wx:for="{{item.items}}" wx:key="index" wx:for-item="dish">
+            <view class="paper-art"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.dishName}}" /></view>
+            <view class="paper-dish-copy">
+              <view class="paper-dish-title"><text class="paper-dish-name">{{dish.dishName}}</text><text class="paper-quantity">× {{dish.quantity}}</text></view>
+              <view class="dish-options" wx:if="{{dish.optionBadges.length}}"><text wx:for="{{dish.optionBadges}}" wx:key="tag" wx:for-item="badge" aria-label="{{badge.tag}}">{{badge.label}}</text></view>
+            </view>
+          </view>
         </view>
-        <text class="card-heart">♡</text>
-        <view class="wish-copy">
-          <text class="dish-name">{{item.displayName}}</text>
-          <text class="dish-status {{item.actionClass}}">{{item.statusText}}</text>
-          <text class="dish-remaining">{{item.itemSummary}}</text>
-          <text class="dish-remaining" wx:if="{{item.remainingText}}">{{item.remainingText}}</text>
+        <text class="paper-total">{{item.itemSummary}}</text>
+        <view class="wish-note" wx:if="{{item.note}}">
+          <image class="note-pencil" src="/images/cartoon/note-pencil.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="note-title">给大厨的话</text><text class="note-copy">{{item.note}}</text><text class="note-heart" aria-hidden="true">♥</text>
         </view>
-        <button class="wish-action {{item.actionClass}}" disabled="{{item.disabled}}" catchtap="onAction" data-index="{{index}}">
-          {{item.actionText}}
-        </button>
       </view>
     </view>
-
-    <view class="empty-state" wx:elif="{{!loading}}">
-      <text class="empty-heart">♡</text>
-      <text>还没有愿望，先去菜单选一道吧</text>
+    <view class="heart-progress" wx:if="{{item.status !== 'cancelled'}}">
+      <view class="progress-stop {{progressIndex <= item.statusStep ? 'reached' : ''}}" wx:for="{{progressLabels}}" wx:for-item="label" wx:for-index="progressIndex" wx:key="*this"><image class="progress-heart" src="/images/cartoon/wishlist{{progressIndex <= item.statusStep ? '-active' : ''}}.svg" mode="aspectFit" aria-hidden="true" /><text>{{label}}</text></view>
     </view>
-    <view class="loading" wx:else>愿望单加载中...</view>
-
-    <button class="add-wish" bindtap="goMenu">＋ 去菜单添加愿望</button>
-  </scroll-view>
-
-  <view class="bottom-navigation">
-    <button class="bottom-nav-item {{item.key === 'wishlist' ? 'active' : ''}}" wx:for="{{bottomNavigation}}" wx:key="key" hover-class="bottom-nav-item--pressed" bindtap="onBottomNavTap" data-key="{{item.key}}">
-      <image src="{{item.icon}}" mode="aspectFit" style="width: {{item.width}}rpx; height: {{item.height}}rpx;" />
-      <text>{{item.label}}</text>
-    </button>
+    <button class="wish-action cartoon-button" bindtap="onAction" data-index="{{wishIndex}}" disabled="{{busy}}" loading="{{busy}}" hover-class="cartoon-button--pressed">{{item.actionText}}</button>
+    <text class="wish-meta">{{item.orderNumber}} · {{item.createdText}}</text>
   </view>
+  <view class="empty-state" wx:if="{{!loading && !error && !items.length}}"><view class="empty-art"><kitchen-art kind="wishes" /></view><text>还没有这类愿望，先点一道喜欢的吧。</text><button class="btn-primary cartoon-button cartoon-button--compact" bindtap="goMenu" hover-class="cartoon-button--pressed">去点菜</button></view>
+  <button class="load-more" wx:if="{{hasMore}}" bindtap="loadMore" disabled="{{loading}}">{{loading ? '加载中…' : '再看看更多愿望'}}</button>
+  <bottom-navigation active="wishlist" />
 </view>

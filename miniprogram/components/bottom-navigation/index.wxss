@@ -1,0 +1,9 @@
+@import '../../styles/button-reset.wxss';
+.bottom-navigation { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: flex; padding: 8rpx 20rpx calc(8rpx + env(safe-area-inset-bottom)); background: #FFF9EA; border-top: 2rpx solid #593B30; border-radius: 30rpx 30rpx 0 0; box-shadow: 0 -4rpx 12rpx rgba(89,59,48,.04); }
+.nav-item { min-width: 0; position: relative; flex: 1; min-height: 100rpx; margin: 0; padding: 8rpx 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4rpx; color: #593B30; background: transparent; font-size: 24rpx; line-height: 1.3; }
+.nav-item::after { border: 0; }
+.nav-item::before { content: ''; position: absolute; bottom: 6rpx; width: 110rpx; height: 42rpx; background: transparent; border-radius: 40% 55% 45% 60%; transform: rotate(-4deg); }
+.nav-item.active::before { background: #FFD4C1; }
+.nav-item image { position: relative; width: 52rpx; height: 52rpx; }
+.nav-item text { position: relative; }
+.nav-item.active { font-weight: 600; }

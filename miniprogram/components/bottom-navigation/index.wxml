@@ -1,0 +1,5 @@
+<view class="bottom-navigation" aria-role="tablist" aria-label="主要导航">
+  <button wx:for="{{items}}" wx:key="key" class="nav-item {{active === item.key ? 'active' : ''}}" data-index="{{index}}" bindtap="navigate" aria-role="tab" aria-selected="{{active === item.key}}" aria-label="{{item.label}}">
+    <image src="/images/cartoon/{{item.key}}{{active === item.key && (item.key === 'wishlist' || item.key === 'profile') ? '-active' : ''}}.svg" mode="aspectFit" /><text>{{item.label}}</text>
+  </button>
+</view>

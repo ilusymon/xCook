@@ -57,6 +57,7 @@ func New() (*App, error) {
 
 	api := router.Group("/api", middleware.AuthRequired(tokenManager))
 	api.GET("/users/me", restHandler.GetCurrentUser)
+	api.PATCH("/users/me", restHandler.UpdateCurrentUser)
 	api.GET("/categories", restHandler.ListCategories)
 	api.GET("/menu", restHandler.GetMenu)
 	api.GET("/dishes/:id", restHandler.GetDish)

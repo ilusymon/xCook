@@ -12,23 +12,45 @@ const STATUS_TEXT = {
 
 Page({
   data: {
-    ginghamTiles: Array.from({ length: 48 }, (_, index) => index),
     wishlist: { items: [] },
     statusStep: 0,
     statusText: '',
     updatedText: '',
-    isChef: false
+    isChef: false,
+    loading: true,
+    error: '',
+    busy: false
   },
 
   onLoad(options) {
-    if (!options.id) return
+    this._wishlistId = options.id
+    if (!options.id) {
+      this.setData({ loading: false, error: '缺少愿望单信息，请返回重试' })
+      return
+    }
     const isChef = options.role === 'chef'
     this.setData({ isChef })
-    this._watcher = cloud.watchWishlistDetail(options.id, isChef ? 'chef' : '', wishlist => this.setWishlist(wishlist))
+  },
+
+  onShow() { this._visible = true; this.startWatch() },
+
+  onHide() { this._visible = false; this.stopWatch() },
+
+  startWatch() {
+    this.stopWatch()
+    if (!this._wishlistId || this._visible === false) return
+    this._watcher = cloud.watchWishlistDetail(this._wishlistId, this.data.isChef ? 'chef' : '',
+      wishlist => this.setWishlist(wishlist), err => this.setData({ loading: false, error: err.message || '进度加载失败' }))
+  },
+
+  stopWatch() {
+    if (this._watcher) this._watcher.close()
+    this._watcher = null
   },
 
   onUnload() {
-    if (this._watcher) this._watcher.close()
+    this._visible = false
+    this.stopWatch()
   },
 
   setWishlist(wishlist) {
@@ -46,10 +68,12 @@ Page({
         optionTags,
         status,
         statusText: STATUS_TEXT[status] || (status === 'pending' ? '等待接下' : status),
-        canCook: this.data.isChef && ['accepted', 'cooking'].includes(status)
+        canCook: this.data.isChef && ['accepted', 'cooking'].includes(wishlist.status) && ['accepted', 'cooking'].includes(status)
       }
     })
     this.setData({
+      loading: false,
+      error: '',
       wishlist: { ...wishlist, items },
       statusStep: Object.prototype.hasOwnProperty.call(STATUS_STEP, wishlist.status) ? STATUS_STEP[wishlist.status] : 0,
       statusText: STATUS_TEXT[wishlist.status] || wishlist.status,
@@ -57,7 +81,10 @@ Page({
     })
   },
 
-  goBack() { wx.navigateBack() },
+  goBack() {
+    getApp().globalData.wishlistRole = this.data.isChef ? 'chef' : 'orderer'
+    wx.switchTab({ url: '/pages/order/wishlist/index' })
+  },
 
   acceptWishlist() {
     this.updateStatus('accepted', '已接下愿望')
@@ -75,15 +102,22 @@ Page({
   },
 
   updateStatus(status, message) {
-    wx.showLoading({ title: '更新中...' })
+    if (this.data.busy || !this.data.wishlist._id) return
+    this.setData({ busy: true })
+    this.stopWatch()
+    wx.showLoading({ title: '更新中...', mask: true })
     cloud.updateWishlistStatus(this.data.wishlist._id, status)
       .then(() => {
         wx.hideLoading()
         wx.showToast({ title: message, icon: 'success' })
       })
-      .catch(() => {
+      .catch(err => {
         wx.hideLoading()
-        wx.showToast({ title: '更新失败', icon: 'none' })
+        wx.showToast({ title: err.message || '更新失败', icon: 'none' })
+      })
+      .finally(() => {
+        this.setData({ busy: false })
+        this.startWatch()
       })
   },
 
@@ -95,5 +129,8 @@ Page({
     })
   },
 
-  cheer() { wx.showToast({ title: '加油已经送达大厨 ♡', icon: 'none' }) }
+  refreshProgress() {
+    this.setData({ loading: true, error: '' })
+    this.startWatch()
+  }
 })

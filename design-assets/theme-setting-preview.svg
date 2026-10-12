@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1170" height="1260" viewBox="0 0 1170 1260">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#413630" flood-opacity=".14"/>
+    </filter>
+    <style>
+      .ui { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; fill: #241713; }
+      .serif { font-family: Georgia, serif; fill: #241713; font-weight: 700; }
+      .muted { fill: #8B8581; }
+      .label { font-size: 24px; font-weight: 650; }
+      .small { font-size: 19px; }
+    </style>
+  </defs>
+
+  <rect width="1170" height="1260" fill="#F7F3EE"/>
+  <text x="585" y="58" text-anchor="middle" class="ui" font-size="28" font-weight="750">“我的”页主题设置预览</text>
+  <text x="585" y="94" text-anchor="middle" class="ui muted" font-size="18">沿用现有蓝色背景与粉色主操作色，不改变当前卡片和排版风格</text>
+
+  <!-- Blue phone -->
+  <g transform="translate(70,130)" filter="url(#shadow)">
+    <rect width="490" height="1040" rx="48" fill="#DFF4FF"/>
+    <text x="245" y="70" text-anchor="middle" class="serif" font-size="27">Couple Wishlist</text>
+    <circle cx="48" cy="64" r="24" fill="#FFFFFF" fill-opacity=".9"/>
+    <text x="48" y="72" text-anchor="middle" class="ui" font-size="25">⌂</text>
+    <rect y="102" width="490" height="938" rx="36" fill="#EAF8FF"/>
+
+    <g transform="translate(24,128)">
+      <rect width="442" height="112" rx="24" fill="#FFFDF9" stroke="#E2D0C6"/>
+      <circle cx="58" cy="56" r="36" fill="#FFF1E3"/>
+      <text x="58" y="64" text-anchor="middle" class="ui" font-size="24">👩‍🍳</text>
+      <text x="108" y="48" class="ui" font-size="24" font-weight="800">小满</text>
+      <rect x="108" y="64" width="82" height="28" rx="14" fill="#EAF7FD"/>
+      <text x="149" y="84" text-anchor="middle" class="ui small" fill="#438EB1">我是吃货</text>
+      <text x="410" y="90" text-anchor="end" class="ui muted small">编辑资料 ›</text>
+    </g>
+
+    <g transform="translate(24,260)">
+      <rect width="442" height="318" rx="24" fill="#FFFDF9" stroke="#E2D0C6"/>
+      <g class="ui label">
+        <text x="70" y="58">菜品管理</text><text x="410" y="58" text-anchor="end" class="muted small">8 道菜 ›</text>
+        <line x1="54" y1="80" x2="418" y2="80" stroke="#F1E5DE"/>
+        <text x="70" y="128">消息提醒</text><text x="410" y="128" text-anchor="end" class="muted small">去设置 ›</text>
+        <line x1="54" y1="150" x2="418" y2="150" stroke="#F1E5DE"/>
+        <text x="70" y="198">情侣关系</text><text x="410" y="198" text-anchor="end" class="muted small">相伴中 ›</text>
+        <line x1="54" y1="220" x2="418" y2="220" stroke="#F1E5DE"/>
+        <text x="70" y="268">主题颜色</text><text x="410" y="268" text-anchor="end" class="muted small">蓝色 ›</text>
+      </g>
+      <circle cx="30" cy="50" r="16" fill="#FFF0F3"/><circle cx="30" cy="120" r="16" fill="#FFF7DF"/>
+      <circle cx="30" cy="190" r="16" fill="#EAF9F1"/><circle cx="30" cy="260" r="16" fill="#EAF7FD"/>
+      <circle cx="30" cy="260" r="7" fill="#438EB1"/>
+    </g>
+
+    <g transform="translate(0,690)">
+      <rect y="0" width="490" height="350" rx="34" fill="#FFFDF9"/>
+      <rect x="213" y="14" width="64" height="6" rx="3" fill="#DED4CE"/>
+      <text x="28" y="65" class="ui" font-size="28" font-weight="800">选择主题颜色</text>
+      <text x="28" y="96" class="ui muted small">全局页面会立即应用，并自动保存</text>
+      <rect x="24" y="124" width="442" height="76" rx="22" fill="#EDF8FD" stroke="#438EB1" stroke-width="2"/>
+      <circle cx="62" cy="162" r="16" fill="#438EB1"/><text x="94" y="170" class="ui label">蓝色</text>
+      <circle cx="430" cy="162" r="15" fill="#438EB1"/><text x="430" y="169" text-anchor="middle" font-size="17" fill="#FFFFFF">✓</text>
+      <rect x="24" y="216" width="442" height="76" rx="22" fill="#FFFFFF" stroke="#EEE3DC"/>
+      <circle cx="62" cy="254" r="16" fill="#FF7180"/><text x="94" y="262" class="ui label">粉色</text>
+      <text x="245" y="326" text-anchor="middle" class="ui muted small">轻触遮罩或下滑关闭</text>
+    </g>
+  </g>
+
+  <!-- Pink phone -->
+  <g transform="translate(610,130)" filter="url(#shadow)">
+    <rect width="490" height="1040" rx="48" fill="#FFDDE3"/>
+    <text x="245" y="70" text-anchor="middle" class="serif" font-size="27">Couple Wishlist</text>
+    <circle cx="48" cy="64" r="24" fill="#FFFFFF" fill-opacity=".9"/>
+    <text x="48" y="72" text-anchor="middle" class="ui" font-size="25">⌂</text>
+    <rect y="102" width="490" height="938" rx="36" fill="#FFF5F5"/>
+
+    <g transform="translate(24,128)">
+      <rect width="442" height="112" rx="24" fill="#FFFDF9" stroke="#E2D0C6"/>
+      <circle cx="58" cy="56" r="36" fill="#FFF1E3"/>
+      <text x="58" y="64" text-anchor="middle" class="ui" font-size="24">👩‍🍳</text>
+      <text x="108" y="48" class="ui" font-size="24" font-weight="800">小满</text>
+      <rect x="108" y="64" width="82" height="28" rx="14" fill="#FFF0F3"/>
+      <text x="149" y="84" text-anchor="middle" class="ui small" fill="#E75F78">我是吃货</text>
+      <text x="410" y="90" text-anchor="end" class="ui muted small">编辑资料 ›</text>
+    </g>
+
+    <g transform="translate(24,260)">
+      <rect width="442" height="318" rx="24" fill="#FFFDF9" stroke="#E2D0C6"/>
+      <g class="ui label">
+        <text x="70" y="58">菜品管理</text><text x="410" y="58" text-anchor="end" class="muted small">8 道菜 ›</text>
+        <line x1="54" y1="80" x2="418" y2="80" stroke="#F1E5DE"/>
+        <text x="70" y="128">消息提醒</text><text x="410" y="128" text-anchor="end" class="muted small">去设置 ›</text>
+        <line x1="54" y1="150" x2="418" y2="150" stroke="#F1E5DE"/>
+        <text x="70" y="198">情侣关系</text><text x="410" y="198" text-anchor="end" class="muted small">相伴中 ›</text>
+        <line x1="54" y1="220" x2="418" y2="220" stroke="#F1E5DE"/>
+        <text x="70" y="268">主题颜色</text><text x="410" y="268" text-anchor="end" class="muted small">粉色 ›</text>
+      </g>
+      <circle cx="30" cy="50" r="16" fill="#FFF0F3"/><circle cx="30" cy="120" r="16" fill="#FFF7DF"/>
+      <circle cx="30" cy="190" r="16" fill="#EAF9F1"/><circle cx="30" cy="260" r="16" fill="#FFF0F3"/>
+      <circle cx="30" cy="260" r="7" fill="#FF7180"/>
+    </g>
+
+    <g transform="translate(0,690)">
+      <rect y="0" width="490" height="350" rx="34" fill="#FFFDF9"/>
+      <rect x="213" y="14" width="64" height="6" rx="3" fill="#DED4CE"/>
+      <text x="28" y="65" class="ui" font-size="28" font-weight="800">选择主题颜色</text>
+      <text x="28" y="96" class="ui muted small">全局页面会立即应用，并自动保存</text>
+      <rect x="24" y="124" width="442" height="76" rx="22" fill="#FFFFFF" stroke="#EEE3DC"/>
+      <circle cx="62" cy="162" r="16" fill="#438EB1"/><text x="94" y="170" class="ui label">蓝色</text>
+      <rect x="24" y="216" width="442" height="76" rx="22" fill="#FFF0F3" stroke="#FF7180" stroke-width="2"/>
+      <circle cx="62" cy="254" r="16" fill="#FF7180"/><text x="94" y="262" class="ui label">粉色</text>
+      <circle cx="430" cy="254" r="15" fill="#FF7180"/><text x="430" y="261" text-anchor="middle" font-size="17" fill="#FFFFFF">✓</text>
+      <text x="245" y="326" text-anchor="middle" class="ui muted small">轻触遮罩或下滑关闭</text>
+    </g>
+  </g>
+
+  <g transform="translate(70,1198)">
+    <circle cx="12" cy="8" r="10" fill="#438EB1"/><text x="32" y="15" class="ui small">蓝色：沿用菜单/“我的”页现有天空蓝</text>
+    <circle cx="572" cy="8" r="10" fill="#FF7180"/><text x="592" y="15" class="ui small">粉色：沿用现有主按钮与高亮粉</text>
+  </g>
+</svg>

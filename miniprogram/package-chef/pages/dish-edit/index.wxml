@@ -1,4 +1,7 @@
 <view class="edit-page">
+  <view class="state-panel" wx:if="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="retryLoad">重新加载</button></view>
+  <view class="state-panel" wx:elif="{{loading}}">编辑信息加载中...</view>
+  <view class="state-panel" wx:elif="{{!categories.length}}">还没有菜品分类<button class="btn-primary cartoon-button cartoon-button--compact" bindtap="goCategories" hover-class="cartoon-button--pressed">先添加分类</button></view>
   <!-- 封面图 -->
   <view class="section-card">
     <text class="section-title">封面图片</text>
@@ -16,7 +19,7 @@
     <text class="section-title">基本信息</text>
     <view class="form-item">
       <text class="form-label">菜品名称</text>
-      <input class="form-input" placeholder="输入菜品名称" value="{{dish.name}}" bindinput="onInput" data-field="name" />
+      <input class="form-input" placeholder="输入菜品名称" value="{{dish.name}}" bindinput="onInput" data-field="name" maxlength="128" />
     </view>
     <view class="form-item">
       <text class="form-label">描述</text>
@@ -172,11 +175,11 @@
   <!-- 视频链接 -->
   <view class="section-card">
     <text class="section-title">制作视频</text>
-    <input class="form-input" placeholder="视频链接（可选）" value="{{dish.videoUrl}}" bindinput="onInput" data-field="videoUrl" />
+    <input class="form-input" placeholder="可直接播放的视频链接（可选）" value="{{dish.videoUrl}}" bindinput="onInput" data-field="videoUrl" maxlength="1024" />
   </view>
 
   <!-- 保存按钮 -->
   <view class="save-btn-wrap">
-    <view class="save-btn" bindtap="saveDish">保存菜品</view>
+    <button class="save-btn cartoon-button" bindtap="saveDish" disabled="{{saving || loading || error || !categories.length}}" loading="{{saving}}" hover-class="cartoon-button--pressed">保存菜品</button>
   </view>
 </view>

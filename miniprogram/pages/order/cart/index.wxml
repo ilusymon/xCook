@@ -2,14 +2,14 @@
   <!-- 顶部栏 -->
   <view class="top-bar">
     <home-btn />
-    <text class="page-title">购物车</text>
+    <text class="page-title">我的小餐单</text>
     <view class="top-bar-spacer"></view>
   </view>
 
   <!-- 购物车列表 -->
   <view class="cart-list" wx:if="{{cart.length > 0}}">
     <view class="cart-item" wx:for="{{cart}}" wx:key="cartItemId">
-      <image class="item-cover" src="{{item.coverImage}}" mode="aspectFill" />
+      <view class="item-cover"><dish-art cover-image="{{item.coverImage}}" dish-name="{{item.dishName}}" /></view>
       <view class="item-info">
         <text class="item-name">{{item.dishName}}</text>
         <!-- 已选选项 -->
@@ -19,9 +19,9 @@
         <view class="item-bottom">
           <text class="item-calories">{{item.calories * item.quantity}}kcal</text>
           <view class="qty-control">
-            <view class="qty-btn" bindtap="decreaseQty" data-id="{{item.cartItemId}}">-</view>
+            <button class="qty-btn" bindtap="decreaseQty" data-id="{{item.cartItemId}}" aria-label="减少{{item.dishName}}">−</button>
             <text class="qty-value">{{item.quantity}}</text>
-            <view class="qty-btn" bindtap="increaseQty" data-id="{{item.cartItemId}}">+</view>
+            <button class="qty-btn" bindtap="increaseQty" disabled="{{item.quantity >= 99}}" data-id="{{item.cartItemId}}" aria-label="增加{{item.dishName}}">＋</button>
           </view>
         </view>
       </view>
@@ -31,20 +31,21 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:else>
-    <text class="empty-emoji">🛒</text>
-    <text class="empty-text">购物车空空的</text>
+    <view class="empty-art"><kitchen-art kind="categories" /></view>
+    <text class="empty-text">小餐单还空着呢</text>
     <text class="empty-hint">去菜单看看吧～</text>
+    <button class="btn-primary cartoon-button cartoon-button--compact" bindtap="goMenu" hover-class="cartoon-button--pressed">去选菜</button>
   </view>
 
   <!-- 底部愿望确认栏 -->
   <view class="checkout-bar" wx:if="{{cart.length > 0}}">
     <view class="checkout-info">
       <view class="checkout-row">
-        <text class="checkout-label">共{{totalCount}}道菜</text>
+        <text class="checkout-label">共{{totalCount}} 份</text>
         <text class="checkout-cal">{{totalCalories}}kcal</text>
       </view>
     </view>
     <view class="clear-btn" bindtap="clearCart">清空</view>
-    <view class="checkout-btn" bindtap="goCheckout">确认愿望</view>
+    <button class="checkout-btn cartoon-button cartoon-button--compact" bindtap="goCheckout" hover-class="cartoon-button--pressed">确认愿望</button>
   </view>
 </view>

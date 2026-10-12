@@ -1,5 +1,4 @@
 {
-  "cloud": true,
   "pages": [
     "pages/index/index",
     "pages/order/menu/index",
@@ -26,39 +25,48 @@
         "pages/dish-manage/index",
         "pages/dish-edit/index",
         "pages/cook-view/index",
-        "pages/category-manage/index"
+        "pages/category-manage/index",
+        "pages/order-manage/index"
       ]
     }
   ],
   "preloadRule": {
     "pages/order/menu/index": {
       "network": "all",
-      "packages": ["order"]
+      "packages": [
+        "order"
+      ]
     },
     "pages/order/cart/index": {
       "network": "all",
-      "packages": ["order"]
+      "packages": [
+        "order"
+      ]
     },
     "pages/order/records/index": {
       "network": "all",
-      "packages": ["order"]
+      "packages": [
+        "order"
+      ]
     },
     "pages/chef/dashboard/index": {
       "network": "all",
-      "packages": ["chef"]
+      "packages": [
+        "chef"
+      ]
     }
   },
   "window": {
     "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#F6AEBB",
+    "navigationBarBackgroundColor": "#FFF9EA",
     "navigationBarTitleText": "星厨房",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FFF5D9"
+    "backgroundColor": "#FFF9EA"
   },
   "tabBar": {
-    "color": "#816F69",
-    "selectedColor": "#EF8297",
-    "backgroundColor": "#FFFDF7",
+    "color": "#8A7466",
+    "selectedColor": "#9F4F38",
+    "backgroundColor": "#FFF9EA",
     "borderStyle": "white",
     "list": [
       {
@@ -88,6 +96,5 @@
     ]
   },
   "sitemapLocation": "sitemap.json",
-  "style": "v2",
   "lazyCodeLoading": "requiredComponents"
 }

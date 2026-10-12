@@ -1,256 +1,54 @@
 <view class="menu-page">
-  <!-- 系统状态栏与胶囊由小程序保留；导航栏和头图上下分层。 -->
-  <view class="hero-header">
-    <view class="custom-navigation" style="height: {{navigationHeight}}px; padding-top: {{statusBarHeight}}px;">
-      <view
-        class="navigation-actions"
-        style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;"
-      >
-        <button
-          class="navigation-icon-button"
-          hover-class="navigation-icon-button--pressed"
-          bindtap="goHome"
-          aria-label="返回首页"
-        >
-          <image class="home-icon" src="/images/menu/home.png" mode="aspectFit" />
-        </button>
-
-        <button
-          class="navigation-icon-button"
-          hover-class="navigation-icon-button--pressed"
-          aria-label="搜索菜品"
-        >
-          <image class="search-icon" src="/images/menu/search.png" mode="aspectFit" />
-        </button>
-      </view>
-
-      <view
-        class="navigation-title"
-        style="top: {{navigationContentTop}}px; height: {{navigationContentHeight}}px;"
-      >
-        <text class="page-title">Couple Wishlist</text>
-      </view>
-    </view>
-
-    <image class="hero-art" src="/images/menu/menu-hero.gif" mode="aspectFill" aria-hidden="true" />
+  <view class="menu-heading"><storybook-header title="今天想吃什么？" subtitle="点一道喜欢的，让大厨为你做。" scene="menu" compact show-search bind:hometap="goHome" bind:searchtap="toggleSearch" /></view>
+  <view class="search-row" wx:if="{{searchVisible}}">
+    <image src="/images/cartoon/search.svg" mode="aspectFit" />
+    <input class="search-input" value="{{keyword}}" bindinput="onSearchInput" placeholder="搜索菜名或描述" focus="{{true}}" maxlength="64" confirm-type="search" aria-label="搜索菜品" />
   </view>
-
-  <view class="menu-body">
-    <view class="menu-content menu-content--{{layoutMode}}">
-      <!-- 默认沿用旧版左右双栏，也可切换到横向分类胶囊。 -->
-      <scroll-view
-        class="category-tabs"
-        scroll-x="{{layoutMode === 'tabs'}}"
-        scroll-y="{{layoutMode === 'split'}}"
-        enhanced
-        show-scrollbar="{{false}}"
-        scroll-with-animation
-        scroll-into-view="{{categoryScrollTo}}"
-        aria-role="tablist"
-        aria-label="菜品分类"
-      >
-        <view class="category-track" style="width: {{layoutMode === 'tabs' ? categoryTrackWidth : 180}}rpx;">
-          <button
-            class="category-item {{currentCategory === index ? 'active' : ''}}"
-            wx:for="{{categories}}"
-            wx:key="_id"
-            id="side_{{item._id}}"
-            hover-class="category-item--pressed"
-            bindtap="onCategoryTap"
-            data-index="{{index}}"
-            data-id="{{item._id}}"
-            aria-role="tab"
-            aria-label="{{item.name}}"
-          >
-            <view class="category-active-bar" aria-hidden="true"></view>
-            <image class="category-icon" src="{{item.icon}}" mode="aspectFit" aria-hidden="true" />
-            <text class="category-label">{{item.name}}</text>
-          </button>
-        </view>
-      </scroll-view>
-
-      <!-- 参考图菜品列表 -->
-      <scroll-view
-        class="dish-list"
-        scroll-y
-        enhanced
-        show-scrollbar="{{false}}"
-        scroll-with-animation
-        scroll-into-view="{{scrollToView}}"
-        bindscroll="onDishScroll"
-      >
-        <view class="dish-list-inner">
-          <view
-            class="dish-section"
-            wx:for="{{dishSections}}"
-            wx:key="categoryId"
-            wx:for-item="section"
-            id="dish-section-{{section.categoryId}}"
-          >
-            <view class="dish-section-title" wx:if="{{layoutMode === 'split'}}">{{section.categoryName}}</view>
-            <view class="menu-dish-card" wx:for="{{section.dishes}}" wx:key="_id" wx:for-item="dish">
-              <view class="dish-art-box">
-                <image
-                  class="dish-art"
-                  src="{{dish.image}}"
-                  mode="aspectFill"
-                  aria-hidden="true"
-                />
-              </view>
-
-              <view class="dish-copy">
-                <text class="dish-name">{{dish.name}}</text>
-                <text class="dish-description">{{dish.description}}</text>
-                <text class="dish-calories">{{dish.calories}} kcal</text>
-              </view>
-
-              <view class="quantity-control" aria-label="{{dish.name}}数量">
-                <button
-                  class="quantity-button"
-                  disabled="{{dish.quantity === 0}}"
-                  hover-class="quantity-button--pressed"
-                  catchtap="onQuantityTap"
-                  data-id="{{dish._id}}"
-                  data-delta="-1"
-                  aria-label="减少{{dish.name}}"
-                >
-                  <view class="quantity-icon-circle">
-                    <image class="quantity-icon" src="/images/menu/remove.svg" mode="aspectFit" />
-                  </view>
-                </button>
-
-                <text class="quantity-value">{{dish.quantity}}</text>
-
-                <button
-                  class="quantity-button"
-                  hover-class="quantity-button--pressed"
-                  catchtap="onQuantityTap"
-                  data-id="{{dish._id}}"
-                  data-delta="1"
-                  aria-label="增加{{dish.name}}"
-                >
-                  <view class="quantity-icon-circle quantity-icon-circle--add">
-                    <image class="quantity-icon" src="/images/menu/add.svg" mode="aspectFit" />
-                  </view>
-                </button>
-              </view>
-            </view>
-
-            <view class="section-empty" wx:if="{{section.dishes.length === 0}}">暂无菜品</view>
+  <view class="menu-columns">
+    <scroll-view class="category-tabs" scroll-y enhanced show-scrollbar="{{false}}" scroll-into-view="{{categoryScrollTo}}" scroll-with-animation>
+      <view class="category-track" aria-role="tablist" aria-label="菜品分类">
+        <view wx:for="{{categories}}" wx:key="_id" id="category-{{item._id}}" class="category-item {{currentCategory === index ? 'active' : ''}}" bindtap="onCategoryTap" data-index="{{index}}" hover-class="category-item-pressed" aria-role="tab" aria-selected="{{currentCategory === index}}">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <scroll-view class="dish-list" scroll-y enhanced show-scrollbar="{{false}}" scroll-into-view="{{dishScrollTo}}" bindscroll="onDishScroll" bindtouchstart="onDishTouchStart">
+      <view id="dish-list-top"></view>
+      <view wx:for="{{dishSections}}" wx:key="categoryId" wx:for-item="section" class="dish-section" id="dish-section-{{section.categoryId}}">
+        <text class="dish-section-title">{{section.categoryName}}</text>
+        <view class="menu-dish-card" wx:for="{{section.dishes}}" wx:key="_id" wx:for-item="dish" bindtap="onDishTap" data-id="{{dish._id}}" aria-label="查看{{dish.name}}详情">
+          <view class="dish-art-box"><dish-art cover-image="{{dish.coverImage}}" dish-name="{{dish.name}}" /></view>
+          <view class="dish-copy">
+            <text class="dish-name">{{dish.name}}</text>
+            <text class="dish-description">{{dish.description || '认真做的一道好味道。'}}</text>
+            <text class="dish-calories">{{dish.calories}} kcal</text>
           </view>
-
-          <view class="menu-loading" wx:if="{{loading}}">菜单加载中...</view>
-          <view class="empty-hint" wx:if="{{!loading && categories.length === 0}}">暂无可用分类</view>
+          <view class="quantity-control">
+            <text wx:if="{{dish.quantity}}" class="quantity-value">{{dish.quantity}}</text>
+            <button class="quantity-button" catchtap="onQuantityTap" data-id="{{dish._id}}" data-delta="1" aria-label="增加{{dish.name}}"><image class="quantity-circle" src="/images/cartoon/button-add.svg" mode="aspectFit" aria-hidden="true" /></button>
+          </view>
         </view>
-      </scroll-view>
-    </view>
+      </view>
+      <view class="state-panel" wx:if="{{loading}}">菜单加载中…</view>
+      <view class="state-panel" wx:elif="{{error}}"><text>{{error}}</text><button class="btn-secondary" bindtap="loadMenuData">重新加载</button></view>
+      <view class="state-panel" wx:elif="{{!dishSections.length}}"><view class="empty-art"><kitchen-art kind="add" /></view><text>{{keyword ? '没有找到这道菜，试试其他关键词' : '这里还没有菜品，来添一道拿手菜吧'}}</text><button class="btn-primary cartoon-button cartoon-button--compact" wx:if="{{!keyword}}" bindtap="goChef" hover-class="cartoon-button--pressed">进入厨房</button></view>
+    </scroll-view>
   </view>
-
-  <view
-    class="cart-panel-mask"
-    wx:if="{{cartPanelVisible}}"
-    catchtap="closeCartPanel"
-    aria-label="收起已选菜品"
-  ></view>
-
-  <view
-    class="selected-dishes-panel {{cartPanelVisible ? 'selected-dishes-panel--open' : ''}}"
-    style="height: {{cartPanelHeight}}rpx;"
-    catchtap="stopTap"
-    aria-hidden="{{!cartPanelVisible}}"
-  >
-    <view class="selected-panel-header">
-      <text class="selected-panel-title">已选菜品</text>
-      <text class="selected-panel-count">{{selectedDishes.length}} 种 · {{cartSummary.totalCalories}} kcal</text>
-    </view>
-
-    <scroll-view class="selected-dishes-list" scroll-y enhanced show-scrollbar="{{false}}">
-      <view class="selected-dish-row" wx:for="{{selectedDishes}}" wx:key="_id" wx:for-item="dish">
-        <image class="selected-dish-image" src="{{dish.image}}" mode="aspectFill" aria-hidden="true" />
-
-        <view class="selected-dish-copy">
-          <text class="selected-dish-name">{{dish.name}}</text>
-          <text class="selected-dish-calories">{{dish.calories}} kcal / 份</text>
-        </view>
-
-        <view class="selected-quantity-control" aria-label="{{dish.name}}数量">
-          <button
-            class="selected-quantity-button"
-            hover-class="selected-quantity-button--pressed"
-            catchtap="onQuantityTap"
-            data-id="{{dish._id}}"
-            data-delta="-1"
-            aria-label="减少{{dish.name}}"
-          >
-            <image class="selected-quantity-icon" src="/images/menu/remove.svg" mode="aspectFit" />
-          </button>
-          <text class="selected-quantity-value">{{dish.quantity}}</text>
-          <button
-            class="selected-quantity-button selected-quantity-button--add"
-            hover-class="selected-quantity-button--pressed"
-            catchtap="onQuantityTap"
-            data-id="{{dish._id}}"
-            data-delta="1"
-            aria-label="增加{{dish.name}}"
-          >
-            <image class="selected-quantity-icon" src="/images/menu/add.svg" mode="aspectFit" />
-          </button>
-        </view>
+  <view class="cart-panel-mask" wx:if="{{cartPanelVisible}}" catchtap="closeCartPanel"></view>
+  <view class="cart-panel" wx:if="{{cartPanelVisible}}" catchtap="stopTap">
+    <view class="cart-panel-heading"><text>我的小餐单 · {{cartSummary.totalCount}} 份</text><button class="text-button" bindtap="goCart">编辑餐单 ›</button></view>
+    <scroll-view class="cart-panel-list" scroll-y style="max-height: {{cartPanelHeight}}rpx;">
+      <view class="selected-row" wx:for="{{selectedDishes}}" wx:key="cartItemId">
+        <view class="selected-art"><dish-art cover-image="{{item.coverImage}}" dish-name="{{item.dishName}}" /></view>
+        <view class="selected-copy"><text>{{item.dishName}}</text><text class="selected-options" wx:for="{{item.optionTags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text></view>
+        <view class="selected-quantity"><button catchtap="onQuantityTap" data-cart-id="{{item.cartItemId}}" data-delta="-1" aria-label="减少{{item.dishName}}">−</button><text>{{item.quantity}}</text><button catchtap="onQuantityTap" data-cart-id="{{item.cartItemId}}" data-delta="1" aria-label="增加{{item.dishName}}">＋</button></view>
       </view>
     </scroll-view>
   </view>
-
-  <!-- 选中菜品后显示愿望栏；左侧展开已选菜品，右侧确认愿望。 -->
-  <view class="checkout-bar" wx:if="{{cartSummary.totalCount > 0}}">
-    <button
-      class="checkout-cart-trigger"
-      hover-class="checkout-cart-trigger--pressed"
-      bindtap="toggleCartPanel"
-      aria-label="{{cartPanelVisible ? '收起' : '展开'}}已选菜品"
-    >
-      <view class="checkout-art-wrap" aria-hidden="true">
-        <image class="checkout-art" src="/images/menu/15_checkout_couple.png" mode="aspectFit" />
-        <view class="checkout-badge" wx:if="{{cartSummary.totalCount > 0}}">{{cartSummary.totalCount}}</view>
-      </view>
-
-      <view class="checkout-summary">
-        <text class="checkout-total">{{cartSummary.totalCalories}} kcal</text>
-        <text class="checkout-count">共 {{cartSummary.totalCount}} 道菜</text>
-      </view>
-
-      <text class="checkout-chevron" aria-hidden="true">{{cartPanelVisible ? '⌄' : '⌃'}}</text>
+  <view class="wish-bar">
+    <button class="wish-summary" bindtap="toggleCartPanel" aria-label="查看已选菜品">
+      <view class="basket"><kitchen-art kind="categories" /></view>
+      <view><text>已选 <text class="count">{{cartSummary.totalCount}}</text> 份</text><text class="summary-calories">{{cartSummary.totalCalories}} kcal · 点击查看</text></view>
     </button>
-
-    <button
-      class="checkout-button"
-      disabled="{{cartSummary.totalCount === 0}}"
-      hover-class="checkout-button--pressed"
-      bindtap="goCheckout"
-      aria-label="加入愿望单"
-    >确认愿望</button>
+    <button class="confirm-button cartoon-button cartoon-button--compact" bindtap="goCheckout" hover-class="cartoon-button--pressed">确认愿望</button>
   </view>
-
-  <!-- 参考图底部导航；仅菜单页隐藏系统 TabBar，离开后立即恢复。 -->
-  <view class="bottom-navigation" aria-role="navigation" aria-label="底部导航">
-    <button
-      class="bottom-nav-item {{index === 0 ? 'active' : ''}}"
-      wx:for="{{bottomNavigation}}"
-      wx:key="key"
-      hover-class="bottom-nav-item--pressed"
-      bindtap="onBottomNavTap"
-      data-key="{{item.key}}"
-      aria-label="{{item.label}}"
-    >
-      <view class="bottom-nav-icon-wrap">
-        <image
-          class="bottom-nav-icon"
-          src="{{item.icon}}"
-          mode="aspectFit"
-          style="width: {{item.iconWidth}}rpx; height: {{item.iconHeight}}rpx;"
-          aria-hidden="true"
-        />
-      </view>
-      <text class="bottom-nav-label">{{item.label}}</text>
-    </button>
-  </view>
+  <bottom-navigation active="menu" />
 </view>

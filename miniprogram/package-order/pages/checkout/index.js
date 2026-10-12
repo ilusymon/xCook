@@ -1,16 +1,18 @@
 const app = getApp()
 const cloud = require('../../../utils/cloud')
+const { formatCartItem } = require('../../../utils/format')
 
 Page({
   data: {
     cart: [],
     note: '',
     totalCount: 0,
-    totalCalories: 0
+    totalCalories: 0,
+    submitting: false
   },
 
-  onLoad() {
-    const cart = app.globalData.cart
+  onShow() {
+    const cart = app.globalData.cart.map(formatCartItem)
     const summary = app.getCartSummary()
     this.setData({
       cart,
@@ -24,6 +26,7 @@ Page({
   },
 
   placeOrder() {
+    if (this.data.submitting) return
     const { cart } = this.data
     if (cart.length === 0) {
       wx.showToast({ title: '购物车为空', icon: 'none' })
@@ -43,6 +46,8 @@ Page({
   },
 
   submitWishlist() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
     wx.showLoading({ title: '提交愿望中...' })
     const items = this.data.cart.map(item => ({
       dishId: item.dishId,
@@ -55,21 +60,31 @@ Page({
 
     cloud.createWishlist(items, this.data.note).then(res => {
       wx.hideLoading()
-      if (res && res.success) {
+      if (res && res.success && res.wishlistId) {
         // 清空购物车
         app.clearCart()
         wx.showToast({ title: '愿望已提交 💕', icon: 'success' })
-        setTimeout(() => {
-          wx.redirectTo({
-            url: `/package-order/pages/wishlist-detail/index?id=${res.wishlistId}`
-          })
-        }, 1000)
+        app.globalData.wishlistRole = 'orderer'
+        wx.redirectTo({
+          url: `/package-order/pages/wishlist-detail/index?id=${res.wishlistId}`,
+          fail: () => wx.switchTab({ url: '/pages/order/wishlist/index' })
+        })
       } else {
-        wx.showToast({ title: res.message || '提交失败', icon: 'none' })
+        this.setData({ submitting: false })
+        wx.showToast({ title: (res && res.message) || '提交失败', icon: 'none' })
       }
     }).catch(err => {
       wx.hideLoading()
+      this.setData({ submitting: false })
       wx.showToast({ title: err.message || '提交失败', icon: 'none' })
     })
+  },
+
+  editCart() {
+    wx.redirectTo({ url: '/pages/order/cart/index' })
+  },
+
+  goMenu() {
+    wx.switchTab({ url: '/pages/order/menu/index' })
   }
 })

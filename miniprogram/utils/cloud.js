@@ -19,6 +19,10 @@ function getUserInfo() {
   })
 }
 
+function updateUserInfo(nickName) {
+  return api.request({ url: '/api/users/me', method: 'PATCH', data: { nickName } })
+}
+
 /**
  * 获取菜单（分类 + 菜品）
  * @param {string} role - 'chef' 时返回全部菜品（含下架），默认只返回上架菜品
@@ -111,8 +115,12 @@ function getWishlistDetail(wishlistId, role) {
 }
 
 function updateWishlistStatus(wishlistId, newStatus) {
+  const id = String(wishlistId || '').trim()
+  if (!id || id === '0' || id === 'undefined' || id === 'null') {
+    return Promise.reject(new Error('愿望单ID无效'))
+  }
   return api.request({
-    url: `/api/wishlists/${wishlistId}/status`,
+    url: `/api/wishlists/${id}/status`,
     method: 'PATCH',
     data: { status: newStatus }
   })
@@ -212,30 +220,33 @@ function watchNewOrders(onChange) {
   )
 }
 
-function watchWishlistDetail(wishlistId, role, onChange) {
+function watchWishlistDetail(wishlistId, role, onChange, onError) {
   return createPollWatcher(
     () => getWishlistDetail(wishlistId, role),
     (res) => res && res.wishlist ? res.wishlist : null,
     onChange,
-    '监听愿望进度失败'
+    '监听愿望进度失败',
+    onError
   )
 }
 
-function watchWishlist(role, onChange) {
+function watchWishlist(role, onChange, onError, status = '', pageSize = 20) {
   return createPollWatcher(
-    () => getWishlist(role, '', 1, 50),
+    () => getWishlist(role, status, 1, pageSize),
     (res) => res && res.wishlists ? res.wishlists : [],
     onChange,
-    '监听愿望单失败'
+    '监听愿望单失败',
+    onError
   )
 }
 
-function watchFoodRecords(type, onChange) {
+function watchFoodRecords(type, onChange, onError) {
   return createPollWatcher(
     () => getFoodRecords(type),
     (res) => res && res.records ? res.records : [],
     onChange,
-    '监听饮食记录失败'
+    '监听饮食记录失败',
+    onError
   )
 }
 
@@ -250,7 +261,7 @@ function uploadImage(filePath, _cloudPath, options) {
   return upload.uploadImage(filePath, options)
 }
 
-function createPollWatcher(fetcher, formatter, onChange, errorLabel) {
+function createPollWatcher(fetcher, formatter, onChange, errorLabel, onError) {
   let closed = false
   let timer = null
   let lastValue = ''
@@ -260,14 +271,17 @@ function createPollWatcher(fetcher, formatter, onChange, errorLabel) {
       .then((res) => {
         if (closed) return
         const value = formatter(res)
-        const serialized = JSON.stringify(value || null)
+        const serialized = JSON.stringify(res || null)
         if (serialized !== lastValue) {
           lastValue = serialized
-          onChange(value)
+          onChange(value, res)
         }
       })
       .catch((err) => {
+        if (closed) return
+        lastValue = ''
         console.error(errorLabel, err)
+        if (onError) onError(err)
       })
       .finally(() => {
         if (!closed) {
@@ -293,6 +307,7 @@ module.exports = {
   _,
   collections,
   getUserInfo,
+  updateUserInfo,
   getCategories,
   getMenu,
   getDishDetail,

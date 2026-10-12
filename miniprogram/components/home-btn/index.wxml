@@ -1,3 +1,1 @@
-<view class="home-btn" bindtap="goHome">
-  <text class="home-icon">⌂</text>
-</view>
+<button class="home-btn" bindtap="goHome" aria-label="返回首页"><image class="home-icon" src="/images/cartoon/star.svg" mode="aspectFit" /></button>

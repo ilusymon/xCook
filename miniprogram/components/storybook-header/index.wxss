@@ -1,0 +1,15 @@
+@import '../../styles/button-reset.wxss';
+:host { display: block; }
+.storybook-header { background: #FFF9EA; color: #593B30; }
+.brand-navigation { position: relative; }
+.brand { position: absolute; left: 28rpx; margin: 0; padding: 0; display: flex; align-items: center; gap: 8rpx; background: transparent; color: #593B30; font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 38rpx; line-height: 1; }
+.brand::after, .search::after { border: 0; }
+.brand image { width: 56rpx; height: 56rpx; }
+.search { position: absolute; margin: 0; padding: 0 16rpx; display: flex; align-items: center; background: transparent; }
+.search image { width: 38rpx; height: 38rpx; }
+.scene { height: 416rpx; position: relative; overflow: hidden; }
+.scene.compact { height: 320rpx; }
+.scene-image { width: 100%; height: 100%; }
+.scene-copy { position: absolute; top: 10rpx; left: 24rpx; right: 24rpx; display: flex; flex-direction: column; align-items: center; gap: 10rpx; text-align: center; }
+.title { font-family: 'XCookHand', 'YouYuan', sans-serif; font-size: 54rpx; line-height: 1.25; }
+.subtitle { font-size: 24rpx; line-height: 1.5; }

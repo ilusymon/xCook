@@ -1,4 +1,6 @@
 {
-  "navigationStyle": "custom",
-  "navigationBarTitleText": "愿望进度"
+  "navigationBarTitleText": "愿望进度",
+  "usingComponents": {
+    "dish-art": "/components/dish-art/index"
+  }
 }

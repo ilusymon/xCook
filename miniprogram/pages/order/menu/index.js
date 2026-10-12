@@ -1,159 +1,95 @@
 const app = getApp()
 const cloud = require('../../../utils/cloud')
+const { formatCartItem } = require('../../../utils/format')
 
-const CATEGORY_ICONS = {
-  meat: '/images/menu/06_category_snack.png',
-  vegetable: '/images/menu/04_category_recommended.png',
-  soup: '/images/menu/04_category_recommended.png',
-  staple: '/images/menu/05_category_main.png',
-  main: '/images/menu/05_category_main.png',
-  snack: '/images/menu/06_category_snack.png',
-  dessert: '/images/menu/08_category_dessert.png',
-  drink: '/images/menu/07_category_drink.png',
-  default: '/images/menu/04_category_recommended.png'
-}
-
-const CATEGORY_ICON_FALLBACKS = [
-  '/images/menu/04_category_recommended.png',
-  '/images/menu/05_category_main.png',
-  '/images/menu/06_category_snack.png',
-  '/images/menu/07_category_drink.png',
-  '/images/menu/08_category_dessert.png'
-]
-
-const DISH_ART_FALLBACKS = [
-  { image: '/images/menu/09_dish_pasta.png', artWidth: 142, artHeight: 98 },
-  { image: '/images/menu/10_dish_rice.png', artWidth: 134, artHeight: 101 },
-  { image: '/images/menu/11_dish_burger.png', artWidth: 110, artHeight: 112 },
-  { image: '/images/menu/12_dish_fried_chicken.png', artWidth: 126, artHeight: 108 },
-  { image: '/images/menu/13_dish_bubble_tea.png', artWidth: 87, artHeight: 123 },
-  { image: '/images/menu/14_dish_cake.png', artWidth: 128, artHeight: 100 }
-]
-
-const BOTTOM_NAVIGATION = [
-  { key: 'menu', label: '菜单', icon: '/images/menu/17_nav_menu.png', iconWidth: 53, iconHeight: 50 },
-  { key: 'wishlist', label: '愿望单', icon: '/images/menu/20_nav_wishlist.png', iconWidth: 52, iconHeight: 49 },
-  { key: 'record', label: '记录', icon: '/images/menu/18_nav_record.png', iconWidth: 51, iconHeight: 50 },
-  { key: 'profile', label: '我的', icon: '/images/menu/19_nav_profile.png', iconWidth: 48, iconHeight: 41 }
-]
-
-function decorateCategory(category, index) {
-  const iconKey = category.icon || 'default'
-  const icon = CATEGORY_ICONS[iconKey] ||
-    (String(iconKey).startsWith('/') ? iconKey : CATEGORY_ICON_FALLBACKS[index % CATEGORY_ICON_FALLBACKS.length])
-  return Object.assign({}, category, {
-    _id: String(category._id),
-    icon
-  })
-}
-
-function decorateDish(dish, index, cart) {
-  const fallback = DISH_ART_FALLBACKS[index % DISH_ART_FALLBACKS.length]
-  const cartItem = cart.find(item => String(item.dishId) === String(dish._id))
-  return Object.assign({}, dish, {
-    _id: String(dish._id),
-    categoryId: String(dish.categoryId),
-    image: dish.coverImage || fallback.image,
-    artWidth: dish.coverImage ? 132 : fallback.artWidth,
-    artHeight: dish.coverImage ? 108 : fallback.artHeight,
-    quantity: cartItem ? cartItem.quantity : 0
-  })
+function decorateDish(dish, cart) {
+  const quantity = cart.filter(item => String(item.dishId) === String(dish._id))
+    .reduce((total, item) => total + item.quantity, 0)
+  return { ...dish, _id: String(dish._id), categoryId: String(dish.categoryId), quantity }
 }
 
 function buildDishSections(categories, dishes) {
   return categories.map(category => ({
-    categoryId: category._id,
-    categoryName: category.name,
+    categoryId: category._id, categoryName: category.name,
     dishes: dishes.filter(dish => dish.categoryId === category._id)
-  }))
-}
-
-function summarizeDishes(dishes) {
-  return dishes.reduce((summary, dish) => {
-    summary.totalCount += dish.quantity
-    summary.totalCalories += Number(dish.calories || 0) * dish.quantity
-    return summary
-  }, { totalCount: 0, totalCalories: 0 })
-}
-
-function getSelectedDishes(dishes) {
-  return dishes.filter(dish => dish.quantity > 0)
+  })).filter(section => section.dishes.length)
 }
 
 function getCartPanelHeight(selectedDishes) {
-  return 84 + Math.min(selectedDishes.length, 3) * 116
+  return 88 + Math.min(selectedDishes.length, 3) * 128
 }
 
 Page({
   data: {
-    statusBarHeight: 20,
-    navigationHeight: 64,
-    navigationContentTop: 20,
-    navigationContentHeight: 44,
     categories: [],
     dishes: [],
     dishSections: [],
-    bottomNavigation: BOTTOM_NAVIGATION,
-    layoutMode: 'split',
     currentCategory: 0,
-    categoryTrackWidth: 0,
     categoryScrollTo: '',
-    scrollToView: '',
+    dishScrollTo: '',
     loading: true,
+    error: '',
+    searchVisible: false,
+    keyword: '',
     selectedDishes: [],
     cartPanelVisible: false,
     cartPanelHeight: 84,
     cartSummary: { totalCount: 0, totalCalories: 0 }
   },
 
-  onLoad() {
-    this.setupNavigation()
-  },
-
-  setupNavigation() {
-    try {
-      const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
-      const menuButton = wx.getMenuButtonBoundingClientRect ? wx.getMenuButtonBoundingClientRect() : null
-      const statusBarHeight = windowInfo.statusBarHeight || 20
-      const contentTop = menuButton && menuButton.top ? menuButton.top : statusBarHeight + 6
-      const contentHeight = menuButton && menuButton.height ? menuButton.height : 32
-      const navigationHeight = contentTop + contentHeight + Math.max(contentTop - statusBarHeight, 6)
-
-      this.setData({
-        statusBarHeight,
-        navigationHeight,
-        navigationContentTop: contentTop,
-        navigationContentHeight: contentHeight
-      })
-    } catch (e) {
-      // 保留默认导航尺寸，兼容较低版本基础库。
-    }
-  },
-
   goHome() {
     wx.reLaunch({ url: '/pages/index/index' })
   },
 
-  toggleLayout() {
-    const layoutMode = this.data.layoutMode === 'split' ? 'tabs' : 'split'
-    const category = this.data.categories[this.data.currentCategory]
-    const targetView = category ? `dish-section-${category._id}` : ''
-    this._tapping = true
-    this._sectionOffsets = null
-
-    this.setData({ layoutMode, scrollToView: '' }, () => {
-      this.setData({ scrollToView: targetView }, () => {
-        setTimeout(() => {
-          this.cacheSectionOffsets()
-          this._tapping = false
-        }, 80)
-      })
-    })
+  onShow() {
+    if (app.globalData.searchMenu) {
+      this.setData({ searchVisible: true })
+      app.globalData.searchMenu = false
+    }
+    this.hideNativeTabBar()
+    this.refreshCart()
+    this.loadMenuData()
   },
 
-  onShow() {
-    this.hideNativeTabBar()
-    this.loadMenuData()
+  onUnload() {
+    this._menuRequestId = null
+    this._sectionQueryId = null
+    this.onDishTouchStart()
+    this._sectionOffsets = []
+  },
+
+  onHide() {
+    this._sectionQueryId = null
+    this.onDishTouchStart()
+  },
+
+  onResize() {
+    this.measureDishSections()
+  },
+
+  toggleSearch() {
+    this.setData({ searchVisible: !this.data.searchVisible }, () => this.measureDishSections())
+  },
+
+  onSearchInput(e) {
+    this.setData({ keyword: e.detail.value })
+    this.filterDishes(true)
+  },
+
+  filterDishes(resetScroll = false) {
+    const keyword = this.data.keyword.trim().toLowerCase()
+    const dishes = this.data.dishes.filter(dish =>
+      `${dish.name} ${dish.description || ''}`.toLowerCase().includes(keyword)
+    )
+    this._sectionOffsets = []
+    if (resetScroll) {
+      this.onDishTouchStart()
+      this.setData({ dishScrollTo: '' })
+    }
+    this.setData({ dishSections: buildDishSections(this.data.categories, dishes) }, () => {
+      if (resetScroll) this.setData({ dishScrollTo: 'dish-list-top' }, () => this.measureDishSections())
+      else this.measureDishSections()
+    })
   },
 
   hideNativeTabBar() {
@@ -161,71 +97,51 @@ Page({
     wx.hideTabBar({ animation: false })
   },
 
-  onBottomNavTap(e) {
-    const key = e.currentTarget.dataset.key
-    if (key === 'menu') return
-
-    if (key === 'wishlist') {
-      app.globalData.wishlistRole = 'orderer'
-      wx.switchTab({ url: '/pages/order/wishlist/index' })
-      return
-    }
-    if (key === 'record') {
-      wx.switchTab({ url: '/pages/order/records/index' })
-      return
-    }
-    if (key === 'profile') wx.switchTab({ url: '/pages/profile/index' })
-  },
 
   loadMenuData() {
     const requestId = Date.now()
     this._menuRequestId = requestId
-    this.setData({ loading: true })
+    this.setData({ loading: true, error: '' })
 
     cloud.getMenu()
       .then(menuResponse => {
         if (this._menuRequestId !== requestId) return
 
-        const categories = ((menuResponse && menuResponse.categories) || []).map(decorateCategory)
+        const previousCategory = this.data.categories[this.data.currentCategory]
+        const categories = ((menuResponse && menuResponse.categories) || []).map(category => ({ ...category, _id: String(category._id) }))
         const menuDishMap = (menuResponse && menuResponse.dishes) || {}
         const cart = app.globalData.cart || []
         const dishes = []
-        let dishIndex = 0
 
         categories.forEach(category => {
           const categoryDishes = menuDishMap[category._id] || []
           categoryDishes.forEach(dish => {
-            dishes.push(decorateDish(dish, dishIndex, cart))
-            dishIndex += 1
+            dishes.push(decorateDish(dish, cart))
           })
         })
 
         const dishSections = buildDishSections(categories, dishes)
-        const cartSummary = summarizeDishes(dishes)
-        const selectedDishes = getSelectedDishes(dishes)
+        const cartSummary = app.getCartSummary()
+        const selectedDishes = cart.map(formatCartItem)
 
         this.setData({
           categories,
           dishes,
           dishSections,
-          currentCategory: 0,
-          categoryTrackWidth: categories.length * 134,
-          categoryScrollTo: categories[0] ? `side_${categories[0]._id}` : '',
-          scrollToView: '',
+          currentCategory: Math.max(0, previousCategory ? categories.findIndex(category => category._id === previousCategory._id) : 0),
           loading: false,
           selectedDishes,
           cartPanelVisible: false,
           cartPanelHeight: getCartPanelHeight(selectedDishes),
           cartSummary
         }, () => {
-          setTimeout(() => this.cacheSectionOffsets(), 80)
+          this.filterDishes()
         })
       })
       .catch(err => {
         if (this._menuRequestId !== requestId) return
         console.error('加载分类和菜单失败', err)
-        this.setData({ loading: false })
-        wx.showToast({ title: '菜单加载失败', icon: 'none' })
+        this.setData({ loading: false, error: err.message || '菜单加载失败，请重试' })
       })
   },
 
@@ -233,50 +149,85 @@ Page({
     const index = Number(e.currentTarget.dataset.index)
     const category = this.data.categories[index]
     if (!category) return
-
-    const targetView = `dish-section-${category._id}`
-    this._tapping = true
-
-    if (this.data.scrollToView === targetView) {
-      this.setData({
-        currentCategory: index,
-        categoryScrollTo: `side_${category._id}`,
-        scrollToView: ''
-      }, () => this.setData({ scrollToView: targetView }))
-    } else {
-      this.setData({
-        currentCategory: index,
-        categoryScrollTo: `side_${category._id}`,
-        scrollToView: targetView
-      })
+    if (!this.data.dishSections.some(section => section.categoryId === category._id)) {
+      wx.showToast({ title: this.data.keyword ? '这个分类没有匹配结果' : '这个分类暂时没有菜品', icon: 'none' })
+      return
     }
+    clearTimeout(this._categoryJumpTimer)
+    this._categoryJump = true
+    this.setData({ currentCategory: index, categoryScrollTo: `category-${category._id}`, dishScrollTo: '' }, () => {
+      this.setData({ dishScrollTo: `dish-section-${category._id}` })
+      this._categoryJumpTimer = setTimeout(() => { this._categoryJump = false }, 200)
+    })
+  },
 
-    setTimeout(() => {
-      this._tapping = false
-    }, 450)
+  measureDishSections() {
+    const queryId = this._sectionQueryId = {}
+    const sections = this.data.dishSections
+    this.createSelectorQuery().select('.dish-list').boundingClientRect()
+      .select('.dish-list').scrollOffset().selectAll('.dish-section').boundingClientRect()
+      .exec(([list, scroll, rects]) => {
+        if (queryId !== this._sectionQueryId || sections !== this.data.dishSections || !list || !scroll || !rects || rects.length !== sections.length) return
+        this._dishListHeight = list.height
+        this._sectionOffsets = rects.map((rect, index) => ({
+          top: rect.top - list.top + scroll.scrollTop, categoryId: sections[index].categoryId
+        }))
+        this.focusVisibleCategory(scroll.scrollTop, scroll.scrollHeight)
+      })
+  },
+
+  onDishTouchStart() {
+    clearTimeout(this._categoryJumpTimer)
+    this._categoryJump = false
+  },
+
+  onDishScroll(e) {
+    this.focusVisibleCategory(e.detail.scrollTop, e.detail.scrollHeight)
+  },
+
+  focusVisibleCategory(scrollTop, scrollHeight) {
+    const offsets = this._sectionOffsets || []
+    if (this._categoryJump || !offsets.length) return
+    let section = offsets[0]
+    for (const offset of offsets) {
+      if (offset.top > scrollTop + 8) break
+      section = offset
+    }
+    if (scrollTop > 0 && scrollTop + this._dishListHeight >= scrollHeight - 2) section = offsets[offsets.length - 1]
+    const index = this.data.categories.findIndex(category => category._id === section.categoryId)
+    if (index >= 0 && index !== this.data.currentCategory) {
+      this.setData({ currentCategory: index, categoryScrollTo: `category-${section.categoryId}` })
+    }
   },
 
   onQuantityTap(e) {
     const id = String(e.currentTarget.dataset.id)
     const delta = Number(e.currentTarget.dataset.delta)
-    const dishes = this.data.dishes.map(dish => {
-      if (dish._id !== id) return dish
-      return Object.assign({}, dish, {
-        quantity: Math.max(0, Math.min(9, dish.quantity + delta))
-      })
-    })
-    const dishSections = buildDishSections(this.data.categories, dishes)
-    const cartSummary = summarizeDishes(dishes)
-    const selectedDishes = getSelectedDishes(dishes)
-
-    this.setData({
-      dishes,
-      dishSections,
-      selectedDishes,
-      cartPanelVisible: selectedDishes.length > 0 && this.data.cartPanelVisible,
-      cartPanelHeight: getCartPanelHeight(selectedDishes),
-      cartSummary
-    })
+    const cartId = e.currentTarget.dataset.cartId
+    if (cartId) {
+      const item = app.globalData.cart.find(item => item.cartItemId === cartId)
+      if (item) app.updateCartItemQuantity(cartId, item.quantity + delta)
+    } else {
+      const dish = this.data.dishes.find(dish => dish._id === id)
+      if (!dish) return
+      if (delta > 0) {
+        if ((dish.optionGroups || []).length) {
+          this.openDish(id)
+          return
+        }
+        try {
+          app.addToCart({ dishId: dish._id, dishName: dish.name, coverImage: dish.coverImage,
+            calories: dish.calories, quantity: 1, selectedOptions: {} })
+        } catch (err) {
+          wx.showToast({ title: err.message, icon: 'none' })
+          return
+        }
+      } else {
+        const item = [...app.globalData.cart].reverse().find(item => String(item.dishId) === id)
+        if (item) app.updateCartItemQuantity(item.cartItemId, item.quantity - 1)
+      }
+    }
+    this.refreshCart()
   },
 
   toggleCartPanel() {
@@ -297,105 +248,32 @@ Page({
       return
     }
 
-    const currentCart = app.globalData.cart || []
-    const selectedItems = this.data.dishes
-      .filter(dish => dish.quantity > 0)
-      .map(dish => {
-        const existing = currentCart.find(item => String(item.dishId) === dish._id)
-        return {
-          cartItemId: existing ? existing.cartItemId : app.generateId(),
-          dishId: dish._id,
-          dishName: dish.name,
-          coverImage: dish.image,
-          calories: dish.calories,
-          quantity: dish.quantity,
-          selectedOptions: {}
-        }
-      })
-
-    app.saveCart(selectedItems)
     wx.navigateTo({ url: '/package-order/pages/checkout/index' })
   },
 
   onDishTap(e) {
-    const { dish } = e.detail
-    wx.navigateTo({
-      url: `/package-order/pages/dish-detail/index?id=${dish._id}`
-    })
+    this.openDish(e.currentTarget.dataset.id)
   },
 
-  onDishAdd(e) {
-    const { dish } = e.detail
-    // 如果菜品没有选项组，直接加入购物车
-    if (!dish.optionGroups || dish.optionGroups.length === 0) {
-      const cartItem = {
-        dishId: dish._id,
-        dishName: dish.name,
-        coverImage: dish.coverImage,
-        calories: dish.calories,
-        quantity: 1,
-        selectedOptions: {}
-      }
-      app.addToCart(cartItem)
-      this.refreshCart()
-      wx.showToast({ title: '已加入购物车', icon: 'success' })
-    } else {
-      // 有选项的跳详情页
-      wx.navigateTo({
-        url: `/package-order/pages/dish-detail/index?id=${dish._id}`
-      })
-    }
+  openDish(id) {
+    wx.navigateTo({ url: `/package-order/pages/dish-detail/index?id=${id}` })
+  },
+
+  goCart() {
+    wx.navigateTo({ url: '/pages/order/cart/index' })
+  },
+
+  goChef() {
+    wx.navigateTo({ url: '/pages/chef/dashboard/index' })
   },
 
   refreshCart() {
-    const summary = app.getCartSummary()
-    this.setData({ cartSummary: summary })
-  },
-
-  /* ---- 锚点偏移量驱动的滚动联动 ---- */
-
-  cacheSectionOffsets() {
-    this.createSelectorQuery()
-      .selectAll('.dish-section')
-      .boundingClientRect()
-      .select('.dish-list')
-      .boundingClientRect()
-      .select('.dish-list')
-      .scrollOffset()
-      .exec(res => {
-        const sections = res[0]
-        const container = res[1]
-        const scroll = res[2]
-        if (!sections || !sections.length || !container || !scroll) return
-        // 绝对偏移量 = 视口相对位置差 + 当前滚动距离
-        const st = scroll.scrollTop
-        this._sectionOffsets = sections.map(s => s.top - container.top + st)
-        this._dishListHeight = container.height
-      })
-  },
-
-  onDishScroll(e) {
-    if (this._tapping || !this._sectionOffsets) return
-    if (this._scrollTimer) return
-    this._scrollTimer = setTimeout(() => {
-      this._scrollTimer = null
-      const scrollTop = e.detail.scrollTop
-      let current = 0
-      for (let i = 0; i < this._sectionOffsets.length; i++) {
-        if (this._sectionOffsets[i] <= scrollTop + 12) {
-          current = i
-        }
-      }
-      if (this._dishListHeight && scrollTop + this._dishListHeight >= e.detail.scrollHeight - 3) {
-        current = this._sectionOffsets.length - 1
-      }
-      if (current !== this.data.currentCategory) {
-        const cat = this.data.categories[current]
-        this.setData({
-          currentCategory: current,
-          categoryScrollTo: cat ? 'side_' + cat._id : ''
-        })
-      }
-    }, 50)
+    const cart = app.globalData.cart
+    const dishes = this.data.dishes.map(dish => decorateDish(dish, cart))
+    const selectedDishes = cart.map(formatCartItem)
+    this.setData({ dishes, cartSummary: app.getCartSummary(), selectedDishes,
+      cartPanelVisible: selectedDishes.length > 0 && this.data.cartPanelVisible,
+      cartPanelHeight: getCartPanelHeight(selectedDishes) })
+    this.filterDishes()
   }
 })
