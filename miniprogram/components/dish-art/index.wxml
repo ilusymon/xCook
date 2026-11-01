@@ -1,5 +1,5 @@
 <view class="art">
   <image wx:if="{{coverImage && !failed}}" class="photo" src="{{coverImage}}" mode="{{mode}}" binderror="imageError" aria-label="{{dishName}}" />
-  <image wx:elif="{{artIndex >= 0}}" class="atlas" style="left: {{-artIndex * 100}}%;" src="/images/cartoon/food-atlas.jpg" mode="scaleToFill" aria-label="{{dishName}}插画" />
+  <image wx:elif="{{artIndex >= 0}}" class="atlas" style="left: {{-artIndex * 100}}%;" src="/images/cartoon/food-atlas.png" mode="scaleToFill" aria-label="{{dishName}}插画" />
   <image wx:else class="placeholder" src="/images/cartoon/plate.svg" mode="aspectFit" aria-label="菜品待添加图片" />
 </view>

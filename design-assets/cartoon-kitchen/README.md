@@ -40,10 +40,10 @@
 | menu-hero.jpg | 两人做饭，上方留出标题空间 | 1672 × 941 |
 | wishlist-hero.jpg | 女孩递心愿纸条 | 1672 × 941 |
 | chef-hero.jpg | 小厨师与蓝色汤锅 | 1672 × 941 |
-| food-atlas.jpg | 牛腩、厚蛋烧、排骨汤三格横向图集 | 2172 × 724 |
-| tools-atlas.jpg | 菜品、添加、分类、愿望四格图集 | 1254 × 1254 |
+| food-atlas.png | 透明底牛腩、厚蛋烧、排骨汤三格横向图集 | 1152 × 384 |
+| tools-atlas.png | 透明底菜品、添加、分类、愿望四格图集 | 512 × 512 |
 
-运行 JPEG 位于 miniprogram/images/cartoon/，质量 82 编码，未裁切或缩放；PNG 原件保留在 sources/。图集以原生 image 的宽高与位置截取展示。旧人物、格纹、菜品和加载动图移至 legacy/，原文件可恢复。设计目录不进入小程序包。
+运行素材位于 miniprogram/images/cartoon/。头图仍使用质量 82 的 JPEG；两份图集在 2026-10-15 使用内置 imagegen 去除奶油色背景，保留真实 Alpha 通道，再按上表尺寸缩小并无损 PNG 编码。原始 PNG 和新增的 *-atlas-transparent.png 去底原图保留在 sources/；完整去底提示词记录在 generation-prompts.json。图集以原生 image 的宽高与位置截取展示，dish-art 容器不再填充底色，让插画透出所在卡片的颜色。旧人物、格纹、菜品和加载动图移至 legacy/，原文件可恢复。设计目录不进入小程序包。
 
 标题采用 [Google Fonts 的 ZCOOL KuaiLe](https://github.com/google/fonts/tree/main/ofl/zcoolkuaile)，按 SIL OFL 1.1 分发。完整许可证随包保存在 miniprogram/fonts/OFL-ZCOOL.txt；完整 TTF 与 WOFF2 子集位于 sources/。发布样式嵌入子集，未收录的动态菜名使用系统字体回退。
 
